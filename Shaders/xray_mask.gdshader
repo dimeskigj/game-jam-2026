@@ -19,9 +19,9 @@ void fragment() {
     color *= smoothstep(0.8, 0.4, d * (1.0 + color.g * 0.2));
     
     // Boost Green channel
-    color.g = color.g * 1.2;
+    color.g = 0.8;
     color.r *= 0.8;
-    color.b *= 0.8;
+    color.b *= color.b * 1.1;
     
-    COLOR = vec4(color, 1.0);
+    COLOR = vec4(color, 0.5);
 }

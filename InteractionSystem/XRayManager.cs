@@ -22,25 +22,21 @@ public partial class XRayManager : Node
         
         foreach (var node in nodes)
         {
-            if (node is MeshInstance3D meshInstance)
+            // 1. Apply to the node itself if it's a visual
+            if (node is GeometryInstance3D geoInstance)
             {
-                if (enabled)
-                {
-                    meshInstance.MaterialOverlay = XRayOverlayMaterial;
-                }
-                else
-                {
-                    meshInstance.MaterialOverlay = null;
-                }
+                geoInstance.MaterialOverlay = enabled ? XRayOverlayMaterial : null;
             }
-            // Logic for Pickups inheriting MeshInstance or having one
-            else if (node is Node n)
+            
+            // 2. ALSO check for common child visuals (common in simple prefabs/pickups)
+            // This handles the case where the parent is a container (Node3D or empty MeshInstance)
+            var childVis = node.GetNodeOrNull<GeometryInstance3D>("Mesh") 
+                        ?? node.GetNodeOrNull<GeometryInstance3D>("Visual") 
+                        ?? node.GetNodeOrNull<GeometryInstance3D>("MeshInstance3D");
+           
+            if (childVis != null && childVis != node) // Ensure we don't double set if named same
             {
-               var mesh = n.GetNodeOrNull<MeshInstance3D>("MeshInstance3D");
-               if (mesh != null)
-               {
-                    mesh.MaterialOverlay = enabled ? XRayOverlayMaterial : null;
-               }
+                childVis.MaterialOverlay = enabled ? XRayOverlayMaterial : null;
             }
         }
     }

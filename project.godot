@@ -11,13 +11,17 @@ config_version=5
 [application]
 
 config/name="game-jam-2026"
-config/features=PackedStringArray("4.6", "Forward Plus")
-config/icon="res://icon.svg"
 run/main_scene="res://node_3d.tscn"
+config/features=PackedStringArray("4.6", "C#", "Forward Plus")
+config/icon="res://icon.svg"
 
 [dotnet]
 
 project/assembly_name="game-jam-2026"
+
+[filesystem]
+
+import/blender/enabled=false
 
 [physics]
 

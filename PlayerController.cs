@@ -19,10 +19,17 @@ public partial class PlayerController : CharacterBody3D
 
 	public float gravity = ProjectSettings.GetSetting("physics/3d/default_gravity").AsSingle();
 
+	public MaskEffect CurrentMaskEffect { get; private set; } = MaskEffect.None;
+
 	private Camera3D _camera;
 	private RayCast3D _interactionRay;
 	private Inventory _inventory;
 	private PlayerInput _input;
+	
+	// Mask Visuals
+	private ColorRect _gasMaskOverlay;
+	private ColorRect _xRayOverlay;
+	private XRayManager _xRayManager;
 
 	private RigidBody3D _heldBody;
 
@@ -33,14 +40,66 @@ public partial class PlayerController : CharacterBody3D
 		_interactionRay = _camera.GetNode<RayCast3D>("RayCast3D");
 		_inventory = GetNode<Inventory>("Inventory");
 		_input = GetNode<PlayerInput>("PlayerInput");
+		
+		// Find Overlay Rects (Assuming they will be added to UI)
+		_gasMaskOverlay = GetNode<ColorRect>("../UI/GasMaskOverlay");
+		_xRayOverlay = GetNode<ColorRect>("../UI/XRayOverlay");
+		_xRayManager = GetNode<XRayManager>("../XRayManager");
 
 		// Connect Signals
 		_input.LookInput += OnLookInput;
 		_input.ToggleMouseCapture += OnToggleMouseCapture;
 		_input.Interact += OnInteract;
-		_input.UseItem += OnUseItem;
+		_input.UseItem += OnUseItem; // Consuming/Generic usage (E key)
 		_input.SlotSelected += OnSlotSelected;
 		_input.ScrollSlot += OnScrollSlot;
+		
+		_inventory.ItemUsed += OnInventoryItemUsed;
+	}
+	
+	private void OnInventoryItemUsed(InventoryItem item)
+	{
+		if (item.Type == ItemType.Mask)
+		{
+			// Toggle or Swap?
+			if (CurrentMaskEffect == item.Effect)
+			{
+				UnequipMask();
+			}
+			else
+			{
+				EquipMask(item.Effect);
+			}
+		}
+	}
+
+	public void EquipMask(MaskEffect effect)
+	{
+		UnequipMask(); // Clear current first
+		CurrentMaskEffect = effect;
+		GD.Print($"Equipped Mask: {effect}");
+		
+		if (effect == MaskEffect.Gas)
+		{
+			_gasMaskOverlay.Visible = true;
+		}
+		else if (effect == MaskEffect.XRay)
+		{
+			_xRayOverlay.Visible = true;
+			_xRayManager.ToggleXRay(true);
+		}
+	}
+
+	public void UnequipMask()
+	{
+		if (CurrentMaskEffect == MaskEffect.XRay)
+		{
+			_xRayManager.ToggleXRay(false);
+		}
+		
+		CurrentMaskEffect = MaskEffect.None;
+		_gasMaskOverlay.Visible = false;
+		_xRayOverlay.Visible = false;
 	}
 
 	public override void _PhysicsProcess(double delta)

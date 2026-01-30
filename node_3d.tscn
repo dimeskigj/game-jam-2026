@@ -10,6 +10,12 @@
 [ext_resource type="Resource" path="res://InventorySystem/item_potion.tres" id="7_potion"]
 [ext_resource type="Resource" path="res://InventorySystem/item_key.tres" id="8_key"]
 [ext_resource type="Script" uid="uid://cr346gptxty8" path="res://InteractionSystem/Door.cs" id="9_door"]
+[ext_resource type="Script" path="res://InteractionSystem/XRayManager.cs" id="10_xray_mgr"]
+[ext_resource type="Script" path="res://InteractionSystem/RadioactiveZone.cs" id="11_rad_zone"]
+[ext_resource type="Resource" path="res://InventorySystem/item_mask_gas.tres" id="12_gas"]
+[ext_resource type="Resource" path="res://InventorySystem/item_mask_xray.tres" id="13_xray"]
+[ext_resource type="Shader" path="res://Shaders/gas_mask.gdshader" id="14_gas_shader"]
+[ext_resource type="Shader" path="res://Shaders/xray_mask.gdshader" id="15_xray_shader"]
 
 [sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_default"]
 panorama = ExtResource("3_sky_tex")
@@ -39,6 +45,27 @@ size = Vector3(0.5, 0.5, 0.5)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_door"]
 size = Vector3(2, 3, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_gas"]
+shader = ExtResource("14_gas_shader")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_xray"]
+shader = ExtResource("15_xray_shader")
+shader_parameter/scanline_count = 150.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xray_overlay"]
+transparency = 1
+no_depth_test = true
+albedo_color = Color(0, 1, 0, 0.5)
+emission_enabled = true
+emission = Color(0, 1, 0, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_radzone"]
+size = Vector3(10, 5, 10)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_radzone"]
+transparency = 1
+albedo_color = Color(0.2, 1, 0.2, 0.1)
 
 [node name="Node3D" type="Node3D" unique_id=1025875681]
 
@@ -246,6 +273,26 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(1, 0, 0, 1)
 
+[node name="GasMaskOverlay" type="ColorRect" parent="UI"]
+visible = false
+material = SubResource("ShaderMaterial_gas")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="XRayOverlay" type="ColorRect" parent="UI"]
+visible = false
+material = SubResource("ShaderMaterial_xray")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
 [node name="Target" type="CSGBox3D" parent="." unique_id=302556415]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -5)
 use_collision = true
@@ -297,3 +344,54 @@ material = SubResource("StandardMaterial3D_gold")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Door" unique_id=1971973663]
 shape = SubResource("BoxShape3D_door")
+
+[node name="XRayManager" type="Node" parent="."]
+script = ExtResource("10_xray_mgr")
+XRayOverlayMaterial = SubResource("StandardMaterial3D_xray_overlay")
+
+[node name="RadioactiveZone" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 2.5, 0)
+script = ExtResource("11_rad_zone")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RadioactiveZone"]
+shape = SubResource("BoxShape3D_radzone")
+
+[node name="Visual" type="CSGBox3D" parent="RadioactiveZone"]
+size = Vector3(10, 5, 10)
+material = SubResource("StandardMaterial3D_radzone")
+
+[node name="Pickup_GasMask" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 3)
+script = ExtResource("6_pickup")
+ItemResource = ExtResource("12_gas")
+
+[node name="MeshInstance3D" type="CSGBox3D" parent="Pickup_GasMask"]
+size = Vector3(0.4, 0.4, 0.4)
+material = SubResource("StandardMaterial3D_red")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_GasMask"]
+shape = SubResource("BoxShape3D_pickup")
+
+[node name="Pickup_XRayMask" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.5, 3)
+script = ExtResource("6_pickup")
+ItemResource = ExtResource("13_xray")
+
+[node name="MeshInstance3D" type="CSGBox3D" parent="Pickup_XRayMask"]
+size = Vector3(0.4, 0.4, 0.4)
+material = SubResource("StandardMaterial3D_gold")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_XRayMask"]
+shape = SubResource("BoxShape3D_pickup")
+
+[node name="WallHidingItem" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 1.5, 0)
+use_collision = true
+size = Vector3(1, 3, 5)
+
+[node name="HiddenItem" type="MeshInstance3D" parent="." groups=["XRayable"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 1.5, 0)
+
+[node name="Mesh" type="CSGBox3D" parent="HiddenItem"]
+size = Vector3(0.5, 0.5, 0.5)
+material = SubResource("StandardMaterial3D_gold")

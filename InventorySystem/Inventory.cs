@@ -11,6 +11,8 @@ public partial class Inventory : Node
 	public delegate void InventoryUpdatedEventHandler();
 	[Signal]
 	public delegate void SelectedSlotChangedEventHandler(int newSlot);
+	[Signal]
+	public delegate void ItemUsedEventHandler(InventoryItem item);
 
 	public bool AddItem(InventoryItem newItem)
 	{
@@ -54,28 +56,29 @@ public partial class Inventory : Node
 	public void UseCurrentItem()
 	{
 		InventoryItem item = items[selectedSlot];
-		if (item != null && item.Usable)
+		if (item != null)
 		{
-			GD.Print($"Used item: {item.Name}");
-			// Basic consumption logic
-			if (item.Stackable)
+			// Emit signal for external handling (e.g. Player equipping mask, drinking potion)
+			EmitSignal(SignalName.ItemUsed, item);
+
+			if (item.Usable && item.Type != ItemType.Mask)
 			{
-				item.CurrentStack--;
-				if (item.CurrentStack <= 0)
+				GD.Print($"Consumed item: {item.Name}");
+				// Basic consumption logic
+				if (item.Stackable)
+				{
+					item.CurrentStack--;
+					if (item.CurrentStack <= 0)
+					{
+						items[selectedSlot] = null;
+					}
+				}
+				else
 				{
 					items[selectedSlot] = null;
 				}
+				EmitSignal(SignalName.InventoryUpdated);
 			}
-			else
-			{
-				// Unstackables might not be consumed? Or maybe they are. Assuming consumed for now if usable.
-				items[selectedSlot] = null;
-			}
-			EmitSignal(SignalName.InventoryUpdated);
-		}
-		else
-		{
-			GD.Print("Nothing to use or item not usable.");
 		}
 	}
 }

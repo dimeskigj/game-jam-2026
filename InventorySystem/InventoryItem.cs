@@ -1,5 +1,8 @@
 using Godot;
 
+public enum ItemType { Generic, Mask }
+public enum MaskEffect { None, XRay, Gas }
+
 public partial class InventoryItem : Resource
 {
     [Export]
@@ -12,6 +15,11 @@ public partial class InventoryItem : Resource
     public int MaxStack { get; set; } = 64;
     [Export]
     public bool Usable { get; set; } = false;
+    
+    [Export]
+    public ItemType Type { get; set; } = ItemType.Generic;
+    [Export]
+    public MaskEffect Effect { get; set; } = MaskEffect.None;
 
     public int CurrentStack { get; set; } = 1;
 

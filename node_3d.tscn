@@ -1,13 +1,15 @@
 [gd_scene format=3 uid="uid://clsgsyq4e35in"]
 
-[ext_resource type="Script" uid="uid://bgakfbey5xyuf" path="res://BallController.cs" id="1_script"]
+[ext_resource type="Script" uid="uid://bugxpobj04nyw" path="res://PlayerInput.cs" id="1_input"]
+[ext_resource type="Script" uid="uid://6pc13djetn7y" path="res://PlayerController.cs" id="1_script"]
 [ext_resource type="Material" path="res://floor_material.tres" id="2_floor_mat"]
 [ext_resource type="Texture2D" uid="uid://8d0uj6envljt" path="res://textures/sky.exr" id="3_sky_tex"]
 [ext_resource type="Script" uid="uid://dne8d4vd2mkxf" path="res://InventorySystem/Inventory.cs" id="4_inventory"]
 [ext_resource type="Script" uid="uid://cx8x1mac1t274" path="res://InventorySystem/InventoryUI.cs" id="5_inventory_ui"]
-[ext_resource type="Script" uid="uid://s5h1endoulkn" path="res://InventorySystem/Pickup.cs" id="6_pickup"]
+[ext_resource type="Script" uid="uid://36lhpbg631ox" path="res://InteractionSystem/Pickup.cs" id="6_pickup"]
 [ext_resource type="Resource" path="res://InventorySystem/item_potion.tres" id="7_potion"]
 [ext_resource type="Resource" path="res://InventorySystem/item_key.tres" id="8_key"]
+[ext_resource type="Script" uid="uid://cr346gptxty8" path="res://InteractionSystem/Door.cs" id="9_door"]
 
 [sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_default"]
 panorama = ExtResource("3_sky_tex")
@@ -35,6 +37,9 @@ albedo_color = Color(1, 0.8, 0, 1)
 [sub_resource type="BoxShape3D" id="BoxShape3D_pickup"]
 size = Vector3(0.5, 0.5, 0.5)
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_door"]
+size = Vector3(2, 3, 1)
+
 [node name="Node3D" type="Node3D" unique_id=1025875681]
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1572345889]
@@ -53,6 +58,9 @@ material = ExtResource("2_floor_mat")
 [node name="Ball" type="CharacterBody3D" parent="." unique_id=1249645612]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 script = ExtResource("1_script")
+
+[node name="PlayerInput" type="Node" parent="Ball" unique_id=145355438]
+script = ExtResource("1_input")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Ball" unique_id=1419102380]
 shape = SubResource("SphereShape3D_ball")
@@ -242,7 +250,7 @@ color = Color(1, 0, 0, 1)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -5)
 use_collision = true
 
-[node name="Pickup_Potion1" type="Area3D" parent="." unique_id=1227574063]
+[node name="Pickup_Potion1" type="RigidBody3D" parent="." unique_id=1227574063]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.5, -3)
 script = ExtResource("6_pickup")
 ItemResource = ExtResource("7_potion")
@@ -254,7 +262,7 @@ material = SubResource("StandardMaterial3D_red")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_Potion1" unique_id=497447018]
 shape = SubResource("SphereShape3D_pickup")
 
-[node name="Pickup_Potion2" type="Area3D" parent="." unique_id=2081942578]
+[node name="Pickup_Potion2" type="RigidBody3D" parent="." unique_id=2081942578]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0.5, -3.5)
 script = ExtResource("6_pickup")
 ItemResource = ExtResource("7_potion")
@@ -266,7 +274,7 @@ material = SubResource("StandardMaterial3D_red")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_Potion2" unique_id=981769412]
 shape = SubResource("SphereShape3D_pickup")
 
-[node name="Pickup_Key" type="Area3D" parent="." unique_id=1181565980]
+[node name="Pickup_Key" type="RigidBody3D" parent="." unique_id=1181565980]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.5, -3)
 script = ExtResource("6_pickup")
 ItemResource = ExtResource("8_key")
@@ -277,3 +285,15 @@ material = SubResource("StandardMaterial3D_gold")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_Key" unique_id=1387910736]
 shape = SubResource("BoxShape3D_pickup")
+
+[node name="Door" type="StaticBody3D" parent="." unique_id=218706111]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.2, -4, 1.5, -4)
+script = ExtResource("9_door")
+
+[node name="MeshInstance3D" type="CSGBox3D" parent="Door" unique_id=1214367948]
+use_collision = true
+size = Vector3(2, 3, 1)
+material = SubResource("StandardMaterial3D_gold")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Door" unique_id=1971973663]
+shape = SubResource("BoxShape3D_door")

@@ -1,0 +1,34 @@
+[gd_scene load_steps=5 format=3 uid="uid://bvmujkt7g26vc"]
+
+[ext_resource type="Script" uid="uid://b6ve2oh4nyign" path="res://EnemyAI.cs" id="1_enemy"]
+[ext_resource type="PackedScene" uid="uid://b3bsawn2e6f8o" path="res://kit_player.glb" id="2_model"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_enemy"]
+radius = 0.4
+height = 1.8
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_vision"]
+points = PackedVector3Array(0, 0, 0, 8, 2, -12, -8, 2, -12, 8, -2, -12, -8, -2, -12)
+
+[node name="Enemy" type="CharacterBody3D" node_paths=PackedStringArray("Waypoints")]
+collision_layer = 4
+script = ExtResource("1_enemy")
+Waypoints = []
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_enemy")
+
+[node name="Model" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="kit_player" parent="Model" instance=ExtResource("2_model")]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
+
+[node name="VisionArea" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+collision_layer = 0
+collision_mask = 3
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="VisionArea"]
+shape = SubResource("ConvexPolygonShape3D_vision")

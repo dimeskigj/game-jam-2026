@@ -17,11 +17,15 @@ public partial class BallController : CharacterBody3D
 	public float gravity = ProjectSettings.GetSetting("physics/3d/default_gravity").AsSingle();
 
 	private Camera3D _camera;
+	private RayCast3D _interactionRay;
+	private Inventory _inventory;
 
 	public override void _Ready()
 	{
 		Input.MouseMode = Input.MouseModeEnum.Captured;
 		_camera = GetNode<Camera3D>("Camera3D");
+		_interactionRay = _camera.GetNode<RayCast3D>("RayCast3D");
+		_inventory = GetNode<Inventory>("Inventory");
 	}
 
 	public override void _Input(InputEvent @event)
@@ -39,7 +43,7 @@ public partial class BallController : CharacterBody3D
 			}
 		}
 		
-		// Setup mouse capture toggling
+		// Mouse Capture
 		if (Input.IsMouseButtonPressed(MouseButton.Left))
 		{
 			Input.MouseMode = Input.MouseModeEnum.Captured;
@@ -48,6 +52,36 @@ public partial class BallController : CharacterBody3D
 		{
 			Input.MouseMode = Input.MouseModeEnum.Visible;
 		}
+
+		// Inventory Interaction
+		if (Input.IsMouseButtonPressed(MouseButton.Right) && _interactionRay.IsColliding())
+		{
+			var collider = _interactionRay.GetCollider();
+			if (collider is Pickup pickup)
+			{
+				pickup.Interact(_inventory);
+			}
+			else if (collider is Node node && node.GetParent() is Pickup parentPickup)
+			{
+				// In case we hit a child of the pickup (like the mesh)
+				parentPickup.Interact(_inventory);
+			}
+		}
+
+		// Use Item
+		if (Input.IsKeyPressed(Key.E))
+		{
+			_inventory.UseCurrentItem();
+		}
+		
+		// Slot Selection (Numbers 1-8)
+		if (@event is InputEventKey keyEvent && keyEvent.Pressed)
+		{
+			if (keyEvent.Keycode >= Key.Key1 && keyEvent.Keycode <= Key.Key8)
+			{
+				_inventory.SelectSlot((int)(keyEvent.Keycode - Key.Key1));
+			}
+		} 
 	}
 
 	public override void _PhysicsProcess(double delta)

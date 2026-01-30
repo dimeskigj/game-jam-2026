@@ -1,8 +1,13 @@
-[gd_scene load_steps=6 format=3 uid="uid://clsgsyq4e35in"]
+[gd_scene format=3 uid="uid://clsgsyq4e35in"]
 
-[ext_resource type="Script" path="res://BallController.cs" id="1_script"]
+[ext_resource type="Script" uid="uid://bgakfbey5xyuf" path="res://BallController.cs" id="1_script"]
 [ext_resource type="Material" path="res://floor_material.tres" id="2_floor_mat"]
-[ext_resource type="Texture2D" path="res://textures/sky.exr" id="3_sky_tex"]
+[ext_resource type="Texture2D" uid="uid://8d0uj6envljt" path="res://textures/sky.exr" id="3_sky_tex"]
+[ext_resource type="Script" uid="uid://dne8d4vd2mkxf" path="res://InventorySystem/Inventory.cs" id="4_inventory"]
+[ext_resource type="Script" uid="uid://cx8x1mac1t274" path="res://InventorySystem/InventoryUI.cs" id="5_inventory_ui"]
+[ext_resource type="Script" uid="uid://s5h1endoulkn" path="res://InventorySystem/Pickup.cs" id="6_pickup"]
+[ext_resource type="Resource" path="res://InventorySystem/item_potion.tres" id="7_potion"]
+[ext_resource type="Resource" path="res://InventorySystem/item_key.tres" id="8_key"]
 
 [sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_default"]
 panorama = ExtResource("3_sky_tex")
@@ -17,39 +22,208 @@ tonemap_mode = 2
 glow_enabled = true
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_ball"]
-radius = 0.5
 
-[node name="Node3D" type="Node3D"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_red"]
+albedo_color = Color(1, 0.2, 0.2, 1)
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[sub_resource type="SphereShape3D" id="SphereShape3D_pickup"]
+radius = 0.3
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gold"]
+albedo_color = Color(1, 0.8, 0, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_pickup"]
+size = Vector3(0.5, 0.5, 0.5)
+
+[node name="Node3D" type="Node3D" unique_id=1025875681]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1572345889]
 environment = SubResource("Environment_default")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=2106531217]
 transform = Transform3D(-0.866023, -0.433016, 0.250001, 0, 0.499998, 0.866027, -0.500003, 0.749999, -0.43301, 0, 0, 0)
 shadow_enabled = true
 
-[node name="Floor" type="CSGBox3D" parent="."]
+[node name="Floor" type="CSGBox3D" parent="." unique_id=1229859552]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 use_collision = true
 size = Vector3(20, 1, 20)
 material = ExtResource("2_floor_mat")
 
-[node name="Ball" type="CharacterBody3D" parent="."]
+[node name="Ball" type="CharacterBody3D" parent="." unique_id=1249645612]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 script = ExtResource("1_script")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Ball"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ball" unique_id=1419102380]
 shape = SubResource("SphereShape3D_ball")
 
-[node name="MeshInstance3D" type="CSGSphere3D" parent="Ball"]
-radius = 0.5
+[node name="MeshInstance3D" type="CSGSphere3D" parent="Ball" unique_id=1333422521]
 
-[node name="Camera3D" type="Camera3D" parent="Ball"]
+[node name="Camera3D" type="Camera3D" parent="Ball" unique_id=1247597468]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 
-[node name="UI" type="CanvasLayer" parent="."]
+[node name="RayCast3D" type="RayCast3D" parent="Ball/Camera3D" unique_id=883531826]
+target_position = Vector3(0, 0, -3)
+collide_with_areas = true
 
-[node name="Crosshair" type="ColorRect" parent="UI"]
+[node name="Inventory" type="Node" parent="Ball" unique_id=2095621343]
+script = ExtResource("4_inventory")
+
+[node name="UI" type="CanvasLayer" parent="." unique_id=2005998870]
+script = ExtResource("5_inventory_ui")
+
+[node name="Control" type="Control" parent="UI" unique_id=1160298769]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GridContainer" type="GridContainer" parent="UI/Control" unique_id=751471897]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -200.0
+offset_top = -60.0
+offset_right = 200.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 0
+columns = 8
+
+[node name="Slot1" type="ColorRect" parent="UI/Control/GridContainer" unique_id=2013721968]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+color = Color(0.2, 0.2, 0.2, 0.8)
+
+[node name="Label" type="Label" parent="UI/Control/GridContainer/Slot1" unique_id=1850638493]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Slot2" type="ColorRect" parent="UI/Control/GridContainer" unique_id=889359463]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+color = Color(0.2, 0.2, 0.2, 0.8)
+
+[node name="Label" type="Label" parent="UI/Control/GridContainer/Slot2" unique_id=198238984]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Slot3" type="ColorRect" parent="UI/Control/GridContainer" unique_id=292027137]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+color = Color(0.2, 0.2, 0.2, 0.8)
+
+[node name="Label" type="Label" parent="UI/Control/GridContainer/Slot3" unique_id=1036987448]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Slot4" type="ColorRect" parent="UI/Control/GridContainer" unique_id=516472064]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+color = Color(0.2, 0.2, 0.2, 0.8)
+
+[node name="Label" type="Label" parent="UI/Control/GridContainer/Slot4" unique_id=60902637]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Slot5" type="ColorRect" parent="UI/Control/GridContainer" unique_id=454721777]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+color = Color(0.2, 0.2, 0.2, 0.8)
+
+[node name="Label" type="Label" parent="UI/Control/GridContainer/Slot5" unique_id=1336268451]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Slot6" type="ColorRect" parent="UI/Control/GridContainer" unique_id=1624942022]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+color = Color(0.2, 0.2, 0.2, 0.8)
+
+[node name="Label" type="Label" parent="UI/Control/GridContainer/Slot6" unique_id=1525462817]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Slot7" type="ColorRect" parent="UI/Control/GridContainer" unique_id=33963411]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+color = Color(0.2, 0.2, 0.2, 0.8)
+
+[node name="Label" type="Label" parent="UI/Control/GridContainer/Slot7" unique_id=1154777434]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Slot8" type="ColorRect" parent="UI/Control/GridContainer" unique_id=226407523]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+color = Color(0.2, 0.2, 0.2, 0.8)
+
+[node name="Label" type="Label" parent="UI/Control/GridContainer/Slot8" unique_id=43236677]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Crosshair" type="ColorRect" parent="UI" unique_id=180665215]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -64,8 +238,42 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(1, 0, 0, 1)
 
-[node name="Target" type="CSGBox3D" parent="."]
+[node name="Target" type="CSGBox3D" parent="." unique_id=302556415]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -5)
 use_collision = true
-size = Vector3(1, 1, 1)
 
+[node name="Pickup_Potion1" type="Area3D" parent="." unique_id=1227574063]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.5, -3)
+script = ExtResource("6_pickup")
+ItemResource = ExtResource("7_potion")
+
+[node name="MeshInstance3D" type="CSGSphere3D" parent="Pickup_Potion1" unique_id=2002314835]
+radius = 0.3
+material = SubResource("StandardMaterial3D_red")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_Potion1" unique_id=497447018]
+shape = SubResource("SphereShape3D_pickup")
+
+[node name="Pickup_Potion2" type="Area3D" parent="." unique_id=2081942578]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0.5, -3.5)
+script = ExtResource("6_pickup")
+ItemResource = ExtResource("7_potion")
+
+[node name="MeshInstance3D" type="CSGSphere3D" parent="Pickup_Potion2" unique_id=928566177]
+radius = 0.3
+material = SubResource("StandardMaterial3D_red")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_Potion2" unique_id=981769412]
+shape = SubResource("SphereShape3D_pickup")
+
+[node name="Pickup_Key" type="Area3D" parent="." unique_id=1181565980]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.5, -3)
+script = ExtResource("6_pickup")
+ItemResource = ExtResource("8_key")
+
+[node name="MeshInstance3D" type="CSGBox3D" parent="Pickup_Key" unique_id=60037945]
+size = Vector3(0.5, 0.5, 0.5)
+material = SubResource("StandardMaterial3D_gold")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_Key" unique_id=1387910736]
+shape = SubResource("BoxShape3D_pickup")

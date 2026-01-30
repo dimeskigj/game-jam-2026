@@ -6,9 +6,49 @@ public partial class BallController : CharacterBody3D
 	public float Speed = 5.0f;
 	[Export]
 	public float JumpVelocity = 6.0f;
+	[Export]
+	public float MouseSensitivity = 0.002f;
+	[Export]
+	public float Acceleration = 20.0f;
+	[Export]
+	public float Friction = 10.0f;
 
 	// Get the gravity from the project settings to be synced with RigidBody nodes.
 	public float gravity = ProjectSettings.GetSetting("physics/3d/default_gravity").AsSingle();
+
+	private Camera3D _camera;
+
+	public override void _Ready()
+	{
+		Input.MouseMode = Input.MouseModeEnum.Captured;
+		_camera = GetNode<Camera3D>("Camera3D");
+	}
+
+	public override void _Input(InputEvent @event)
+	{
+		if (@event is InputEventMouseMotion mouseMotion && Input.MouseMode == Input.MouseModeEnum.Captured)
+		{
+			RotateY(-mouseMotion.Relative.X * MouseSensitivity);
+			
+			if (_camera != null)
+			{
+				Vector3 camRot = _camera.Rotation;
+				camRot.X -= mouseMotion.Relative.Y * MouseSensitivity;
+				camRot.X = Mathf.Clamp(camRot.X, Mathf.DegToRad(-89), Mathf.DegToRad(89));
+				_camera.Rotation = camRot;
+			}
+		}
+		
+		// Setup mouse capture toggling
+		if (Input.IsMouseButtonPressed(MouseButton.Left))
+		{
+			Input.MouseMode = Input.MouseModeEnum.Captured;
+		}
+		if (Input.IsKeyPressed(Key.Escape))
+		{
+			Input.MouseMode = Input.MouseModeEnum.Visible;
+		}
+	}
 
 	public override void _PhysicsProcess(double delta)
 	{
@@ -17,12 +57,13 @@ public partial class BallController : CharacterBody3D
 		// Add the gravity.
 		if (!IsOnFloor())
 			velocity.Y -= gravity * (float)delta;
-
+		
 		// Handle Jump.
+		// Note: Using Key.Space directly as per previous code style
 		if (Input.IsKeyPressed(Key.Space) && IsOnFloor())
 			velocity.Y = JumpVelocity;
 
-		// Get the input direction and handle the movement/deceleration.
+		// Get the input direction
 		Vector2 inputDir = Vector2.Zero;
 		
 		if (Input.IsKeyPressed(Key.W)) inputDir.Y -= 1;
@@ -32,18 +73,20 @@ public partial class BallController : CharacterBody3D
 		
 		inputDir = inputDir.Normalized();
 		
-		// Move relative to global coordinates (could be improved to be camera-relative)
-		Vector3 direction = new Vector3(inputDir.X, 0, inputDir.Y).Normalized();
+		// Move relative to the character's forward direction
+		Vector3 direction = (Transform.Basis * new Vector3(inputDir.X, 0, inputDir.Y)).Normalized();
 
 		if (direction != Vector3.Zero)
 		{
-			velocity.X = direction.X * Speed;
-			velocity.Z = direction.Z * Speed;
+			// Apply acceleration (Humanlike movement)
+			velocity.X = Mathf.MoveToward(velocity.X, direction.X * Speed, Acceleration * (float)delta);
+			velocity.Z = Mathf.MoveToward(velocity.Z, direction.Z * Speed, Acceleration * (float)delta);
 		}
 		else
 		{
-			velocity.X = Mathf.MoveToward(Velocity.X, 0, Speed);
-			velocity.Z = Mathf.MoveToward(Velocity.Z, 0, Speed);
+			// Apply friction/deceleration
+			velocity.X = Mathf.MoveToward(velocity.X, 0, Friction * (float)delta);
+			velocity.Z = Mathf.MoveToward(velocity.Z, 0, Friction * (float)delta);
 		}
 
 		Velocity = velocity;

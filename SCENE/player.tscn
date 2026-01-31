@@ -1,0 +1,36 @@
+[gd_scene format=3 uid="uid://bw5pjdvnaigpr"]
+
+[ext_resource type="Script" uid="uid://6pc13djetn7y" path="res://PlayerController.cs" id="1_m0ta0"]
+[ext_resource type="Script" uid="uid://bugxpobj04nyw" path="res://PlayerInput.cs" id="2_s47mi"]
+[ext_resource type="Script" uid="uid://dne8d4vd2mkxf" path="res://InventorySystem/Inventory.cs" id="3_74isj"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_nu31w"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_shapecast"]
+radius = 0.1
+
+[node name="Player" type="CharacterBody3D" unique_id=1129234290]
+collision_mask = 7
+script = ExtResource("1_m0ta0")
+HoldDistance = 1.5
+
+[node name="PlayerInput" type="Node" parent="." unique_id=17684149]
+script = ExtResource("2_s47mi")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=412638820]
+shape = SubResource("CapsuleShape3D_nu31w")
+
+[node name="MeshInstance3D" type="CSGSphere3D" parent="." unique_id=1962930636]
+radius = 0.001
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=279085869]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8866763, 0)
+
+[node name="ShapeCast3D" type="ShapeCast3D" parent="Camera3D" unique_id=298029791]
+shape = SubResource("SphereShape3D_shapecast")
+target_position = Vector3(0, 0, -2.5)
+collision_mask = 3
+collide_with_areas = true
+
+[node name="Inventory" type="Node" parent="." unique_id=44814474]
+script = ExtResource("3_74isj")

@@ -11,12 +11,26 @@ public partial class InventoryUI : CanvasLayer
     public override void _Ready()
     {
         _gridContainer = GetNode<GridContainer>("Control/GridContainer");
-        _inventory = GetNode<Inventory>("/root/Node3D/Ball/Inventory"); // Adjust path if needed
+        
+        // Try to find the Player node first, then Ball as fallback
+        Node root = GetTree().Root.GetNodeOrNull("Node3D");
+        if (root != null)
+        {
+            Node playerNode = root.GetNodeOrNull("Player") ?? root.GetNodeOrNull("Ball");
+            if (playerNode != null)
+            {
+                _inventory = playerNode.GetNodeOrNull<Inventory>("Inventory");
+            }
+        }
 
         if (_inventory != null)
         {
             _inventory.InventoryUpdated += UpdateUI;
             _inventory.SelectedSlotChanged += UpdateSelection;
+        }
+        else
+        {
+            GD.PrintErr("InventoryUI: Could not find Inventory node! UI will not update.");
         }
 
         // Initialize UI slots

@@ -117,13 +117,13 @@ public partial class PlayerController : CharacterBody3D
 		_input = GetNode<PlayerInput>("PlayerInput");
 		
 		// Find Overlay Rects
-		_gasMaskOverlay = GetNode<ColorRect>("../UI/GasMaskOverlay");
-		_xRayOverlay = GetNode<ColorRect>("../UI/XRayOverlay");
-		_stealthOverlay = GetNode<ColorRect>("../UI/StealthOverlay");
-		_sanityOverlay = GetNode<ColorRect>("../UI/SanityOverlay");
+		_gasMaskOverlay = GetNodeOrNull<ColorRect>("../UI/GasMaskOverlay");
+		_xRayOverlay = GetNodeOrNull<ColorRect>("../UI/XRayOverlay");
+		_stealthOverlay = GetNodeOrNull<ColorRect>("../UI/StealthOverlay");
+		_sanityOverlay = GetNodeOrNull<ColorRect>("../UI/SanityOverlay");
 		_detectionOverlay = GetNodeOrNull<ColorRect>("../UI/DetectionOverlay"); 
 		
-		_interactionLabel = GetNode<Label>("../UI/InteractionLabel");
+		_interactionLabel = GetNodeOrNull<Label>("../UI/InteractionLabel");
 		_statusLabel = GetNodeOrNull<Label>("../UI/StatusLabel");
 		_sanityBar = GetNodeOrNull<ProgressBar>("../UI/SanityBar");
 		_gameOverLabel = GetNodeOrNull<Label>("../UI/GameOverLabel");
@@ -134,7 +134,7 @@ public partial class PlayerController : CharacterBody3D
 
 		_detectionLabel = GetNodeOrNull<Label>("../UI/DetectionLabel"); 
 		
-		_xRayManager = GetNode<XRayManager>("../XRayManager");
+		_xRayManager = GetNodeOrNull<XRayManager>("../XRayManager");
 
 		// Setup Outline Material
 		_outlineMaterial = new ShaderMaterial();
@@ -200,23 +200,23 @@ public partial class PlayerController : CharacterBody3D
 		CurrentMaskEffect = effect;
 		GD.Print($"Equipped Mask: {effect}");
 		
-		if (effect == MaskEffect.Gas) _gasMaskOverlay.Visible = true;
+		if (effect == MaskEffect.Gas && _gasMaskOverlay != null) _gasMaskOverlay.Visible = true;
 		else if (effect == MaskEffect.XRay)
 		{
-			_xRayOverlay.Visible = true;
-			_xRayManager.ToggleXRay(true);
+			if (_xRayOverlay != null) _xRayOverlay.Visible = true;
+			if (_xRayManager != null) _xRayManager.ToggleXRay(true);
 		}
-		else if (effect == MaskEffect.Invisibility) _stealthOverlay.Visible = true;
+		else if (effect == MaskEffect.Invisibility && _stealthOverlay != null) _stealthOverlay.Visible = true;
 	}
 
 	public void UnequipMask()
 	{
-		if (CurrentMaskEffect == MaskEffect.XRay) _xRayManager.ToggleXRay(false);
+		if (CurrentMaskEffect == MaskEffect.XRay && _xRayManager != null) _xRayManager.ToggleXRay(false);
 		
 		CurrentMaskEffect = MaskEffect.None;
-		_gasMaskOverlay.Visible = false;
-		_xRayOverlay.Visible = false;
-		_stealthOverlay.Visible = false;
+		if (_gasMaskOverlay != null) _gasMaskOverlay.Visible = false;
+		if (_xRayOverlay != null) _xRayOverlay.Visible = false;
+		if (_stealthOverlay != null) _stealthOverlay.Visible = false;
 	}
 
 	// SetAlert replaced SetDetected
@@ -360,8 +360,11 @@ public partial class PlayerController : CharacterBody3D
 
 	private void UpdateInteractionPrompt()
 	{
-		_interactionLabel.Text = "";
-		_interactionLabel.Visible = false;
+		if (_interactionLabel != null)
+		{
+			_interactionLabel.Text = "";
+			_interactionLabel.Visible = false;
+		}
 
 		if (_statusLabel != null)
 		{
@@ -420,14 +423,20 @@ public partial class PlayerController : CharacterBody3D
 
 			if (bestInteractable is Pickup pickup)
 			{
-				_interactionLabel.Text = $"Right Click to Pickup {pickup.ItemResource?.Name}";
-				_interactionLabel.Visible = true;
+				if (_interactionLabel != null)
+				{
+					_interactionLabel.Text = $"Right Click to Pickup {pickup.ItemResource?.Name}";
+					_interactionLabel.Visible = true;
+				}
 				HighlightObject(pickup);
 			}
 			else if (bestInteractable is Node nodePickup && nodePickup.GetParent() is Pickup parentPickup)
 			{
-				_interactionLabel.Text = $"Right Click to Pickup {parentPickup.ItemResource?.Name}";
-				_interactionLabel.Visible = true;
+				if (_interactionLabel != null)
+				{
+					_interactionLabel.Text = $"Right Click to Pickup {parentPickup.ItemResource?.Name}";
+					_interactionLabel.Visible = true;
+				}
 				HighlightObject(nodePickup as GeometryInstance3D);
 			}
 			else if (bestInteractable is Door door)
@@ -439,30 +448,33 @@ public partial class PlayerController : CharacterBody3D
 				{
 					if (hasKeyInHand)
 					{
-						_interactionLabel.Text = "Right Click to Unlock";
+						if (_interactionLabel != null) _interactionLabel.Text = "Right Click to Unlock";
 					}
 					else
 					{
-						_interactionLabel.Text = "Right Click (Locked)";
+						if (_interactionLabel != null) _interactionLabel.Text = "Right Click (Locked)";
 					}
 				}
 				else
 				{
 					if (hasKeyInHand)
 					{
-						_interactionLabel.Text = "Right Click to Lock";
+						if (_interactionLabel != null) _interactionLabel.Text = "Right Click to Lock";
 					}
 					else
 					{
-						_interactionLabel.Text = "Right Click to Open/Close";
+						if (_interactionLabel != null) _interactionLabel.Text = "Right Click to Open/Close";
 					}
 				}
-				_interactionLabel.Visible = true;
+				if (_interactionLabel != null) _interactionLabel.Visible = true;
 			}
 			else if (bestInteractable is Radio radio)
 			{
-				_interactionLabel.Text = "Right Click to Toggle Radio";
-				_interactionLabel.Visible = true;
+				if (_interactionLabel != null)
+				{
+					_interactionLabel.Text = "Right Click to Toggle Radio";
+					_interactionLabel.Visible = true;
+				}
 				HighlightObject(radio);
 			}
 			else if (bestInteractable is Drawer drawer)
@@ -472,21 +484,36 @@ public partial class PlayerController : CharacterBody3D
 
 				if (drawer.IsLocked)
 				{
-					if (hasKeyInHand) _interactionLabel.Text = "Right Click to Unlock Drawer";
-					else _interactionLabel.Text = "Right Click (Locked)";
+					if (hasKeyInHand) 
+					{
+						if (_interactionLabel != null) _interactionLabel.Text = "Right Click to Unlock Drawer";
+					}
+					else 
+					{
+						if (_interactionLabel != null) _interactionLabel.Text = "Right Click (Locked)";
+					}
 				}
 				else
 				{
-					if (hasKeyInHand) _interactionLabel.Text = "Right Click to Lock Drawer";
-					else _interactionLabel.Text = "Right Click to Open/Close Drawer";
+					if (hasKeyInHand) 
+					{
+						if (_interactionLabel != null) _interactionLabel.Text = "Right Click to Lock Drawer";
+					}
+					else 
+					{
+						if (_interactionLabel != null) _interactionLabel.Text = "Right Click to Open/Close Drawer";
+					}
 				}
-				_interactionLabel.Visible = true;
+				if (_interactionLabel != null) _interactionLabel.Visible = true;
 				HighlightObject(drawer);
 			}
 			else if (bestInteractable is Note note)
 			{
-				_interactionLabel.Text = "Right Click to Read";
-				_interactionLabel.Visible = true;
+				if (_interactionLabel != null)
+				{
+					_interactionLabel.Text = "Right Click to Read";
+					_interactionLabel.Visible = true;
+				}
 				HighlightObject(note);
 			}
 		}
@@ -608,7 +635,7 @@ public partial class PlayerController : CharacterBody3D
 		_isReadingNote = true;
 		if (_noteLabel != null) _noteLabel.Text = text;
 		if (_noteOverlay != null) _noteOverlay.Visible = true;
-		_interactionLabel.Visible = false;
+		if (_interactionLabel != null) _interactionLabel.Visible = false;
 	}
 
 	private void CloseNote()
@@ -648,7 +675,7 @@ public partial class PlayerController : CharacterBody3D
 		if (CurrentSanity <= 0)
 		{
 			IsDead = true;
-			_gameOverLabel.Visible = true;
+			if (_gameOverLabel != null) _gameOverLabel.Visible = true;
 			Input.MouseMode = Input.MouseModeEnum.Visible;
 			GD.Print("GAME OVER: Sanity Depleted.");
 		}

@@ -1,0 +1,62 @@
+[gd_scene format=3 uid="uid://djedkheulovl3"]
+
+[ext_resource type="Script" uid="uid://yvedskp3bxhc" path="res://SCENE/SceneCollisionGenerator.cs" id="1_7ach4"]
+[ext_resource type="PackedScene" uid="uid://cksm4gr08bems" path="res://NEW_MODELS/Finished_Buildings/Aparments/Aparment_1.fbx" id="2_c4mwc"]
+[ext_resource type="PackedScene" uid="uid://cohqk4i566kn1" path="res://NEW_MODELS/Finished_Buildings/Aparments/Aparment_2.fbx" id="3_moreo"]
+[ext_resource type="PackedScene" uid="uid://dkdqmq2vjjpx7" path="res://NEW_MODELS/Finished_Buildings/Brutalist_Apartments/Brutalist_Apartment_1.fbx" id="4_457dm"]
+[ext_resource type="PackedScene" uid="uid://c1hbbatnwvviv" path="res://NEW_MODELS/Finished_Buildings/Brutalist_Apartments/Brutalist_Apartment_2.fbx" id="5_pbjnk"]
+[ext_resource type="PackedScene" uid="uid://btf0ddlss81j6" path="res://NEW_MODELS/Finished_Buildings/Brutalist_Apartments/Brutalist_Apartment_3.fbx" id="6_u0qmd"]
+[ext_resource type="PackedScene" uid="uid://dkd84x3rsrn0a" path="res://NEW_MODELS/Finished_Buildings/Construction_Building/Construction_Building.fbx" id="7_888qu"]
+[ext_resource type="PackedScene" uid="uid://dmaj5vteatvdt" path="res://NEW_MODELS/Finished_Buildings/W-Kruschev/Kruchevka.fbx" id="8_cl1yn"]
+[ext_resource type="PackedScene" uid="uid://cf6b8gt5rue1y" path="res://NEW_MODELS/Finished_Buildings/Workers_Housing/Workers_Housing_1.fbx" id="9_j1d56"]
+[ext_resource type="PackedScene" uid="uid://3gtceoon553g" path="res://NEW_MODELS/Finished_Buildings/Workers_Housing/Workers_Housing_2.fbx" id="10_ng8tv"]
+[ext_resource type="PackedScene" uid="uid://cgsaqs0orqvui" path="res://NEW_MODELS/Finished_Buildings/Workers_Housing/Workers_Housing_3.fbx" id="11_xujkr"]
+[ext_resource type="PackedScene" uid="uid://ci4p75ey4wi3c" path="res://NEW_MODELS/Finished_Buildings/WALL/Wall.fbx" id="12_ad3bl"]
+[ext_resource type="PackedScene" uid="uid://bpk5iwa4yg8e2" path="res://NEW_MODELS/Finished_Buildings/fmopasgmf.fbx" id="13_6bssk"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_floor"]
+size = Vector3(1000, 1, 1000)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ground"]
+albedo_color = Color(0.2, 0.2, 0.2, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ground"]
+material = SubResource("StandardMaterial3D_ground")
+size = Vector3(1000, 1, 1000)
+
+[node name="Node3D" type="Node3D" unique_id=379405592]
+script = ExtResource("1_7ach4")
+
+[node name="Ground" type="StaticBody3D" parent="." unique_id=2027758011]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -17.478218, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground" unique_id=1680878032]
+shape = SubResource("BoxShape3D_floor")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground" unique_id=340081491]
+mesh = SubResource("BoxMesh_ground")
+
+[node name="Aparment_1" parent="." unique_id=949401137 instance=ExtResource("2_c4mwc")]
+
+[node name="Aparment_2" parent="." unique_id=894202894 instance=ExtResource("3_moreo")]
+
+[node name="Brutalist_Apartment_1" parent="." unique_id=1830734141 instance=ExtResource("4_457dm")]
+
+[node name="Brutalist_Apartment_2" parent="." unique_id=582192063 instance=ExtResource("5_pbjnk")]
+
+[node name="Brutalist_Apartment_3" parent="." unique_id=2145957896 instance=ExtResource("6_u0qmd")]
+
+[node name="Construction_Building" parent="." unique_id=1017354091 instance=ExtResource("7_888qu")]
+
+[node name="Kruchevka" parent="." unique_id=570762059 instance=ExtResource("8_cl1yn")]
+
+[node name="Workers_Housing_1" parent="." unique_id=1856614271 instance=ExtResource("9_j1d56")]
+
+[node name="Workers_Housing_2" parent="." unique_id=1665188472 instance=ExtResource("10_ng8tv")]
+
+[node name="Workers_Housing_3" parent="." unique_id=433006204 instance=ExtResource("11_xujkr")]
+
+[node name="Wall" parent="." unique_id=2077116835 instance=ExtResource("12_ad3bl")]
+transform = Transform3D(0.9271899, 0, 0, 0, 1, 0, 0, 0, 1.037994, 0, 12.432373, 1.3963575)
+
+[node name="fmopasgmf" parent="." unique_id=638228135 instance=ExtResource("13_6bssk")]

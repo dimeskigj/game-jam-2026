@@ -1,13 +1,10 @@
 [gd_scene format=3 uid="uid://clsgsyq4e35in"]
 
-[ext_resource type="Script" uid="uid://bugxpobj04nyw" path="res://PlayerInput.cs" id="1_input"]
-[ext_resource type="Script" uid="uid://6pc13djetn7y" path="res://PlayerController.cs" id="1_script"]
 [ext_resource type="Material" path="res://floor_material.tres" id="2_floor_mat"]
+[ext_resource type="PackedScene" uid="uid://bw5pjdvnaigpr" path="res://SCENE/player.tscn" id="3_5t8nk"]
 [ext_resource type="Texture2D" uid="uid://8d0uj6envljt" path="res://textures/sky.exr" id="3_sky_tex"]
-[ext_resource type="Script" uid="uid://dne8d4vd2mkxf" path="res://InventorySystem/Inventory.cs" id="4_inventory"]
 [ext_resource type="Script" uid="uid://cx8x1mac1t274" path="res://InventorySystem/InventoryUI.cs" id="5_inventory_ui"]
 [ext_resource type="Script" uid="uid://36lhpbg631ox" path="res://InteractionSystem/Pickup.cs" id="6_pickup"]
-[ext_resource type="Resource" path="res://InventorySystem/item_potion.tres" id="7_potion"]
 [ext_resource type="Resource" uid="uid://kjpgb7fjq8yj" path="res://InventorySystem/item_key.tres" id="8_key"]
 [ext_resource type="Script" uid="uid://cr346gptxty8" path="res://InteractionSystem/Door.cs" id="9_door"]
 [ext_resource type="Script" uid="uid://c7hr6yy3se2ag" path="res://InteractionSystem/XRayManager.cs" id="10_xray_mgr"]
@@ -19,31 +16,32 @@
 [ext_resource type="Shader" uid="uid://bi2pcl63pfjp4" path="res://Shaders/xray_mask.gdshader" id="15_xray_shader"]
 [ext_resource type="Shader" uid="uid://bwplect3jwpmg" path="res://Shaders/stealth_mask.gdshader" id="16_stealth_shader"]
 [ext_resource type="Shader" uid="uid://crgke0qi3gsvd" path="res://Shaders/sanity_distortion.gdshader" id="17_sanity_shader"]
-[ext_resource type="PackedScene" uid="uid://bvmujkt7g26vc" path="res://Enemy.tscn" id="17_tuemg"]
 [ext_resource type="Script" uid="uid://bycgccef6qxd0" path="res://InteractionSystem/SecurityCamera.cs" id="19_camera_script"]
 [ext_resource type="PackedScene" uid="uid://b8d5477s0d1d6" path="res://Models/KAMERA.fbx" id="21_s0gvp"]
 [ext_resource type="PackedScene" path="res://Radio.tscn" id="22_radio"]
 [ext_resource type="Script" uid="uid://c3kxsx5ujtgbq" path="res://InteractionSystem/SetupNavigation.cs" id="23_nav_setup"]
 [ext_resource type="Resource" uid="uid://cinl6dcub0s6t" path="res://InventorySystem/item_silverkey.tres" id="24_silverkey"]
 [ext_resource type="Script" uid="uid://dvjnuu11sqjgv" path="res://InteractionSystem/Drawer.cs" id="25_drawer"]
+[ext_resource type="PackedScene" uid="uid://djedkheulovl3" path="res://SCENE/city.tscn" id="26_j3e5s"]
 [ext_resource type="Script" uid="uid://cq57csrn0m4qu" path="res://InteractionSystem/Note.cs" id="26_note"]
 
 [sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_default"]
 panorama = ExtResource("3_sky_tex")
 
-[sub_resource type="Sky" id="Sky_default"]
+[sub_resource type="Sky" id="Sky_nu31w"]
 sky_material = SubResource("PanoramaSkyMaterial_default")
 
 [sub_resource type="Environment" id="Environment_default"]
 background_mode = 2
-sky = SubResource("Sky_default")
+sky = SubResource("Sky_nu31w")
+ambient_light_source = 2
+ambient_light_color = Color(0.5, 0.5, 0.5, 1)
+ambient_light_sky_contribution = 0.5
 tonemap_mode = 2
+sdfgi_enabled = true
+sdfgi_use_occlusion = true
 glow_enabled = true
-
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_nu31w"]
-
-[sub_resource type="SphereShape3D" id="SphereShape3D_shapecast"]
-radius = 0.1
+volumetric_fog_density = 0.01
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_gas"]
 shader = ExtResource("14_gas_shader")
@@ -60,17 +58,6 @@ shader_parameter/scanline_count = 50.0
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_sanity"]
 shader = ExtResource("17_sanity_shader")
 shader_parameter/intensity = 0.0
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_red"]
-albedo_color = Color(1, 0.2, 0.2, 1)
-
-[sub_resource type="SphereMesh" id="SphereMesh_red"]
-material = SubResource("StandardMaterial3D_red")
-radius = 0.3
-height = 0.6
-
-[sub_resource type="SphereShape3D" id="SphereShape3D_pickup"]
-radius = 0.3
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gold"]
 albedo_color = Color(1, 0.8, 0, 1)
@@ -104,6 +91,9 @@ size = Vector3(10, 5, 10)
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_radzone"]
 transparency = 1
 albedo_color = Color(0.2, 1, 0.2, 0.3)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_red"]
+albedo_color = Color(1, 0.2, 0.2, 1)
 
 [sub_resource type="BoxMesh" id="BoxMesh_red_small"]
 material = SubResource("StandardMaterial3D_red")
@@ -169,7 +159,10 @@ environment = SubResource("Environment_default")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=2106531217]
 transform = Transform3D(-0.866023, -0.433016, 0.250001, 0, 0.499998, 0.866027, -0.500003, 0.749999, -0.43301, 0, 0, 0)
+light_color = Color(1, 0.95, 0.9, 1)
+light_energy = 1.5
 shadow_enabled = true
+shadow_opacity = 0.8
 
 [node name="Floor" type="CSGBox3D" parent="." unique_id=1229859552]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0.7739258)
@@ -177,32 +170,8 @@ use_collision = true
 size = Vector3(35.288086, 1, 46.45508)
 material = ExtResource("2_floor_mat")
 
-[node name="Ball" type="CharacterBody3D" parent="." unique_id=1249645612]
+[node name="Player" parent="." unique_id=1129234290 instance=ExtResource("3_5t8nk")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -2.376791)
-collision_mask = 7
-script = ExtResource("1_script")
-HoldDistance = 1.5
-
-[node name="PlayerInput" type="Node" parent="Ball" unique_id=145355438]
-script = ExtResource("1_input")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Ball" unique_id=1419102380]
-shape = SubResource("CapsuleShape3D_nu31w")
-
-[node name="MeshInstance3D" type="CSGSphere3D" parent="Ball" unique_id=1333422521]
-radius = 0.001
-
-[node name="Camera3D" type="Camera3D" parent="Ball" unique_id=1247597468]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8866763, 0)
-
-[node name="ShapeCast3D" type="ShapeCast3D" parent="Ball/Camera3D" unique_id=883531826]
-shape = SubResource("SphereShape3D_shapecast")
-target_position = Vector3(0, 0, -2.5)
-collision_mask = 3
-collide_with_areas = true
-
-[node name="Inventory" type="Node" parent="Ball" unique_id=2095621343]
-script = ExtResource("4_inventory")
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=2005998870]
 script = ExtResource("5_inventory_ui")
@@ -579,30 +548,6 @@ horizontal_alignment = 1
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -5)
 use_collision = true
 
-[node name="Pickup_Potion1" type="RigidBody3D" parent="." unique_id=1227574063]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.5, -3)
-collision_layer = 2
-script = ExtResource("6_pickup")
-ItemResource = ExtResource("7_potion")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Pickup_Potion1" unique_id=2002314835]
-mesh = SubResource("SphereMesh_red")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_Potion1" unique_id=716408832]
-shape = SubResource("SphereShape3D_pickup")
-
-[node name="Pickup_Potion2" type="RigidBody3D" parent="." unique_id=2081942578]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0.5, -3.5)
-collision_layer = 2
-script = ExtResource("6_pickup")
-ItemResource = ExtResource("7_potion")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Pickup_Potion2" unique_id=928566177]
-mesh = SubResource("SphereMesh_red")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_Potion2" unique_id=462182311]
-shape = SubResource("SphereShape3D_pickup")
-
 [node name="Pickup_Key" type="RigidBody3D" parent="." unique_id=1181565980]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.5, -3)
 collision_layer = 2
@@ -774,12 +719,6 @@ target_position = Vector3(0, 0, -12)
 [node name="Pivot" type="Node3D" parent="KAMERA" unique_id=420721037]
 transform = Transform3D(1, 1.7763568e-15, 0, -8.881784e-16, 1, -5.1137216e-16, -7.1054274e-15, -5.1137216e-16, 1, 0, 0.09512232, -0.02548793)
 
-[node name="Enemy" parent="." unique_id=577585736 node_paths=PackedStringArray("Waypoints") groups=["Enemies"] instance=ExtResource("17_tuemg")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.778967, 0.3294413, 1.7581491)
-collision_mask = 5
-ChaseSpeed = 5.0
-Waypoints = [NodePath("../Waypoint1"), NodePath("../Waypoint2"), NodePath("../Waypoint3")]
-
 [node name="Waypoint1" type="Marker3D" parent="." unique_id=812746639]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 7)
 
@@ -887,3 +826,6 @@ mesh = SubResource("BoxMesh_note")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_Note" unique_id=32051481]
 shape = SubResource("BoxShape3D_note")
+
+[node name="Node3D" parent="." unique_id=379405592 instance=ExtResource("26_j3e5s")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.17, 17.055, -15.494)

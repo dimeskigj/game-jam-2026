@@ -1,0 +1,53 @@
+[gd_scene format=3 uid="uid://do5sss34d08sl"]
+
+[ext_resource type="PackedScene" uid="uid://dwhlh8h3krl5u" path="res://Models/City_Wall_BIG.fbx" id="1_wtr2b"]
+[ext_resource type="PackedScene" uid="uid://bw8cm32hp72sn" path="res://Models/Construction_Building_1.fbx" id="2_ric7e"]
+[ext_resource type="PackedScene" uid="uid://c34d6bg0i16ex" path="res://Models/Floor.fbx" id="3_fs5uq"]
+[ext_resource type="PackedScene" uid="uid://bv2fa1dawapmu" path="res://Models/KRUCHEVKA.fbx" id="4_jtwfb"]
+[ext_resource type="PackedScene" uid="uid://c5jkx50flq4y0" path="res://Models/L_House_1.fbx" id="5_cwr8d"]
+[ext_resource type="PackedScene" uid="uid://bkv6vo67jv073" path="res://Models/L_House_2.fbx" id="6_qustl"]
+[ext_resource type="PackedScene" uid="uid://c467ut5pmidfr" path="res://Models/Wall_of_Apartments_1.fbx" id="7_bxjpk"]
+[ext_resource type="PackedScene" uid="uid://b8nnllive06rl" path="res://Models/Wall_of_Apartments_3.fbx" id="9_gpqbj"]
+[ext_resource type="PackedScene" uid="uid://dw66l74fin3kr" path="res://Models/Workers_Housing_1.fbx" id="10_vbah0"]
+[ext_resource type="PackedScene" uid="uid://bffk8jjrf0p1a" path="res://Models/Workers_Housing_2.fbx" id="11_lt38n"]
+[ext_resource type="PackedScene" uid="uid://dn1klfpraafac" path="res://Models/Workers_Housing_3.fbx" id="12_ahr1m"]
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_ayn04"]
+
+[node name="Node3D" type="Node3D" unique_id=1761867061]
+
+[node name="City_Wall_BIG" parent="." unique_id=526952751 instance=ExtResource("1_wtr2b")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.022563562, 44.56502, -0.02902338)
+
+[node name="Construction_Building_1" parent="." unique_id=197413524 instance=ExtResource("2_ric7e")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.374583, 30.5, -2.0386086)
+
+[node name="Floor" parent="." unique_id=741929094 instance=ExtResource("3_fs5uq")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 30.161606, 0)
+
+[node name="KRUCHEVKA" parent="." unique_id=588850389 instance=ExtResource("4_jtwfb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 30.5, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="KRUCHEVKA" unique_id=1036679080]
+mesh = SubResource("ArrayMesh_ayn04")
+
+[node name="L_House_1" parent="." unique_id=1208838114 instance=ExtResource("5_cwr8d")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 30.5, 0)
+
+[node name="L_House_2" parent="." unique_id=1671920934 instance=ExtResource("6_qustl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 30.5, 0)
+
+[node name="Wall_of_Apartments_1" parent="." unique_id=1556009682 instance=ExtResource("7_bxjpk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 30.5, 0)
+
+[node name="Wall_of_Apartments_3" parent="." unique_id=1909994220 instance=ExtResource("9_gpqbj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 30.5, 0)
+
+[node name="Workers_Housing_1" parent="." unique_id=1106110636 instance=ExtResource("10_vbah0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 30.5, 0)
+
+[node name="Workers_Housing_2" parent="." unique_id=1475882596 instance=ExtResource("11_lt38n")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 30.5, 0)
+
+[node name="Workers_Housing_3" parent="." unique_id=838279023 instance=ExtResource("12_ahr1m")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 29.380756, 0)

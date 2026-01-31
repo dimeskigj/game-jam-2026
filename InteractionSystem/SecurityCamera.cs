@@ -12,35 +12,47 @@ public partial class SecurityCamera : Node3D
 	private Area3D _detectionArea;
 	private CollisionShape3D _detectionShape;
 	private RayCast3D _losRay;
-	private MeshInstance3D _cameraBody;
+	private Node3D _rotationPivot;
+	private MeshInstance3D _visionConeMesh;
 
 	private float _time = 0.0f;
 	private float _initialRotationY;
 	
-	// Optimization: Cache enemies list
 	private Godot.Collections.Array<Node> _cachedEnemies;
 	private float _alertCooldown = 0.0f;
 
-	// Alert Logic
 	private PlayerController _detectedPlayer;
 	private bool _isAlerted = false;
 
 	public override void _Ready()
 	{
-		_initialRotationY = Rotation.Y;
+		_initialRotationY = Rotation.Y; 
 		
 		_cachedEnemies = GetTree().GetNodesInGroup("Enemies");
 		
-		// Setup Nodes if not present
+		// Setup Nodes
 		_viewCone = GetNodeOrNull<SpotLight3D>("ViewCone");
 		_detectionArea = GetNodeOrNull<Area3D>("DetectionArea");
 		_losRay = GetNodeOrNull<RayCast3D>("LOSRay");
-		_cameraBody = GetNodeOrNull<GeometryInstance3D>("CameraBody") as MeshInstance3D;
+		_visionConeMesh = GetNodeOrNull<MeshInstance3D>("VisionConeMesh"); 
 		
 		if (_detectionArea != null)
 		{
 			_detectionArea.BodyEntered += OnBodyEntered;
 			_detectionArea.BodyExited += OnBodyExited;
+		}
+
+		// FBX Handling: Find "group1" as pivot
+		Node foundNode = FindChild("group1", true, false); 
+		if (foundNode is Node3D n3d)
+		{
+			_rotationPivot = n3d;
+			_initialRotationY = _rotationPivot.Rotation.Y; 
+			GD.Print("SecurityCamera: Found pivot 'group1'. Using global rotation sync.");
+		}
+		else
+		{
+			_rotationPivot = this; 
 		}
 
 		if (_viewCone != null)
@@ -55,9 +67,28 @@ public partial class SecurityCamera : Node3D
 		// 1. Sweep Movement
 		_time += (float)delta * RotationSpeed;
 		float angleOffset = Mathf.Sin(_time) * SweepAngle;
-		RotationDegrees = new Vector3(RotationDegrees.X, Mathf.RadToDeg(_initialRotationY) + angleOffset, RotationDegrees.Z);
-
-		// Keep checking cache occasionally? No, assume static for jam.
+		
+		// Rotate Visual Model (Pivot)
+		if (_rotationPivot != null)
+		{
+			float currentY = Mathf.RadToDeg(_initialRotationY) + angleOffset;
+			Vector3 curRot = _rotationPivot.RotationDegrees;
+			_rotationPivot.RotationDegrees = new Vector3(curRot.X, currentY, curRot.Z);
+			
+			// SYNC children by forcing their Global Rotation to match the pivot
+			Vector3 pivotGlobalRot = _rotationPivot.GlobalRotationDegrees;
+			
+			if (_detectionArea != null) _detectionArea.GlobalRotationDegrees = pivotGlobalRot;
+			if (_viewCone != null)      _viewCone.GlobalRotationDegrees = pivotGlobalRot;
+			if (_losRay != null)        _losRay.GlobalRotationDegrees = pivotGlobalRot;
+			
+			// VisionConeMesh correction
+			if (_visionConeMesh != null)
+			{
+				_visionConeMesh.GlobalRotationDegrees = pivotGlobalRot + new Vector3(-90, 0, 0);
+			}
+		}
+		
 		if (_alertCooldown > 0) _alertCooldown -= (float)delta;
 
 		// 2. Detection Logic
@@ -69,7 +100,6 @@ public partial class SecurityCamera : Node3D
 
 	private void CheckDetection()
 	{
-		// 1. Invisibility Check
 		if (_detectedPlayer.CurrentMaskEffect == MaskEffect.Invisibility)
 		{
 			if (_isAlerted)
@@ -81,16 +111,12 @@ public partial class SecurityCamera : Node3D
 		}
 		
 		// 2. FOV / Angle Check
-		// Ensure player is actually IN FRONT of the camera and within the cone angle
 		Vector3 toPlayer = (_detectedPlayer.GlobalPosition + Vector3.Up) - GlobalPosition;
 		Vector3 forward = -GlobalTransform.Basis.Z; 
-		
 		float angleToPlayer = Mathf.RadToDeg(forward.AngleTo(toPlayer));
 		
-		// If angle is strictly outside FOV (half angle), we don't see them
 		if (angleToPlayer > FOV / 2.0f)
 		{
-			// Player is in the box, but outside the cone angle (side of view)
 			if (_isAlerted)
 			{
 				_isAlerted = false;
@@ -102,18 +128,19 @@ public partial class SecurityCamera : Node3D
 		// 3. Line of Sight Check
 		var spaceState = GetWorld3D().DirectSpaceState;
 		
-		// Move start point forward but reduce offset to 0.2 to be safe
-		Vector3 fromPos = GlobalPosition + forward * 0.2f; 
+		// Use pivot's forward logic if possible, otherwise camera base.
+		Vector3 fromPos = GlobalPosition;
+		if (_rotationPivot != null) fromPos = _rotationPivot.GlobalPosition;
 		
-		// Check multiple points on player to ensure we don't miss over head/under feet
+		fromPos += -GlobalTransform.Basis.Z * 0.2f; // Slight offset
+		
 		Vector3[] testPoints = new Vector3[]
 		{
-			_detectedPlayer.GlobalPosition + Vector3.Up * 0.5f, // Center?
-			_detectedPlayer.GlobalPosition + Vector3.Up * 1.0f, // Head?
-			_detectedPlayer.GlobalPosition + Vector3.Up * 0.2f  // Feet?
+			_detectedPlayer.GlobalPosition + Vector3.Up * 0.5f,
+			_detectedPlayer.GlobalPosition + Vector3.Up * 1.0f,
+			_detectedPlayer.GlobalPosition + Vector3.Up * 0.2f 
 		};
 		
-		// Build exclusions once
 		var exclusions = new Godot.Collections.Array<Rid>();
 		if (_cachedEnemies != null)
 		{
@@ -138,7 +165,7 @@ public partial class SecurityCamera : Node3D
 				if (collider == _detectedPlayer)
 				{
 					seen = true;
-					break; // Saw them!
+					break; 
 				}
 				else
 				{
@@ -154,8 +181,6 @@ public partial class SecurityCamera : Node3D
 				GD.Print("Camera: Line of Sight Confirmed! Alerting.");
 				_isAlerted = true;
 			}
-			
-			// CONTINUOUS ALERT UPDATE
 			_detectedPlayer.SetAlert(true, this);
 			
 			if (_alertCooldown <= 0)
@@ -166,12 +191,10 @@ public partial class SecurityCamera : Node3D
 		}
 		else
 		{
-			// Only print blocker if we expected to see them (i.e. angle is good, but blocked)
 			if (blockerDebug != "" && !_isAlerted)
 			{
 				GD.Print($"Camera Sight Blocked by: {blockerDebug}");
 			}
-			
 			if (_isAlerted)
 			{
 				_isAlerted = false;
@@ -180,13 +203,9 @@ public partial class SecurityCamera : Node3D
 		}
 	}
 
-
 	private void TriggerAlert()
 	{
-		// _detectedPlayer.SetAlert(true, this); // Handled in CheckDetection now
-		
 		if (_cachedEnemies == null) return;
-
 		foreach(var node in _cachedEnemies)
 		{
 			if (node is EnemyAI enemy)

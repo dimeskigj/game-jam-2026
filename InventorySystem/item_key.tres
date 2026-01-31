@@ -9,3 +9,4 @@ Name = "Ancient Key"
 Icon = ExtResource("1_ekbuc")
 Stackable = false
 MaxStack = 1
+Usable = true

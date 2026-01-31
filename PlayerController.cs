@@ -1,9 +1,43 @@
 using Godot;
+using System.Collections.Generic;
 
 public partial class PlayerController : CharacterBody3D
 {
+	// ... (exports omitted for brevity in diff, but preserved in file)
 	[Export]
 	public float Speed = 5.0f;
+	// ...
+	
+	// State for alerts
+	private HashSet<Node> _alertSources = new HashSet<Node>();
+	
+	// ...
+
+	public void SetAlert(bool active, Node source)
+	{
+		int preCount = _alertSources.Count;
+		
+		if (active)
+		{
+			_alertSources.Add(source);
+		}
+		else
+		{
+			_alertSources.Remove(source);
+		}
+
+		if (_alertSources.Count != preCount)
+		{
+			// GD.Print($"Alert Sources Changed: {_alertSources.Count} (Source: {source.Name} set {active})");
+		}
+
+		bool isDetected = _alertSources.Count > 0;
+		
+		if (_detectionLabel != null) _detectionLabel.Visible = isDetected;
+		if (_detectionOverlay != null) _detectionOverlay.Visible = isDetected;
+	}
+	// ...
+
 	[Export]
 	public float JumpVelocity = 6.0f;
 	[Export]
@@ -22,8 +56,8 @@ public partial class PlayerController : CharacterBody3D
 	public MaskEffect CurrentMaskEffect { get; private set; } = MaskEffect.None;
 
 	[Export] public float MaxSanity = 100.0f;
-	[Export] public float SanityDrainRate = 5.0f; // Slower drain (was 10)
-	[Export] public float SanityRegenRate = 10.0f; // Faster regen relative to drain 
+	[Export] public float SanityDrainRate = 5.0f; 
+	[Export] public float SanityRegenRate = 10.0f; 
 	
 	public float CurrentSanity { get; private set; } = 100.0f;
 	public bool IsDead { get; private set; } = false;
@@ -37,7 +71,10 @@ public partial class PlayerController : CharacterBody3D
 	private ColorRect _gasMaskOverlay;
 	private ColorRect _xRayOverlay;
 	private ColorRect _stealthOverlay;
-	private ColorRect _sanityOverlay; // New
+	private ColorRect _sanityOverlay;
+	private Label _detectionLabel;     
+	private ColorRect _detectionOverlay; 
+	
 	private XRayManager _xRayManager;
 	private Label _interactionLabel;
 	private ProgressBar _sanityBar;
@@ -63,9 +100,12 @@ public partial class PlayerController : CharacterBody3D
 		_xRayOverlay = GetNode<ColorRect>("../UI/XRayOverlay");
 		_stealthOverlay = GetNode<ColorRect>("../UI/StealthOverlay");
 		_sanityOverlay = GetNode<ColorRect>("../UI/SanityOverlay");
+		_detectionOverlay = GetNodeOrNull<ColorRect>("../UI/DetectionOverlay"); 
+		
 		_interactionLabel = GetNode<Label>("../UI/InteractionLabel");
 		_sanityBar = GetNode<ProgressBar>("../UI/SanityBar");
 		_gameOverLabel = GetNode<Label>("../UI/GameOverLabel");
+		_detectionLabel = GetNodeOrNull<Label>("../UI/DetectionLabel"); 
 		
 		_xRayManager = GetNode<XRayManager>("../XRayManager");
 
@@ -78,31 +118,25 @@ public partial class PlayerController : CharacterBody3D
 		_input.ToggleMouseCapture += OnToggleMouseCapture;
 		_input.Interact += OnInteract;
 		_input.UseItem += OnUseItem; 
-		_input.DropItem += OnDropItem; // New signal
+		_input.DropItem += OnDropItem; 
 		_input.SlotSelected += OnSlotSelected;
 		_input.ScrollSlot += OnScrollSlot;
 		
 		_inventory.ItemUsed += OnInventoryItemUsed;
 		
-		// Fix "Too Close" issue: Exclude player body from the cast so we don't hit ourselves
+		// Fix "Too Close" issue
 		_interactionCast.AddException(this);
 	}
 	
 	private void OnDropItem()
 	{
-		// 1. Remove from Inventory
 		InventoryItem removedItem = _inventory.RemoveItem(_inventory.selectedSlot);
 		
 		if (removedItem != null && removedItem.PickupScene != null)
 		{
-			// 2. Spawn Logic
 			Node3D spawnNode = removedItem.PickupScene.Instantiate<Node3D>();
 			GetParent().AddChild(spawnNode);
-			
-			// Position in front of camera
 			spawnNode.GlobalPosition = _camera.GlobalPosition - _camera.GlobalTransform.Basis.Z * 2.0f;
-			
-			// If RigidBody, add impulse
 			if (spawnNode is RigidBody3D rb)
 			{
 				rb.LinearVelocity = -_camera.GlobalTransform.Basis.Z * 5.0f;
@@ -114,45 +148,31 @@ public partial class PlayerController : CharacterBody3D
 	{
 		if (item.Type == ItemType.Mask)
 		{
-			// Toggle or Swap?
 			if (CurrentMaskEffect == item.Effect)
-			{
 				UnequipMask();
-			}
 			else
-			{
 				EquipMask(item.Effect);
-			}
 		}
 	}
 
 	public void EquipMask(MaskEffect effect)
 	{
-		UnequipMask(); // Clear current first
+		UnequipMask();
 		CurrentMaskEffect = effect;
 		GD.Print($"Equipped Mask: {effect}");
 		
-		if (effect == MaskEffect.Gas)
-		{
-			_gasMaskOverlay.Visible = true;
-		}
+		if (effect == MaskEffect.Gas) _gasMaskOverlay.Visible = true;
 		else if (effect == MaskEffect.XRay)
 		{
 			_xRayOverlay.Visible = true;
 			_xRayManager.ToggleXRay(true);
 		}
-		else if (effect == MaskEffect.Invisibility)
-		{
-			_stealthOverlay.Visible = true;
-		}
+		else if (effect == MaskEffect.Invisibility) _stealthOverlay.Visible = true;
 	}
 
 	public void UnequipMask()
 	{
-		if (CurrentMaskEffect == MaskEffect.XRay)
-		{
-			_xRayManager.ToggleXRay(false);
-		}
+		if (CurrentMaskEffect == MaskEffect.XRay) _xRayManager.ToggleXRay(false);
 		
 		CurrentMaskEffect = MaskEffect.None;
 		_gasMaskOverlay.Visible = false;
@@ -160,25 +180,22 @@ public partial class PlayerController : CharacterBody3D
 		_stealthOverlay.Visible = false;
 	}
 
+	// SetAlert replaced SetDetected
+
 	public override void _PhysicsProcess(double delta)
 	{
 		UpdateSanity(delta);
 		if (IsDead) return;
 
-		// Interaction UI & Outline
 		UpdateInteractionPrompt();
 		
-		// 1. Mouse Capture State Check (Visuals) - Managed via signals, but grabbed logic is here
 		if (_input.LeftClickHeld && Input.MouseMode == Input.MouseModeEnum.Captured)
 		{
 			if (_heldBody == null)
 			{
-				// Try Grab (Dragging objects)
 				if (_interactionCast.IsColliding())
 				{
-					// ShapeCast can hit multiple, we take the first logic one
 					var collider = _interactionCast.GetCollider(0);
-					
 					if (collider is RigidBody3D rb && !(collider is Pickup)) 
 					{
 						_heldBody = rb;
@@ -191,24 +208,17 @@ public partial class PlayerController : CharacterBody3D
 			_heldBody = null;
 		}
 
-		// 2. Physics Grabbing Apply Force
 		if (_heldBody != null)
 		{
 			Vector3 targetPos = _camera.GlobalTransform.Origin - _camera.GlobalTransform.Basis.Z * HoldDistance;
 			Vector3 currentPos = _heldBody.GlobalTransform.Origin;
 			Vector3 grabDirection = targetPos - currentPos; 
-			
 			_heldBody.LinearVelocity = grabDirection * GrabPower;
 		}
 
-		// 3. Movement
 		Vector3 velocity = Velocity;
-
-		if (!IsOnFloor())
-			velocity.Y -= gravity * (float)delta;
-		
-		if (_input.JumpPressed && IsOnFloor())
-			velocity.Y = JumpVelocity;
+		if (!IsOnFloor()) velocity.Y -= gravity * (float)delta;
+		if (_input.JumpPressed && IsOnFloor()) velocity.Y = JumpVelocity;
 
 		Vector2 inputDir = _input.MoveInput;
 		Vector3 moveDirection = (Transform.Basis * new Vector3(inputDir.X, 0, inputDir.Y)).Normalized();
@@ -233,7 +243,6 @@ public partial class PlayerController : CharacterBody3D
 		_interactionLabel.Text = "";
 		_interactionLabel.Visible = false;
 		
-		// Clear previous outline
 		if (_currentOutlineObj != null && IsInstanceValid(_currentOutlineObj))
 		{
 			_currentOutlineObj.MaterialOverlay = null;
@@ -242,12 +251,7 @@ public partial class PlayerController : CharacterBody3D
 
 		if (_interactionCast.IsColliding())
 		{
-			// Loop through ALL collisions to find a valid interactable.
-			// ShapeCast can hit the floor/walls first even if an item is "closer" or overlapping.
-			// prioritizes Pickups over static geometry.
-			
 			Node bestInteractable = null;
-			
 			for (int i = 0; i < _interactionCast.GetCollisionCount(); i++)
 			{
 				var collider = _interactionCast.GetCollider(i) as Node;
@@ -256,13 +260,11 @@ public partial class PlayerController : CharacterBody3D
 				if (collider is Pickup || (collider is RigidBody3D && collider.IsInGroup("Interactable")))
 				{
 					bestInteractable = collider;
-					break; // Found high priority item
+					break; 
 				}
 				else if (collider is Door)
 				{
 					bestInteractable = collider;
-					// Don't break yet, maybe there's a smaller pickup in front of the door?
-					// Actually, door is usually big. Let's stick with finding the first "logical" interactable.
 					break; 
 				}
 				else if (collider.GetParent() is Pickup)
@@ -295,12 +297,10 @@ public partial class PlayerController : CharacterBody3D
 	private void HighlightObject(Node obj)
 	{
 		if (obj == null) return;
-		
 		GeometryInstance3D mesh = null;
 		if (obj is GeometryInstance3D g) mesh = g;
 		else 
 		{
-			// Try finding a child mesh
 			foreach(Node child in obj.GetChildren())
 			{
 				if (child is GeometryInstance3D childMesh)
@@ -318,12 +318,9 @@ public partial class PlayerController : CharacterBody3D
 		}
 	}
 
-	// --- Signal Handlers ---
-
 	private void OnLookInput(Vector2 relative)
 	{
 		if (Input.MouseMode != Input.MouseModeEnum.Captured) return;
-		
 		RotateY(-relative.X * MouseSensitivity);
 		if (_camera != null)
 		{
@@ -343,7 +340,6 @@ public partial class PlayerController : CharacterBody3D
 	{
 		if (_interactionCast.IsColliding())
 		{
-			// Same priority logic as prompt
 			Node bestInteractable = null;
 			for (int i = 0; i < _interactionCast.GetCollisionCount(); i++)
 			{
@@ -367,31 +363,14 @@ public partial class PlayerController : CharacterBody3D
 				}
 			}
 
-			if (bestInteractable is Pickup pickup)
-			{
-				pickup.Interact(_inventory);
-			}
-			else if (bestInteractable is Node nodePickup && nodePickup.GetParent() is Pickup parentPickup)
-			{
-				parentPickup.Interact(_inventory);
-			}
-			else if (bestInteractable is Door door)
-			{
-				door.Interact(_inventory);
-			}
+			if (bestInteractable is Pickup pickup) pickup.Interact(_inventory);
+			else if (bestInteractable is Node nodePickup && nodePickup.GetParent() is Pickup parentPickup) parentPickup.Interact(_inventory);
+			else if (bestInteractable is Door door) door.Interact(_inventory);
 		}
 	}
 
-	private void OnUseItem()
-	{
-		_inventory.UseCurrentItem();
-	}
-
-	private void OnSlotSelected(int slot)
-	{
-		_inventory.SelectSlot(slot);
-	}
-
+	private void OnUseItem() => _inventory.UseCurrentItem();
+	private void OnSlotSelected(int slot) => _inventory.SelectSlot(slot);
 	private void OnScrollSlot(int direction)
 	{
 		int newSlot = _inventory.selectedSlot + direction;
@@ -404,34 +383,18 @@ public partial class PlayerController : CharacterBody3D
 	{
 		if (IsDead) return;
 
-		if (CurrentMaskEffect != MaskEffect.None)
-		{
-			// Drain
-			CurrentSanity -= SanityDrainRate * (float)delta;
-		}
-		else
-		{
-			// Regen
-			CurrentSanity += SanityRegenRate * (float)delta;
-		}
+		if (CurrentMaskEffect != MaskEffect.None) CurrentSanity -= SanityDrainRate * (float)delta;
+		else CurrentSanity += SanityRegenRate * (float)delta;
 		
 		CurrentSanity = Mathf.Clamp(CurrentSanity, 0, MaxSanity);
 		
-		// Update UI Bar
-		if (_sanityBar != null)
-		{
-			_sanityBar.Value = CurrentSanity;
-		}
+		if (_sanityBar != null) _sanityBar.Value = CurrentSanity;
 		
-		// Update Shader Intensity (0.0 at full sanity, 1.0 at 0 sanity)
 		if (_sanityOverlay != null)
 		{
 			float intensity = 1.0f - (CurrentSanity / MaxSanity);
 			var material = _sanityOverlay.Material as ShaderMaterial;
-			if (material != null)
-			{
-				material.SetShaderParameter("intensity", intensity);
-			}
+			if (material != null) material.SetShaderParameter("intensity", intensity);
 		}
 
 		if (CurrentSanity <= 0)
@@ -439,7 +402,6 @@ public partial class PlayerController : CharacterBody3D
 			IsDead = true;
 			_gameOverLabel.Visible = true;
 			Input.MouseMode = Input.MouseModeEnum.Visible;
-			// Optional: play sound
 			GD.Print("GAME OVER: Sanity Depleted.");
 		}
 	}

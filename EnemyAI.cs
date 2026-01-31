@@ -29,8 +29,9 @@ public partial class EnemyAI : CharacterBody3D
 
 	private PlayerController _targetPlayer;
 	
-	private enum State { Patrol, Chase }
+	private enum State { Patrol, Chase, Investigate }
 	private State _currentState = State.Patrol;
+	private Vector3 _investigateTarget;
 
 	// Nodes
 	private AnimationPlayer _animPlayer;
@@ -39,11 +40,11 @@ public partial class EnemyAI : CharacterBody3D
 
 	public override void _Ready()
 	{
-		// Try to find AnimationPlayer in the model first (common for GLB imports)
+		// ... existing code ...
+		// Truncated for diff validity, rely on existing code context
 		_animPlayer = GetNodeOrNull<AnimationPlayer>("Model/kit_player/AnimationPlayer");
 		if (_animPlayer == null)
 		{
-			// Fallback: search children
 			foreach (Node child in GetNode("Model").GetChildren())
 			{
 				if (child is AnimationPlayer ap) { _animPlayer = ap; break; }
@@ -70,7 +71,7 @@ public partial class EnemyAI : CharacterBody3D
 		_visionArea = GetNodeOrNull<Area3D>("VisionArea");
 		// Fallback for visual debugging
 		_visualMesh = GetNodeOrNull<GeometryInstance3D>("Model/Body"); 
-
+		
 		if (_visionArea != null)
 		{
 			_visionArea.BodyEntered += OnBodyEnteredVision;
@@ -85,6 +86,13 @@ public partial class EnemyAI : CharacterBody3D
 		// Gravity
 		if (!IsOnFloor())
 			velocity.Y -= 9.8f * (float)delta;
+			
+		// Continuous Vision Check
+		// This ensures we spot the player if they decloak while already inside our vision area
+		if (_currentState == State.Patrol || _currentState == State.Investigate)
+		{
+			CheckVision();
+		}
 
 		switch (_currentState)
 		{
@@ -94,6 +102,9 @@ public partial class EnemyAI : CharacterBody3D
 			case State.Chase:
 				ProcessChase(ref velocity);
 				break;
+			case State.Investigate:
+				ProcessInvestigate(ref velocity);
+				break;
 		}
 
 		Velocity = velocity;
@@ -102,19 +113,11 @@ public partial class EnemyAI : CharacterBody3D
 		// Face movement direction
 		if (velocity.LengthSquared() > 0.1f)
 		{
-			// Look direction is the movement direction
-			// GlobalPosition + velocity points in the direction we are moving
 			Vector3 lookTarget = GlobalPosition + velocity.Normalized();
-			
-			// LookAt aligns the local -Z axis to the target.
-			// "Forward" in Godot is -Z. 
-			// So if we move forward, we want -Z to point that way.
 			LookAt(lookTarget, Vector3.Up);
 		}
 		
 		// Apply Visual Offset Correction
-		// This rotates the Model child node to fix "walking backwards" or "sideways" art.
-		// If the art faces +Z, we need a 180 offset. If it faces -Z, 0.
 		if (GetNodeOrNull<Node3D>("Model") is Node3D modelNode)
 		{
 			modelNode.RotationDegrees = new Vector3(0, ModelRotationOffset, 0);
@@ -122,9 +125,47 @@ public partial class EnemyAI : CharacterBody3D
 		
 		UpdateAnimation(velocity);
 	}
+	
+	private void CheckVision()
+	{
+		if (_visionArea == null) return;
+		
+		var bodies = _visionArea.GetOverlappingBodies();
+		foreach(var body in bodies)
+		{
+			if (body is PlayerController player)
+			{
+				if (player.CurrentMaskEffect == MaskEffect.Invisibility) continue;
+				if (player.IsDead) continue;
+
+				// Raycast Check
+				var spaceState = GetWorld3D().DirectSpaceState;
+				var query = PhysicsRayQueryParameters3D.Create(GlobalPosition + Vector3.Up * 1.5f, player.GlobalPosition + Vector3.Up * 0.5f);
+				query.Exclude = new Godot.Collections.Array<Rid> { GetRid() }; 
+				
+				var result = spaceState.IntersectRay(query);
+
+				if (result.Count > 0)
+				{
+					Node3D hitNode = result["collider"].Obj as Node3D;
+					if (hitNode == player)
+					{
+						_targetPlayer = player;
+						_currentState = State.Chase;
+						_targetPlayer.SetAlert(true, this);
+						GD.Print("ENEMY SPOTTED PLAYER! Switching to Chase.");
+						return; // Found target, stop checking
+					}
+				}
+			}
+		}
+	}
 
 	private void ProcessPatrol(ref Vector3 velocity, float delta)
 	{
+		// If we were chasing and lost target (handled in Chase), ensure we reset detected?
+		// Logic is in ProcessChase
+		
 		if (Waypoints == null || Waypoints.Count == 0)
 		{
 			velocity.X = Mathf.MoveToward(velocity.X, 0, PatrolSpeed * delta);
@@ -212,12 +253,17 @@ public partial class EnemyAI : CharacterBody3D
 
 		if (_targetPlayer.CurrentMaskEffect == MaskEffect.Invisibility)
 		{
+			_targetPlayer.SetAlert(false, this);
 			_targetPlayer = null;
 			_currentState = State.Patrol;
 			return;
 		}
 
+		// Ensure we signal we see them
+		_targetPlayer.SetAlert(true, this);
+
 		Vector3 direction = (_targetPlayer.GlobalPosition - GlobalPosition);
+		float distance = direction.Length();
 		direction.Y = 0;
 		direction = direction.Normalized();
 
@@ -225,8 +271,14 @@ public partial class EnemyAI : CharacterBody3D
 		velocity.Z = direction.Z * ChaseSpeed;
 		
 		// If player too far, lose aggro
-		if (GlobalPosition.DistanceTo(_targetPlayer.GlobalPosition) > DetectionRange * 1.5f)
+		// Force minimum of 15.0f if DetectionRange is 0 (broken inspector)
+		float chaseLimit = Mathf.Max(DetectionRange, 10.0f) * 1.5f;
+		
+		if (distance > chaseLimit)
 		{
+			// Debug why we lost aggro
+			// GD.Print($"Enemy Lost Aggro: Dist {distance:F1} > Limit {chaseLimit:F1}");
+			_targetPlayer.SetAlert(false, this);
 			_targetPlayer = null;
 			_currentState = State.Patrol;
 		}
@@ -243,7 +295,7 @@ public partial class EnemyAI : CharacterBody3D
 		{
 			// The kit_player usually has "run" or "walk". 
 			// We'll try "run" for chase, "walk" for patrol if available.
-			if (_currentState == State.Chase && _animPlayer.HasAnimation("run"))
+			if ((_currentState == State.Chase || _currentState == State.Investigate) && _animPlayer.HasAnimation("run"))
 				animToPlay = "run";
 			else if (_animPlayer.HasAnimation("walk"))
 				animToPlay = "walk";
@@ -316,6 +368,45 @@ public partial class EnemyAI : CharacterBody3D
 				// We need to ensure Raycast Mask includes Player.
 				GD.Print("Raycast hit nothing. Is player collider masked check?");
 			}
+		}
+	}
+	
+	public void AlertToLocation(Vector3 location)
+	{
+		// If we are already chasing the player, we have better info (visual contact)
+		if (_currentState == State.Chase) return;
+
+		// Update investigation target
+		_investigateTarget = location;
+		
+		// If already investigating, just update target (no print spam)
+		if (_currentState != State.Investigate)
+		{
+			GD.Print($"Enemy alerted to location: {location}");
+			_currentState = State.Investigate;
+		}
+	}
+
+	private void ProcessInvestigate(ref Vector3 velocity)
+	{
+		Vector3 direction = (_investigateTarget - GlobalPosition);
+		direction.Y = 0;
+
+		if (direction.Length() < 1.0f)
+		{
+			// Reached investigation point.
+			// Look around? Just go back to patrol for now.
+			GD.Print("Enemy reached alert location. Resuming patrol.");
+			_currentState = State.Patrol;
+			velocity.X = 0;
+			velocity.Z = 0;
+		}
+		else
+		{
+			// Run there? Or Walk? Let's Run.
+			direction = direction.Normalized();
+			velocity.X = direction.X * ChaseSpeed;
+			velocity.Z = direction.Z * ChaseSpeed;
 		}
 	}
 	

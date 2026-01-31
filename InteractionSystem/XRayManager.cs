@@ -16,28 +16,42 @@ public partial class XRayManager : Node
         // Or we can fetch group whenever we toggle.
     }
 
-    public void ToggleXRay(bool enabled)
-    {
-        var nodes = GetTree().GetNodesInGroup("XRayable");
-        
-        foreach (var node in nodes)
-        {
-            // 1. Apply to the node itself if it's a visual
-            if (node is GeometryInstance3D geoInstance)
-            {
-                geoInstance.MaterialOverlay = enabled ? XRayOverlayMaterial : null;
-            }
-            
-            // 2. ALSO check for common child visuals (common in simple prefabs/pickups)
-            // This handles the case where the parent is a container (Node3D or empty MeshInstance)
-            var childVis = node.GetNodeOrNull<GeometryInstance3D>("Mesh") 
-                        ?? node.GetNodeOrNull<GeometryInstance3D>("Visual") 
-                        ?? node.GetNodeOrNull<GeometryInstance3D>("MeshInstance3D");
-           
-            if (childVis != null && childVis != node) // Ensure we don't double set if named same
-            {
-                childVis.MaterialOverlay = enabled ? XRayOverlayMaterial : null;
-            }
-        }
-    }
+    	public void ToggleXRay(bool enabled)
+	{
+		// 1. Standard XRayable items (Overlay only)
+		var nodes = GetTree().GetNodesInGroup("XRayable");
+		
+		foreach (var node in nodes)
+		{
+			// Apply to the node itself if it's a visual
+			if (node is GeometryInstance3D geoInstance)
+			{
+				geoInstance.MaterialOverlay = enabled ? XRayOverlayMaterial : null;
+			}
+			
+			// ALSO check for common child visuals
+			var childVis = node.GetNodeOrNull<GeometryInstance3D>("Mesh") 
+						?? node.GetNodeOrNull<GeometryInstance3D>("Visual") 
+						?? node.GetNodeOrNull<GeometryInstance3D>("MeshInstance3D");
+		   
+			if (childVis != null && childVis != node) 
+			{
+				childVis.MaterialOverlay = enabled ? XRayOverlayMaterial : null;
+			}
+		}
+
+		// 2. Invisible XRay items (Toggle Visibility)
+		var hiddenNodes = GetTree().GetNodesInGroup("XRayInvisible");
+		foreach (var node in hiddenNodes)
+		{
+			if (node is Node3D n3d)
+			{
+				n3d.Visible = enabled;
+			}
+			else if (node is CanvasItem ci)
+			{
+				ci.Visible = enabled;
+			}
+		}
+	}
 }

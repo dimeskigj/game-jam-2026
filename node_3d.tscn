@@ -23,12 +23,10 @@
 [ext_resource type="Script" uid="uid://dvjnuu11sqjgv" path="res://InteractionSystem/Drawer.cs" id="25_drawer"]
 [ext_resource type="PackedScene" uid="uid://djedkheulovl3" path="res://SCENE/city.tscn" id="26_j3e5s"]
 [ext_resource type="Script" uid="uid://cq57csrn0m4qu" path="res://InteractionSystem/Note.cs" id="26_note"]
-[ext_resource type="PackedScene" path="res://Models/key.fbx" id="27_key_model"]
-[ext_resource type="PackedScene" path="res://Models/maska1gotova.fbx" id="28_mask1"]
-[ext_resource type="PackedScene" path="res://Models/maska2gotova.fbx" id="29_mask2"]
-[ext_resource type="PackedScene" path="res://Models/maska3.fbx" id="30_mask3"]
-[ext_resource type="PackedScene" path="res://Models/maska4.fbx" id="31_mask4"]
-[ext_resource type="PackedScene" path="res://Models/xray-mask.fbx" id="32_xray_mask"]
+[ext_resource type="PackedScene" uid="uid://2eitq0pep0d6" path="res://Models/key.fbx" id="27_key_model"]
+[ext_resource type="PackedScene" uid="uid://b1gnuduwgru12" path="res://Models/maska1gotova.fbx" id="28_mask1"]
+[ext_resource type="PackedScene" uid="uid://birqv8ugylv1s" path="res://Models/maska3.fbx" id="30_mask3"]
+[ext_resource type="PackedScene" uid="uid://bjhmb3sr1punt" path="res://Models/xray-mask.fbx" id="32_xray_mask"]
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_vxd74"]
 load_path = "res://.godot/imported/NightSkyHDRI003_4K_HDR.exr-0e20ad0d6ba89c0330da9e9f11ad122e.bptc.ctex"
@@ -94,17 +92,13 @@ shader_parameter/scanline_count = 50.0
 shader = ExtResource("17_sanity_shader")
 shader_parameter/intensity = 0.0
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_pickup"]
+size = Vector3(0.6542969, 0.6760254, 0.61328125)
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gold"]
 albedo_color = Color(1, 0.8, 0, 1)
 metallic = 1.0
 roughness = 0.2
-
-[sub_resource type="BoxMesh" id="BoxMesh_gold"]
-material = SubResource("StandardMaterial3D_gold")
-size = Vector3(0.5, 0.5, 0.5)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_pickup"]
-size = Vector3(0.6542969, 0.6760254, 0.61328125)
 
 [sub_resource type="BoxMesh" id="BoxMesh_door"]
 material = SubResource("StandardMaterial3D_gold")
@@ -126,24 +120,6 @@ size = Vector3(10, 5, 10)
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_radzone"]
 transparency = 1
 albedo_color = Color(0.2, 1, 0.2, 0.3)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_red"]
-albedo_color = Color(1, 0.2, 0.2, 1)
-
-[sub_resource type="BoxMesh" id="BoxMesh_red_small"]
-material = SubResource("StandardMaterial3D_red")
-size = Vector3(0.4, 0.4, 0.4)
-
-[sub_resource type="BoxMesh" id="BoxMesh_gold_small"]
-material = SubResource("StandardMaterial3D_gold")
-size = Vector3(0.4, 0.4, 0.4)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_blue"]
-albedo_color = Color(0.2, 0.2, 1, 1)
-
-[sub_resource type="BoxMesh" id="BoxMesh_blue_small"]
-material = SubResource("StandardMaterial3D_blue")
-size = Vector3(0.4, 0.4, 0.4)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_transparent_red"]
 transparency = 1
@@ -169,10 +145,6 @@ size = Vector3(0.85, 0.05, 0.5)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_drawer_front"]
 size = Vector3(0.85, 0.4, 0.029528808)
-
-[sub_resource type="BoxMesh" id="BoxMesh_key"]
-material = SubResource("StandardMaterial3D_gold")
-size = Vector3(0.1, 0.05, 0.2)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_key"]
 size = Vector3(0.1, 0.05, 0.2)
@@ -612,8 +584,8 @@ collision_layer = 2
 script = ExtResource("6_pickup")
 ItemResource = ExtResource("8_key")
 
-[node name="KeyModel" parent="Pickup_Key" instance=ExtResource("27_key_model")]
-transform = Transform3D(25, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+[node name="KeyModel" parent="Pickup_Key" unique_id=1594710335 instance=ExtResource("27_key_model")]
+transform = Transform3D(25, 0, 0, 0, 25, 0, 0, 0, 25, 0, 0, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_Key" unique_id=463405520]
 shape = SubResource("BoxShape3D_pickup")
@@ -624,8 +596,8 @@ collision_layer = 2
 script = ExtResource("6_pickup")
 ItemResource = ExtResource("24_silverkey")
 
-[node name="KeyModel" parent="Pickup_SilverKey" instance=ExtResource("27_key_model")]
-transform = Transform3D(25, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+[node name="KeyModel" parent="Pickup_SilverKey" unique_id=674613935 instance=ExtResource("27_key_model")]
+transform = Transform3D(25, 0, 0, 0, 25, 0, 0, 0, 25, 0, 0, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_SilverKey" unique_id=463405521]
 shape = SubResource("BoxShape3D_pickup")
@@ -691,8 +663,8 @@ collision_layer = 2
 script = ExtResource("6_pickup")
 ItemResource = ExtResource("12_gas")
 
-[node name="MaskModel" parent="Pickup_GasMask" instance=ExtResource("28_mask1")]
-transform = Transform3D(25, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+[node name="MaskModel" parent="Pickup_GasMask" unique_id=186623245 instance=ExtResource("28_mask1")]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0.27706814, 0, -0.8363302)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_GasMask" unique_id=1189970334]
 shape = SubResource("BoxShape3D_pickup")
@@ -703,8 +675,8 @@ collision_layer = 2
 script = ExtResource("6_pickup")
 ItemResource = ExtResource("13_xray")
 
-[node name="MaskModel" parent="Pickup_XRayMask" instance=ExtResource("32_xray_mask")]
-transform = Transform3D(25, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+[node name="MaskModel" parent="Pickup_XRayMask" unique_id=903877897 instance=ExtResource("32_xray_mask")]
+transform = Transform3D(25, 0, 0, 0, 25, 0, 0, 0, 1.5, 0, 0, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_XRayMask" unique_id=719004815]
 shape = SubResource("BoxShape3D_pickup")
@@ -715,8 +687,8 @@ collision_layer = 2
 script = ExtResource("6_pickup")
 ItemResource = ExtResource("14_stealth")
 
-[node name="MaskModel" parent="Pickup_StealthMask" instance=ExtResource("30_mask3")]
-transform = Transform3D(25, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+[node name="MaskModel" parent="Pickup_StealthMask" unique_id=909891014 instance=ExtResource("30_mask3")]
+transform = Transform3D(1.25, 0, 0, 0, 1.25, 0, 0, 0, 1.5, 0.6251712, 0.004694283, -0.97570634)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_StealthMask" unique_id=719004999]
 shape = SubResource("BoxShape3D_pickup")
@@ -740,8 +712,8 @@ ItemResource = ExtResource("8_key")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="HiddenItem" unique_id=1429999029]
 shape = SubResource("BoxShape3D_pickup")
 
-[node name="KeyModel" parent="HiddenItem" instance=ExtResource("27_key_model")]
-transform = Transform3D(25, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+[node name="KeyModel" parent="HiddenItem" unique_id=107222891 instance=ExtResource("27_key_model")]
+transform = Transform3D(25, 0, 0, 0, 25, 0, 0, 0, 25, 0, 0, 0)
 
 [node name="KAMERA" parent="." unique_id=1498223709 node_paths=PackedStringArray("CameraPivot", "ModelGeometry") instance=ExtResource("21_s0gvp")]
 transform = Transform3D(-3.1404778e-07, 1.9954948, 7.447288, 1.744517e-07, 7.447288, -1.9954948, -7.71, 8.722585e-08, -3.4849828e-07, -2.0343962, 2.5, 7)
@@ -765,7 +737,6 @@ skeleton = NodePath("")
 
 [node name="DetectionArea" type="Area3D" parent="KAMERA" unique_id=2003004008]
 transform = Transform3D(-0.12970169, -2.220446e-16, 1.1338882e-08, 0, 0.12970169, -6.195479e-17, -1.1338882e-08, -6.6325836e-17, -0.12970169, 0, 0.056700215, -0.015192777)
-collision_layer = 0
 monitorable = false
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="KAMERA/DetectionArea" unique_id=2003004009]
@@ -851,8 +822,8 @@ freeze = true
 script = ExtResource("6_pickup")
 ItemResource = ExtResource("8_key")
 
-[node name="KeyModel" parent="CabinetSetup/Drawer_Unlocked/Pickup_SmallKey" instance=ExtResource("27_key_model")]
-transform = Transform3D(25, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+[node name="KeyModel" parent="CabinetSetup/Drawer_Unlocked/Pickup_SmallKey" unique_id=122555564 instance=ExtResource("27_key_model")]
+transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 0, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="CabinetSetup/Drawer_Unlocked/Pickup_SmallKey" unique_id=1832139648]
 shape = SubResource("BoxShape3D_key")

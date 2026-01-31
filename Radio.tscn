@@ -1,0 +1,55 @@
+[gd_scene format=3 uid="uid://bqr8h3k2v5m6p"]
+
+[ext_resource type="Script" path="res://InteractionSystem/Radio.cs" id="1_radio"]
+[ext_resource type="AudioStream" path="res://music-highway-to-hell.mp3" id="2_music"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_radio_body"]
+albedo_color = Color(0.2, 0.2, 0.2, 1)
+metallic = 0.5
+roughness = 0.3
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_light"]
+albedo_color = Color(0.1, 0.1, 0.1, 1)
+emission_enabled = false
+emission = Color(0, 1, 0, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_light"]
+material = SubResource("StandardMaterial3D_light")
+radius = 0.02
+height = 0.04
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_radio"]
+size = Vector3(0.4, 0.3, 0.2)
+
+[node name="Radio" type="StaticBody3D"]
+script = ExtResource("1_radio")
+MusicStream = ExtResource("2_music")
+
+[node name="Body" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+size = Vector3(0.4, 0.3, 0.2)
+material = SubResource("StandardMaterial3D_radio_body")
+
+[node name="Speaker" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0.15, 0.11)
+size = Vector3(0.12, 0.12, 0.02)
+material = SubResource("StandardMaterial3D_radio_body")
+
+[node name="Speaker2" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.15, 0.11)
+size = Vector3(0.12, 0.12, 0.02)
+material = SubResource("StandardMaterial3D_radio_body")
+
+[node name="Antenna" type="CSGCylinder3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.15, 0.35, -0.05)
+radius = 0.01
+height = 0.25
+material = SubResource("StandardMaterial3D_radio_body")
+
+[node name="Light" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.15, 0.25, 0.11)
+mesh = SubResource("SphereMesh_light")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+shape = SubResource("BoxShape3D_radio")

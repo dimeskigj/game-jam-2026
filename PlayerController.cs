@@ -294,6 +294,11 @@ public partial class PlayerController : CharacterBody3D
 					bestInteractable = collider;
 					break; 
 				}
+				else if (collider is Radio)
+				{
+					bestInteractable = collider;
+					break;
+				}
 				else if (collider.GetParent() is Pickup)
 				{
 					bestInteractable = collider;
@@ -317,6 +322,12 @@ public partial class PlayerController : CharacterBody3D
 			{
 				_interactionLabel.Text = "Right Click to Open/Close";
 				_interactionLabel.Visible = true;
+			}
+			else if (bestInteractable is Radio radio)
+			{
+				_interactionLabel.Text = "Right Click to Toggle Radio";
+				_interactionLabel.Visible = true;
+				HighlightObject(radio);
 			}
 		}
 	}
@@ -383,6 +394,11 @@ public partial class PlayerController : CharacterBody3D
 					bestInteractable = collider;
 					break;
 				}
+				else if (collider is Radio)
+				{
+					bestInteractable = collider;
+					break;
+				}
 				else if (collider.GetParent() is Pickup)
 				{
 					bestInteractable = collider;
@@ -393,6 +409,7 @@ public partial class PlayerController : CharacterBody3D
 			if (bestInteractable is Pickup pickup) pickup.Interact(_inventory);
 			else if (bestInteractable is Node nodePickup && nodePickup.GetParent() is Pickup parentPickup) parentPickup.Interact(_inventory);
 			else if (bestInteractable is Door door) door.Interact(_inventory);
+			else if (bestInteractable is Radio radio) radio.Interact(_inventory);
 		}
 	}
 

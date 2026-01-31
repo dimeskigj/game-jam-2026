@@ -6,6 +6,14 @@ public partial class PlayerController : CharacterBody3D
 	// ... (exports omitted for brevity in diff, but preserved in file)
 	[Export]
 	public float Speed = 5.0f;
+	[Export]
+	public float SprintSpeed = 10.0f;
+	[Export]
+	public float BaseFov = 75.0f;
+	[Export]
+	public float SprintFov = 85.0f;
+	[Export]
+	public float FovChangeSpeed = 5.0f;
 	// ...
 	
 	// State for alerts
@@ -223,10 +231,21 @@ public partial class PlayerController : CharacterBody3D
 		Vector2 inputDir = _input.MoveInput;
 		Vector3 moveDirection = (Transform.Basis * new Vector3(inputDir.X, 0, inputDir.Y)).Normalized();
 
+		// Sprinting logic
+		bool isSprinting = Input.IsKeyPressed(Key.Shift) && inputDir != Vector2.Zero;
+		float targetSpeed = isSprinting ? SprintSpeed : Speed;
+
+		// Camera FOV effect
+		float targetFov = isSprinting ? SprintFov : BaseFov;
+		if (_camera != null)
+		{
+			_camera.Fov = (float)Mathf.Lerp(_camera.Fov, targetFov, FovChangeSpeed * (float)delta);
+		}
+
 		if (moveDirection != Vector3.Zero)
 		{
-			velocity.X = Mathf.MoveToward(velocity.X, moveDirection.X * Speed, Acceleration * (float)delta);
-			velocity.Z = Mathf.MoveToward(velocity.Z, moveDirection.Z * Speed, Acceleration * (float)delta);
+			velocity.X = Mathf.MoveToward(velocity.X, moveDirection.X * targetSpeed, Acceleration * (float)delta);
+			velocity.Z = Mathf.MoveToward(velocity.Z, moveDirection.Z * targetSpeed, Acceleration * (float)delta);
 		}
 		else
 		{

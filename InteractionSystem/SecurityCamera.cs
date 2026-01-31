@@ -157,7 +157,7 @@ public partial class SecurityCamera : Node3D
 		
 		if (_detectedPlayer != null)
 		{
-			CheckDetection();
+			CheckDetection(delta);
 		}
 	}
 	
@@ -171,107 +171,105 @@ public partial class SecurityCamera : Node3D
 		}
 		return false;
 	}
+	
+	[Export] public float AlertLingerDuration = 0.5f;
+	private float _lastSeenTimer = 0.0f;
 
-	private void CheckDetection()
+	private void CheckDetection(double delta)
 	{
 		if (_detectedPlayer == null) return;
-		if (_detectedPlayer.CurrentMaskEffect == MaskEffect.Invisibility)
-		{
-			ClearAlert();
-			return;
-		}
 		
-		// 2. FOV Check 
-		// Determine the "Forward" direction of the camera.
-		// If we have a ViewCone (SpotLight), its -Z is the direction of the light.
-		Vector3 forwardDirection = Vector3.Forward; // Default
-		Vector3 cameraOrigin = GlobalPosition;
-		
-		if (_viewCone != null)
-		{
-			forwardDirection = -_viewCone.GlobalTransform.Basis.Z;
-			cameraOrigin = _viewCone.GlobalPosition;
-		}
-		else if (CameraPivot != null)
-		{
-			forwardDirection = -CameraPivot.GlobalTransform.Basis.Z;
-			cameraOrigin = CameraPivot.GlobalPosition;
-		}
-		else
-		{
-			forwardDirection = -GlobalTransform.Basis.Z;
-		}
+		bool currentlySeen = false;
 
-		Vector3 toPlayer = (_detectedPlayer.GlobalPosition + Vector3.Up * 0.5f) - cameraOrigin;
-		
-		// AngleTo is always positive (0-180)
-		float angleToPlayer = Mathf.RadToDeg(forwardDirection.AngleTo(toPlayer));
-		
-		// DEBUG: Uncomment if still having issues
-		// GD.Print($"Camera Angle: {angleToPlayer:F1} vs Max: {FOV/2.0f}");
-
-		if (angleToPlayer > FOV / 2.0f)
+		// 1. Invisibility Check
+		if (_detectedPlayer.CurrentMaskEffect != MaskEffect.Invisibility)
 		{
-			ClearAlert();
-			return; 
-		}
-
-		// 3. Line of Sight Check
-		var spaceState = GetWorld3D().DirectSpaceState;
-		Vector3 fromPos = cameraOrigin; // Start ray from pivot (camera lens)
-		
-		// Small forward offset to avoid self-collision with camera mesh
-		fromPos += forwardDirection * 0.2f; 
-		
-		Vector3[] testPoints = new Vector3[]
-		{
-			_detectedPlayer.GlobalPosition + Vector3.Up * 1.5f, // Head
-			_detectedPlayer.GlobalPosition + Vector3.Up * 0.5f  // Waist
-		};
-		
-		bool seen = false;
-
-		
-		var exclusions = new Godot.Collections.Array<Rid>();
-		if (_cachedEnemies != null)
-		{
-			foreach (var enemyNode in _cachedEnemies)
-			{
-				if (enemyNode is CollisionObject3D colObj) exclusions.Add(colObj.GetRid());
-			}
-		}
-
-		string blockerDebug = "";
-
-		foreach(Vector3 targetPos in testPoints)
-		{
-			var query = PhysicsRayQueryParameters3D.Create(fromPos, targetPos);
-			query.Exclude = exclusions;
-			var result = spaceState.IntersectRay(query);
+			// 2. FOV Check 
+			// Determine the "Forward" direction of the camera.
+			// If we have a ViewCone (SpotLight), its -Z is the direction of the light.
+			Vector3 forwardDirection = Vector3.Forward; // Default
+			Vector3 cameraOrigin = GlobalPosition;
 			
-			if (result.Count > 0)
+			if (_viewCone != null)
 			{
-				Node3D collider = result["collider"].Obj as Node3D;
-				if (collider == _detectedPlayer)
+				forwardDirection = -_viewCone.GlobalTransform.Basis.Z;
+				cameraOrigin = _viewCone.GlobalPosition;
+			}
+			else if (CameraPivot != null)
+			{
+				forwardDirection = -CameraPivot.GlobalTransform.Basis.Z;
+				cameraOrigin = CameraPivot.GlobalPosition;
+			}
+			else
+			{
+				forwardDirection = -GlobalTransform.Basis.Z;
+			}
+
+			Vector3 toPlayer = (_detectedPlayer.GlobalPosition + Vector3.Up * 0.5f) - cameraOrigin;
+			
+			// AngleTo is always positive (0-180)
+			float angleToPlayer = Mathf.RadToDeg(forwardDirection.AngleTo(toPlayer));
+			
+			// DEBUG
+			//GD.Print($"Camera Angle: {angleToPlayer:F1}");
+
+			if (angleToPlayer <= FOV / 2.0f)
+			{
+				// 3. Line of Sight Check
+				var spaceState = GetWorld3D().DirectSpaceState;
+				Vector3 fromPos = cameraOrigin; 
+				fromPos += forwardDirection * 0.2f; 
+				
+				Vector3[] testPoints = new Vector3[]
 				{
-					seen = true;
-					break; 
+					_detectedPlayer.GlobalPosition + Vector3.Up * 1.5f, // Head
+					_detectedPlayer.GlobalPosition + Vector3.Up * 0.5f  // Waist
+				};
+				
+				var exclusions = new Godot.Collections.Array<Rid>();
+				if (_cachedEnemies != null)
+				{
+					foreach (var enemyNode in _cachedEnemies)
+					{
+						if (enemyNode is CollisionObject3D colObj) exclusions.Add(colObj.GetRid());
+					}
 				}
-				else
+
+				foreach(Vector3 targetPos in testPoints)
 				{
-					blockerDebug = collider.Name;
+					var query = PhysicsRayQueryParameters3D.Create(fromPos, targetPos);
+					query.Exclude = exclusions;
+					var result = spaceState.IntersectRay(query);
+					
+					if (result.Count > 0)
+					{
+						Node3D collider = result["collider"].Obj as Node3D;
+						if (collider == _detectedPlayer)
+						{
+							currentlySeen = true;
+							break; 
+						}
+					}
 				}
 			}
 		}
 
-		if (seen)
+		if (currentlySeen)
 		{
+			// Reset linger timer
+			_lastSeenTimer = 0.0f;
+			
 			if (!_isAlerted)
 			{
 				GD.Print("Camera: Line of Sight Confirmed! Alerting.");
 				_isAlerted = true;
+				_detectedPlayer.SetAlert(true, this);
 			}
-			_detectedPlayer.SetAlert(true, this);
+			else
+			{
+				// Ensure it's true (refresh)
+				_detectedPlayer.SetAlert(true, this);
+			}
 			
 			if (_alertCooldown <= 0)
 			{
@@ -281,14 +279,20 @@ public partial class SecurityCamera : Node3D
 		}
 		else
 		{
-			if (blockerDebug != "" && !_isAlerted)
+			// Not seen this frame
+			if (_isAlerted)
 			{
-				GD.Print($"Camera Sight Blocked by: {blockerDebug}");
+				_lastSeenTimer += (float)delta;
+				if (_lastSeenTimer > AlertLingerDuration)
+				{
+					// Time is up, clear alert
+					ClearAlert();
+				}
 			}
-			_isAlerted = false;
-			_detectedPlayer.SetAlert(false, this);
 		}
 	}
+
+
 	
 	private void ClearAlert()
 	{

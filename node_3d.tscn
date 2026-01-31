@@ -604,7 +604,7 @@ transform = Transform3D(-0.12970169, -1.110223e-16, 1.9584412e-08, -1.110223e-16
 target_position = Vector3(0, 0, -12)
 
 [node name="Pivot" type="Node3D" parent="KAMERA" unique_id=420721037]
-transform = Transform3D(1, 8.881784e-16, 0, 0, 1, -5.1137216e-16, -3.5527137e-15, -5.1137216e-16, 1, 0, 0.05987276, -0.016042858)
+transform = Transform3D(1, 1.7763568e-15, 0, -8.881784e-16, 1, -5.1137216e-16, -7.1054274e-15, -5.1137216e-16, 1, 0, 0.09512232, -0.02548793)
 
 [node name="Radio" parent="KAMERA" unique_id=589524713 instance=ExtResource("22_radio")]
 transform = Transform3D(-5.2830775e-09, 2.9347185e-09, -0.12970169, 0.03356927, 0.12528221, 1.4673592e-09, 0.12528221, -0.03356927, -5.862622e-09, 0.27965307, -0.14544553, 0.71001214)
@@ -614,6 +614,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.585043, 0, 1.7581491)
 collision_layer = 1
 PatrolSpeed = 1.0
 ChaseSpeed = 2.0
+DetectionRange = 1.0
 Waypoints = [NodePath("../Waypoint1"), NodePath("../Waypoint2"), NodePath("../Waypoint3")]
 
 [node name="Waypoint1" type="Marker3D" parent="." unique_id=812746639]

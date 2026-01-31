@@ -46,7 +46,7 @@ public partial class PlayerController : CharacterBody3D
 		bool isDetected = _alertSources.Count > 0;
 		
 		if (_detectionLabel != null) _detectionLabel.Visible = isDetected;
-		if (_detectionOverlay != null) _detectionOverlay.Visible = isDetected;
+
 	}
 	// ...
 
@@ -128,6 +128,15 @@ public partial class PlayerController : CharacterBody3D
 		_outlineMaterial = new ShaderMaterial();
 		_outlineMaterial.Shader = GD.Load<Shader>("res://Shaders/outline.gdshader");
 
+		// Setup Detection Overlay Shader
+		if (_detectionOverlay != null)
+		{
+			var alertMat = new ShaderMaterial();
+			alertMat.Shader = GD.Load<Shader>("res://Shaders/alert_overlay.gdshader");
+			_detectionOverlay.Material = alertMat;
+			_detectionOverlay.Visible = false; // Start hidden
+		}
+
 		// Connect Signals
 		_input.LookInput += OnLookInput;
 		_input.ToggleMouseCapture += OnToggleMouseCapture;
@@ -196,9 +205,45 @@ public partial class PlayerController : CharacterBody3D
 	}
 
 	// SetAlert replaced SetDetected
+	private float _alertIntensity = 0.0f;
+	[Export] public float AlertFadeSpeed = 5.0f;
+	
+	private void UpdateAlertOverlay(double delta)
+	{
+		bool isDetected = _alertSources.Count > 0;
+		float target = isDetected ? 1.0f : 0.0f;
+		
+		// Smoothly interpolate intensity
+		_alertIntensity = Mathf.MoveToward(_alertIntensity, target, AlertFadeSpeed * (float)delta);
+		
+		if (_detectionOverlay != null)
+		{
+			// Only show if there is some intensity
+			_detectionOverlay.Visible = _alertIntensity > 0.01f;
+			
+			if (_detectionOverlay.Visible)
+			{
+				if (_detectionOverlay.Material is ShaderMaterial mat)
+				{
+					mat.SetShaderParameter("intensity", _alertIntensity);
+				}
+				else
+				{
+					// Fallback if shader assignment failed (though we do it in Ready)
+					_detectionOverlay.Color = new Color(1, 0, 0, _alertIntensity * 0.3f);
+				}
+			}
+		}
+		
+		if (_detectionLabel != null)
+		{
+			_detectionLabel.Visible = isDetected; 
+		}
+	}
 
 	public override void _PhysicsProcess(double delta)
 	{
+		UpdateAlertOverlay(delta);
 		UpdateSanity(delta);
 		if (IsDead) return;
 

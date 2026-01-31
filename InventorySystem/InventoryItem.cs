@@ -1,7 +1,7 @@
 using Godot;
 
 public enum ItemType { Generic, Mask }
-public enum MaskEffect { None, XRay, Gas, Invisibility }
+public enum MaskEffect { None, XRay, Gas, Invisibility, InsectRepellent }
 
 public partial class InventoryItem : Resource
 {

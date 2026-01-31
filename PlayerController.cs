@@ -15,6 +15,13 @@ public partial class PlayerController : CharacterBody3D
 	[Export]
 	public float FovChangeSpeed = 5.0f;
 
+	[Export]
+	public float DuckSpeed = 2.5f;
+	[Export]
+	public float CrouchOffset = 0.5f;
+	[Export]
+	public float CrouchTransitionSpeed = 10.0f;
+
 	[ExportGroup("Head Bob")]
 	[Export] public float BobFreq = 2.0f;
 	[Export] public float BobAmp = 0.08f;
@@ -85,6 +92,7 @@ public partial class PlayerController : CharacterBody3D
 	private ColorRect _gasMaskOverlay;
 	private ColorRect _xRayOverlay;
 	private ColorRect _stealthOverlay;
+	private ColorRect _insectOverlay;
 	private ColorRect _sanityOverlay;
 	private Label _detectionLabel;     
 	private ColorRect _detectionOverlay; 
@@ -305,9 +313,13 @@ public partial class PlayerController : CharacterBody3D
 		Vector2 inputDir = _input.MoveInput;
 		Vector3 moveDirection = (Transform.Basis * new Vector3(inputDir.X, 0, inputDir.Y)).Normalized();
 
-		// Sprinting logic
-		bool isSprinting = Input.IsKeyPressed(Key.Shift) && inputDir != Vector2.Zero;
-		float targetSpeed = isSprinting ? SprintSpeed : Speed;
+		// Sprinting and Ducking logic
+		bool isDucking = _input.DuckPressed;
+		bool isSprinting = Input.IsKeyPressed(Key.Shift) && inputDir != Vector2.Zero && !isDucking;
+		
+		float targetSpeed = Speed;
+		if (isSprinting) targetSpeed = SprintSpeed;
+		else if (isDucking) targetSpeed = DuckSpeed;
 
 		// Camera FOV effect
 		float targetFov = isSprinting ? SprintFov : BaseFov;
@@ -332,7 +344,7 @@ public partial class PlayerController : CharacterBody3D
 		
 		ApplyKickForce();
 
-		HandleHeadBob(delta, isSprinting);
+		HandleHeadBob(delta, isSprinting, isDucking);
 	}
 
 	private void ApplyKickForce()
@@ -681,7 +693,7 @@ public partial class PlayerController : CharacterBody3D
 		}
 	}
 
-	private void HandleHeadBob(double delta, bool isSprinting)
+	private void HandleHeadBob(double delta, bool isSprinting, bool isDucking)
 	{
 		float horizontalVelocity = new Vector3(Velocity.X, 0, Velocity.Z).Length();
 		bool onFloor = IsOnFloor();
@@ -689,7 +701,10 @@ public partial class PlayerController : CharacterBody3D
 		if (!onFloor || horizontalVelocity < 0.1f)
 		{
 			_bobTime = 0.0f;
-			_camera.Position = _camera.Position.Lerp(_defaultCamPos, (float)delta * 10.0f);
+			Vector3 idleTargetPos = _defaultCamPos;
+			if (isDucking) idleTargetPos.Y -= CrouchOffset;
+			
+			_camera.Position = _camera.Position.Lerp(idleTargetPos, (float)delta * CrouchTransitionSpeed);
 			return;
 		}
 
@@ -697,9 +712,15 @@ public partial class PlayerController : CharacterBody3D
 		_bobTime += (float)delta * horizontalVelocity * multiplier;
 		
 		Vector3 targetPos = _defaultCamPos;
+		
+		if (isDucking)
+		{
+			targetPos.Y -= CrouchOffset;
+		}
+		
 		targetPos.Y += Mathf.Sin(_bobTime * BobFreq) * BobAmp * multiplier;
 		targetPos.X += Mathf.Cos(_bobTime * BobFreq * 0.5f) * BobAmp * 0.5f * multiplier;
 		
-		_camera.Position = _camera.Position.Lerp(targetPos, (float)delta * 10.0f);
+		_camera.Position = _camera.Position.Lerp(targetPos, (float)delta * CrouchTransitionSpeed);
 	}
 }

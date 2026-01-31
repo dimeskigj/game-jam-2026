@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://j04jk504msqs"]
+
+[ext_resource type="PackedScene" uid="uid://bv2fa1dawapmu" path="res://Models/KRUCHEVKA.fbx" id="1_cg8me"]
+[ext_resource type="Material" path="res://floor_material.tres" id="2_fcer5"]
+
+[node name="KRUCHEVKA" unique_id=588850389 instance=ExtResource("1_cg8me")]
+
+[node name="WORKERS_KRUCHEVKA" parent="." index="0" unique_id=1522838415]
+material_override = ExtResource("2_fcer5")

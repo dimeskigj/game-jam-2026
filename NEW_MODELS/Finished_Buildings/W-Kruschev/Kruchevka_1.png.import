@@ -2,17 +2,20 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cnukbkj6pjieo"
-path.s3tc="res://.godot/imported/PavingStones075_1K-JPG_Displacement.jpg-2f1bfd41eaeabf46b91f3179ff21c79c.s3tc.ctex"
+uid="uid://cbs14bxn0w8oa"
+path.s3tc="res://.godot/imported/Kruchevka_1.png-2063a30aaf962263c9c5657b12035b02.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
+generator_parameters={
+"md5": "399b136c18f25a0cd31cae34b334fad5"
+}
 
 [deps]
 
-source_file="res://textures/floor/PavingStones075_1K-JPG_Displacement.jpg"
-dest_files=["res://.godot/imported/PavingStones075_1K-JPG_Displacement.jpg-2f1bfd41eaeabf46b91f3179ff21c79c.s3tc.ctex"]
+source_file="res://NEW_MODELS/Finished_Buildings/W-Kruschev/Kruchevka_1.png"
+dest_files=["res://.godot/imported/Kruchevka_1.png-2063a30aaf962263c9c5657b12035b02.s3tc.ctex"]
 
 [params]
 

@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 public partial class SecurityCamera : Node3D
 {
+	[Export] public Node3D CameraPivot; // The logical pivot for detection (holds cones, areas)
+	[Export] public Node3D ModelGeometry; // The visual mesh to sync (e.g. group1)
+	
 	[Export] public float RotationSpeed = 1.0f;
 	[Export] public float SweepAngle = 45.0f;
 	[Export] public float FOV = 60.0f;
@@ -10,9 +13,7 @@ public partial class SecurityCamera : Node3D
 
 	private SpotLight3D _viewCone;
 	private Area3D _detectionArea;
-	private CollisionShape3D _detectionShape;
 	private RayCast3D _losRay;
-	private Node3D _rotationPivot;
 	private MeshInstance3D _visionConeMesh;
 
 	private float _time = 0.0f;
@@ -26,33 +27,83 @@ public partial class SecurityCamera : Node3D
 
 	public override void _Ready()
 	{
-		_initialRotationY = Rotation.Y; 
-		
+		_initialRotationY = Rotation.Y;
+		if (CameraPivot != null) _initialRotationY = CameraPivot.Rotation.Y;
+
 		_cachedEnemies = GetTree().GetNodesInGroup("Enemies");
 		
-		// Setup Nodes
-		_viewCone = GetNodeOrNull<SpotLight3D>("ViewCone");
-		_detectionArea = GetNodeOrNull<Area3D>("DetectionArea");
-		_losRay = GetNodeOrNull<RayCast3D>("LOSRay");
-		_visionConeMesh = GetNodeOrNull<MeshInstance3D>("VisionConeMesh"); 
-		
-		if (_detectionArea != null)
+		// 1. Establish Pivot
+		if (CameraPivot == null)
 		{
-			_detectionArea.BodyEntered += OnBodyEntered;
-			_detectionArea.BodyExited += OnBodyExited;
+			CameraPivot = GetNodeOrNull<Node3D>("Pivot");
+			if (CameraPivot == null) CameraPivot = GetNodeOrNull<Node3D>("CameraHead");
+		}
+		
+		// 2. Establish Model
+		if (ModelGeometry == null)
+		{
+			Node found = FindChild("group1", true, false);
+			if (found is Node3D n3d) ModelGeometry = n3d;
 		}
 
-		// FBX Handling: Find "group1" as pivot
-		Node foundNode = FindChild("group1", true, false); 
-		if (foundNode is Node3D n3d)
+		// 3. Find Detection Nodes
+		Node searchRoot = CameraPivot != null ? CameraPivot : this;
+		
+		// Utility to find node in Pivot OR Self (if not reparented yet)
+		_viewCone = searchRoot.GetNodeOrNull<SpotLight3D>("ViewCone") ?? GetNodeOrNull<SpotLight3D>("ViewCone");
+		_detectionArea = searchRoot.GetNodeOrNull<Area3D>("DetectionArea") ?? GetNodeOrNull<Area3D>("DetectionArea");
+		_losRay = searchRoot.GetNodeOrNull<RayCast3D>("LOSRay") ?? GetNodeOrNull<RayCast3D>("LOSRay");
+		_visionConeMesh = searchRoot.GetNodeOrNull<MeshInstance3D>("VisionConeMesh") ?? GetNodeOrNull<MeshInstance3D>("VisionConeMesh"); 
+		
+		// 4. Reparent and Align
+		if (CameraPivot != null)
 		{
-			_rotationPivot = n3d;
-			_initialRotationY = _rotationPivot.Rotation.Y; 
-			GD.Print("SecurityCamera: Found pivot 'group1'. Using global rotation sync.");
+			_initialRotationY = CameraPivot.Rotation.Y;
+			// Snap to Pivot (Position 0, Rotation 0) to ensure alignment
+			ReparentToPivot(_viewCone);
+			ReparentToPivot(_detectionArea);
+			ReparentToPivot(_losRay);
+			ReparentToPivot(_visionConeMesh);
 		}
 		else
 		{
-			_rotationPivot = this; 
+			// If no Pivot exists, we treat 'this' as the pivot essentially, 
+			// but we can't rotate 'this' if it's the root of the scene (usually static).
+			// We'll warn properly.
+			GD.PrintErr("SecurityCamera: No Pivot Node found! Create a Node3D named 'Pivot' and assign it or use the Inspector."); 
+		}
+		
+		// 5. Fix Vision Cone Visibility (Double Sided)
+		if (_visionConeMesh != null)
+		{
+			// Try to set Cull Mode to Disabled so it is visible from inside
+			var mat = _visionConeMesh.GetActiveMaterial(0) as StandardMaterial3D;
+			if (mat == null && _visionConeMesh.Mesh is PrimitiveMesh primMesh && primMesh.Material is StandardMaterial3D primMat)
+			{
+				mat = primMat;
+			}
+			
+			if (mat != null)
+			{
+				mat.CullMode = BaseMaterial3D.CullModeEnum.Disabled;
+			}
+			else
+			{
+				// Create a new material if none exists/accessible easily (fallback)
+				var newMat = new StandardMaterial3D();
+				newMat.AlbedoColor = new Color(1, 0, 0, 0.3f);
+				newMat.Transparency = BaseMaterial3D.TransparencyEnum.Alpha;
+				newMat.CullMode = BaseMaterial3D.CullModeEnum.Disabled;
+				_visionConeMesh.MaterialOverride = newMat;
+			}
+		}
+
+		if (_detectionArea != null)
+		{
+			if (!_detectionArea.IsConnected(Area3D.SignalName.BodyEntered, new Callable(this, MethodName.OnBodyEntered)))
+				_detectionArea.BodyEntered += OnBodyEntered;
+			if (!_detectionArea.IsConnected(Area3D.SignalName.BodyExited, new Callable(this, MethodName.OnBodyExited)))
+				_detectionArea.BodyExited += OnBodyExited;
 		}
 
 		if (_viewCone != null)
@@ -62,84 +113,124 @@ public partial class SecurityCamera : Node3D
 		}
 	}
 
+	private void ReparentToPivot(Node3D node)
+	{
+		if (node == null || CameraPivot == null) return;
+		
+		// If already child, do nothing (we trust the editor position)
+		if (node.GetParent() == CameraPivot) return;
+
+		// Move to pivot while keeping Global Position/Rotation
+		Transform3D global = node.GlobalTransform;
+		node.GetParent()?.RemoveChild(node);
+		CameraPivot.AddChild(node);
+		node.GlobalTransform = global;
+	}
+
 	public override void _PhysicsProcess(double delta)
 	{
 		// 1. Sweep Movement
 		_time += (float)delta * RotationSpeed;
 		float angleOffset = Mathf.Sin(_time) * SweepAngle;
 		
-		// Rotate Visual Model (Pivot)
-		if (_rotationPivot != null)
+		float baseRot = Mathf.RadToDeg(_initialRotationY);
+		float targetY = baseRot + angleOffset;
+
+		// Apply to Pivot (Detection + Logic)
+		if (CameraPivot != null)
 		{
-			float currentY = Mathf.RadToDeg(_initialRotationY) + angleOffset;
-			Vector3 curRot = _rotationPivot.RotationDegrees;
-			_rotationPivot.RotationDegrees = new Vector3(curRot.X, currentY, curRot.Z);
-			
-			// SYNC children by forcing their Global Rotation to match the pivot
-			Vector3 pivotGlobalRot = _rotationPivot.GlobalRotationDegrees;
-			
-			if (_detectionArea != null) _detectionArea.GlobalRotationDegrees = pivotGlobalRot;
-			if (_viewCone != null)      _viewCone.GlobalRotationDegrees = pivotGlobalRot;
-			if (_losRay != null)        _losRay.GlobalRotationDegrees = pivotGlobalRot;
-			
-			// VisionConeMesh correction
-			if (_visionConeMesh != null)
-			{
-				_visionConeMesh.GlobalRotationDegrees = pivotGlobalRot + new Vector3(-90, 0, 0);
-			}
+			Vector3 rot = CameraPivot.RotationDegrees;
+			// Only rotate Y
+			CameraPivot.RotationDegrees = new Vector3(rot.X, targetY, rot.Z);
+		}
+		
+		// Sync Model (Visual Mesh) - Only if it's NOT a child of Pivot (to avoid double rotation)
+		// If ModelGeometry is 'group1' and Pivot is a sibling node, we rotate both?
+		// Better: If ModelGeometry is separate, rotate it too.
+		if (ModelGeometry != null && ModelGeometry != CameraPivot && !IsChildOf(ModelGeometry, CameraPivot))
+		{
+			Vector3 rot = ModelGeometry.RotationDegrees;
+			ModelGeometry.RotationDegrees = new Vector3(rot.X, targetY, rot.Z);
 		}
 		
 		if (_alertCooldown > 0) _alertCooldown -= (float)delta;
-
-		// 2. Detection Logic
+		
 		if (_detectedPlayer != null)
 		{
 			CheckDetection();
 		}
 	}
+	
+	private bool IsChildOf(Node node, Node possibleParent)
+	{
+		Node p = node.GetParent();
+		while (p != null)
+		{
+			if (p == possibleParent) return true;
+			p = p.GetParent();
+		}
+		return false;
+	}
 
 	private void CheckDetection()
 	{
+		if (_detectedPlayer == null) return;
 		if (_detectedPlayer.CurrentMaskEffect == MaskEffect.Invisibility)
 		{
-			if (_isAlerted)
-			{
-				_detectedPlayer.SetAlert(false, this);
-				_isAlerted = false;
-			}
+			ClearAlert();
 			return;
 		}
 		
-		// 2. FOV / Angle Check
-		Vector3 toPlayer = (_detectedPlayer.GlobalPosition + Vector3.Up) - GlobalPosition;
-		Vector3 forward = -GlobalTransform.Basis.Z; 
-		float angleToPlayer = Mathf.RadToDeg(forward.AngleTo(toPlayer));
+		// 2. FOV Check 
+		// Determine the "Forward" direction of the camera.
+		// If we have a ViewCone (SpotLight), its -Z is the direction of the light.
+		Vector3 forwardDirection = Vector3.Forward; // Default
+		Vector3 cameraOrigin = GlobalPosition;
 		
+		if (_viewCone != null)
+		{
+			forwardDirection = -_viewCone.GlobalTransform.Basis.Z;
+			cameraOrigin = _viewCone.GlobalPosition;
+		}
+		else if (CameraPivot != null)
+		{
+			forwardDirection = -CameraPivot.GlobalTransform.Basis.Z;
+			cameraOrigin = CameraPivot.GlobalPosition;
+		}
+		else
+		{
+			forwardDirection = -GlobalTransform.Basis.Z;
+		}
+
+		Vector3 toPlayer = (_detectedPlayer.GlobalPosition + Vector3.Up * 0.5f) - cameraOrigin;
+		
+		// AngleTo is always positive (0-180)
+		float angleToPlayer = Mathf.RadToDeg(forwardDirection.AngleTo(toPlayer));
+		
+		// DEBUG: Uncomment if still having issues
+		// GD.Print($"Camera Angle: {angleToPlayer:F1} vs Max: {FOV/2.0f}");
+
 		if (angleToPlayer > FOV / 2.0f)
 		{
-			if (_isAlerted)
-			{
-				_isAlerted = false;
-				_detectedPlayer.SetAlert(false, this);
-			}
+			ClearAlert();
 			return; 
 		}
 
 		// 3. Line of Sight Check
 		var spaceState = GetWorld3D().DirectSpaceState;
+		Vector3 fromPos = cameraOrigin; // Start ray from pivot (camera lens)
 		
-		// Use pivot's forward logic if possible, otherwise camera base.
-		Vector3 fromPos = GlobalPosition;
-		if (_rotationPivot != null) fromPos = _rotationPivot.GlobalPosition;
-		
-		fromPos += -GlobalTransform.Basis.Z * 0.2f; // Slight offset
+		// Small forward offset to avoid self-collision with camera mesh
+		fromPos += forwardDirection * 0.2f; 
 		
 		Vector3[] testPoints = new Vector3[]
 		{
-			_detectedPlayer.GlobalPosition + Vector3.Up * 0.5f,
-			_detectedPlayer.GlobalPosition + Vector3.Up * 1.0f,
-			_detectedPlayer.GlobalPosition + Vector3.Up * 0.2f 
+			_detectedPlayer.GlobalPosition + Vector3.Up * 1.5f, // Head
+			_detectedPlayer.GlobalPosition + Vector3.Up * 0.5f  // Waist
 		};
+		
+		bool seen = false;
+
 		
 		var exclusions = new Godot.Collections.Array<Rid>();
 		if (_cachedEnemies != null)
@@ -150,7 +241,6 @@ public partial class SecurityCamera : Node3D
 			}
 		}
 
-		bool seen = false;
 		string blockerDebug = "";
 
 		foreach(Vector3 targetPos in testPoints)
@@ -195,11 +285,18 @@ public partial class SecurityCamera : Node3D
 			{
 				GD.Print($"Camera Sight Blocked by: {blockerDebug}");
 			}
-			if (_isAlerted)
-			{
-				_isAlerted = false;
+			_isAlerted = false;
+			_detectedPlayer.SetAlert(false, this);
+		}
+	}
+	
+	private void ClearAlert()
+	{
+		if (_isAlerted)
+		{
+			_isAlerted = false;
+			if (_detectedPlayer != null)
 				_detectedPlayer.SetAlert(false, this);
-			}
 		}
 	}
 

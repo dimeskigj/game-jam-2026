@@ -572,9 +572,11 @@ shape = SubResource("BoxShape3D_pickup")
 [node name="Mesh" type="MeshInstance3D" parent="HiddenItem" unique_id=1447599221]
 mesh = SubResource("BoxMesh_gold")
 
-[node name="KAMERA" parent="." unique_id=1498223709 instance=ExtResource("21_s0gvp")]
+[node name="KAMERA" parent="." unique_id=1498223709 node_paths=PackedStringArray("CameraPivot", "ModelGeometry") instance=ExtResource("21_s0gvp")]
 transform = Transform3D(-3.1404778e-07, 1.9954948, 7.447288, 1.744517e-07, 7.447288, -1.9954948, -7.71, 8.722585e-08, -3.4849828e-07, -2.0343962, 2.5, 7)
 script = ExtResource("19_camera_script")
+CameraPivot = NodePath("Pivot")
+ModelGeometry = NodePath("group1")
 
 [node name="ViewCone" type="SpotLight3D" parent="KAMERA" unique_id=2003004007 groups=["XRayable"]]
 transform = Transform3D(-1, -5.1928816e-15, 1.509958e-07, -8.5598196e-16, 1, 2.8721988e-08, -1.509958e-07, 2.8721988e-08, -1, 0, 0.054141685, -0.014507204)
@@ -591,15 +593,21 @@ mesh = SubResource("CylinderMesh_vision_cone")
 skeleton = NodePath("")
 
 [node name="DetectionArea" type="Area3D" parent="KAMERA" unique_id=2003004008]
-transform = Transform3D(-0.12970169, -1.110223e-16, 1.1338882e-08, -1.110223e-16, 0.12970169, -6.195478e-17, -1.1338882e-08, -6.6325836e-17, -0.12970169, 0, 0, 0)
+transform = Transform3D(-0.12970169, -2.220446e-16, 1.1338882e-08, 0, 0.12970169, -6.195479e-17, -1.1338882e-08, -6.6325836e-17, -0.12970169, 0, 0.056700215, -0.015192777)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="KAMERA/DetectionArea" unique_id=2003004009]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -5)
 shape = SubResource("BoxShape3D_camera_detection")
 
 [node name="LOSRay" type="RayCast3D" parent="KAMERA" unique_id=2003004010]
-transform = Transform3D(-0.12970169, 1.110223e-16, 1.1338882e-08, -1.110223e-16, 0.1297017, -6.195478e-17, -1.1338882e-08, -6.6325836e-17, -0.1297017, 0, 0.057036564, -0.015282899)
+transform = Transform3D(-0.12970169, -1.110223e-16, 1.9584412e-08, -1.110223e-16, 0.1297017, -1.5523926e-16, -1.958441e-08, -6.632585e-17, -0.1297017, 0, 0.056891546, -0.015244037)
 target_position = Vector3(0, 0, -12)
+
+[node name="Pivot" type="Node3D" parent="KAMERA" unique_id=420721037]
+transform = Transform3D(1, 8.881784e-16, 0, 0, 1, -5.1137216e-16, -3.5527137e-15, -5.1137216e-16, 1, 0, 0.05987276, -0.016042858)
+
+[node name="Radio" parent="KAMERA" unique_id=589524713 instance=ExtResource("22_radio")]
+transform = Transform3D(-5.2830775e-09, 2.9347185e-09, -0.12970169, 0.03356927, 0.12528221, 1.4673592e-09, 0.12528221, -0.03356927, -5.862622e-09, 0.27965307, -0.14544553, 0.71001214)
 
 [node name="Enemy" parent="." unique_id=577585736 node_paths=PackedStringArray("Waypoints") groups=["Enemies"] instance=ExtResource("17_tuemg")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.585043, 0, 1.7581491)

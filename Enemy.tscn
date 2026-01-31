@@ -33,3 +33,6 @@ collision_mask = 3
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="VisionArea" unique_id=937449206]
 shape = SubResource("ConvexPolygonShape3D_vision")
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=837264910]
+

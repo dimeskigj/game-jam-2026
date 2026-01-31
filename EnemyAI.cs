@@ -37,9 +37,19 @@ public partial class EnemyAI : CharacterBody3D
 	private AnimationPlayer _animPlayer;
 	private Area3D _visionArea;
 	private GeometryInstance3D _visualMesh; // For Debug Color
+	private NavigationAgent3D _navAgent;
+	private bool _mapReady = false;
 
-	public override void _Ready()
+	public override async void _Ready()
 	{
+		_navAgent = GetNode<NavigationAgent3D>("NavigationAgent3D");
+		
+		// Wait for the first physics frame to ensure the NavigationServer has synced the map
+		await ToSignal(GetTree(), SceneTree.SignalName.PhysicsFrame);
+		await ToSignal(GetTree(), SceneTree.SignalName.PhysicsFrame);
+		_mapReady = true;
+		GD.Print("EnemyAI: Map synced, navigation ready.");
+
 		// ... existing code ...
 		// Truncated for diff validity, rely on existing code context
 		_animPlayer = GetNodeOrNull<AnimationPlayer>("Model/kit_player/AnimationPlayer");
@@ -81,6 +91,8 @@ public partial class EnemyAI : CharacterBody3D
 
 	public override void _PhysicsProcess(double delta)
 	{
+		if (!_mapReady) return;
+		
 		Vector3 velocity = Velocity;
 
 		// Gravity
@@ -110,10 +122,25 @@ public partial class EnemyAI : CharacterBody3D
 		Velocity = velocity;
 		MoveAndSlide();
 
-		// Face movement direction
-		if (velocity.LengthSquared() > 0.1f)
+		// Push RigidBodies
+		for (int i = 0; i < GetSlideCollisionCount(); i++)
 		{
-			Vector3 lookTarget = GlobalPosition + velocity.Normalized();
+			KinematicCollision3D collision = GetSlideCollision(i);
+			if (collision.GetCollider() is RigidBody3D rb)
+			{
+				Vector3 pushDir = -collision.GetNormal();
+				pushDir.Y = 0; // Keep horizontal
+				// Apply impulse at collision point, or central impulse
+				// rb.ApplyCentralImpulse(pushDir * 2.0f);
+				rb.ApplyImpulse(pushDir * 2.0f, collision.GetPosition() - rb.GlobalPosition);
+			}
+		}
+
+		// Face movement direction
+		Vector3 flatVelocity = new Vector3(velocity.X, 0, velocity.Z);
+		if (flatVelocity.LengthSquared() > 0.1f)
+		{
+			Vector3 lookTarget = GlobalPosition + flatVelocity.Normalized();
 			LookAt(lookTarget, Vector3.Up);
 		}
 		
@@ -163,9 +190,6 @@ public partial class EnemyAI : CharacterBody3D
 
 	private void ProcessPatrol(ref Vector3 velocity, float delta)
 	{
-		// If we were chasing and lost target (handled in Chase), ensure we reset detected?
-		// Logic is in ProcessChase
-		
 		if (Waypoints == null || Waypoints.Count == 0)
 		{
 			velocity.X = Mathf.MoveToward(velocity.X, 0, PatrolSpeed * delta);
@@ -187,10 +211,14 @@ public partial class EnemyAI : CharacterBody3D
 		}
 
 		Node3D target = Waypoints[_currentWaypointIndex];
-		Vector3 direction = (target.GlobalPosition - GlobalPosition);
-		direction.Y = 0; // Keep movement planner on plane
-
-		if (direction.Length() < 1.0f)
+		
+		// Optimization: Only update target if it changed significantly
+		if (_navAgent.TargetPosition.DistanceSquaredTo(target.GlobalPosition) > 0.1f)
+		{
+			_navAgent.TargetPosition = target.GlobalPosition;
+		}
+		
+		if (_navAgent.IsNavigationFinished())
 		{
 			// Reached waypoint
 			_isWaiting = true;
@@ -200,7 +228,11 @@ public partial class EnemyAI : CharacterBody3D
 		}
 		else
 		{
+			Vector3 nextPos = _navAgent.GetNextPathPosition();
+			Vector3 direction = (nextPos - GlobalPosition);
+			direction.Y = 0;
 			direction = direction.Normalized();
+			
 			velocity.X = direction.X * PatrolSpeed;
 			velocity.Z = direction.Z * PatrolSpeed;
 		}
@@ -262,8 +294,10 @@ public partial class EnemyAI : CharacterBody3D
 		// Ensure we signal we see them
 		_targetPlayer.SetAlert(true, this);
 
-		Vector3 direction = (_targetPlayer.GlobalPosition - GlobalPosition);
-		float distance = direction.Length();
+		// Navigation
+		_navAgent.TargetPosition = _targetPlayer.GlobalPosition;
+		Vector3 nextPos = _navAgent.GetNextPathPosition();
+		Vector3 direction = (nextPos - GlobalPosition);
 		direction.Y = 0;
 		direction = direction.Normalized();
 
@@ -271,10 +305,10 @@ public partial class EnemyAI : CharacterBody3D
 		velocity.Z = direction.Z * ChaseSpeed;
 		
 		// If player too far, lose aggro
-		// Force minimum of 15.0f if DetectionRange is 0 (broken inspector)
+		float distanceToPlayer = GlobalPosition.DistanceTo(_targetPlayer.GlobalPosition);
 		float chaseLimit = Mathf.Max(DetectionRange, 10.0f) * 1.5f;
 		
-		if (distance > chaseLimit)
+		if (distanceToPlayer > chaseLimit)
 		{
 			// Debug why we lost aggro
 			// GD.Print($"Enemy Lost Aggro: Dist {distance:F1} > Limit {chaseLimit:F1}");
@@ -389,13 +423,11 @@ public partial class EnemyAI : CharacterBody3D
 
 	private void ProcessInvestigate(ref Vector3 velocity)
 	{
-		Vector3 direction = (_investigateTarget - GlobalPosition);
-		direction.Y = 0;
-
-		if (direction.Length() < 1.0f)
+		_navAgent.TargetPosition = _investigateTarget;
+		
+		if (_navAgent.IsNavigationFinished())
 		{
 			// Reached investigation point.
-			// Look around? Just go back to patrol for now.
 			GD.Print("Enemy reached alert location. Resuming patrol.");
 			_currentState = State.Patrol;
 			velocity.X = 0;
@@ -403,8 +435,11 @@ public partial class EnemyAI : CharacterBody3D
 		}
 		else
 		{
-			// Run there? Or Walk? Let's Run.
+			Vector3 nextPos = _navAgent.GetNextPathPosition();
+			Vector3 direction = (nextPos - GlobalPosition);
+			direction.Y = 0;
 			direction = direction.Normalized();
+
 			velocity.X = direction.X * ChaseSpeed;
 			velocity.Z = direction.Z * ChaseSpeed;
 		}

@@ -231,15 +231,16 @@ public partial class EnemyAI : CharacterBody3D
 			Vector3 direction = (nextPos - GlobalPosition);
 			direction.Y = 0;
 			
-			if (direction.LengthSquared() < 0.01f)
-			{
-				GD.Print($"Enemy: No valid direction! NextPos: {nextPos}, MyPos: {GlobalPosition}");
-			}
-			else
+			if (direction.LengthSquared() >= 0.01f)
 			{
 				direction = direction.Normalized();
 				velocity.X = direction.X * PatrolSpeed;
 				velocity.Z = direction.Z * PatrolSpeed;
+			}
+			else
+			{
+				velocity.X = 0;
+				velocity.Z = 0;
 			}
 		}
 	}

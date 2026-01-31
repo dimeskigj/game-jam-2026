@@ -125,8 +125,8 @@ public partial class PlayerController : CharacterBody3D
 		
 		_interactionLabel = GetNode<Label>("../UI/InteractionLabel");
 		_statusLabel = GetNodeOrNull<Label>("../UI/StatusLabel");
-		_sanityBar = GetNodeOrNull<ProgressBar>("%SanityBar");
-		_gameOverLabel = GetNodeOrNull<Label>("%GameOverLabel");
+		_sanityBar = GetNodeOrNull<ProgressBar>("../UI/SanityBar");
+		_gameOverLabel = GetNodeOrNull<Label>("../UI/GameOverLabel");
 		
 		_noteOverlay = GetNodeOrNull<Control>("../UI/NoteOverlay");
 		_noteLabel = GetNodeOrNull<Label>("../UI/NoteOverlay/NotePanel/NoteText");

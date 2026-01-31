@@ -4,6 +4,7 @@ public partial class PlayerInput : Node
 {
 	public Vector2 MoveInput { get; private set; }
 	public bool JumpPressed { get; private set; }
+	public bool DuckPressed { get; private set; }
 	public bool SprintPressed { get; private set; }
 	public bool LeftClickHeld { get; private set; }
 
@@ -89,6 +90,7 @@ public partial class PlayerInput : Node
 		}
 
 		JumpPressed = Input.IsKeyPressed(Key.Space);
+		DuckPressed = Input.IsKeyPressed(Key.Ctrl);
 		LeftClickHeld = Input.IsMouseButtonPressed(MouseButton.Left);
 	}
 }

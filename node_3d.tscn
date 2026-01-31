@@ -2,7 +2,6 @@
 
 [ext_resource type="Material" path="res://floor_material.tres" id="2_floor_mat"]
 [ext_resource type="PackedScene" uid="uid://bw5pjdvnaigpr" path="res://SCENE/player.tscn" id="3_5t8nk"]
-[ext_resource type="Texture2D" uid="uid://8d0uj6envljt" path="res://textures/sky.exr" id="3_sky_tex"]
 [ext_resource type="Script" uid="uid://cx8x1mac1t274" path="res://InventorySystem/InventoryUI.cs" id="5_inventory_ui"]
 [ext_resource type="Script" uid="uid://36lhpbg631ox" path="res://InteractionSystem/Pickup.cs" id="6_pickup"]
 [ext_resource type="Resource" uid="uid://kjpgb7fjq8yj" path="res://InventorySystem/item_key.tres" id="8_key"]
@@ -25,8 +24,11 @@
 [ext_resource type="PackedScene" uid="uid://djedkheulovl3" path="res://SCENE/city.tscn" id="26_j3e5s"]
 [ext_resource type="Script" uid="uid://cq57csrn0m4qu" path="res://InteractionSystem/Note.cs" id="26_note"]
 
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_vxd74"]
+load_path = "res://.godot/imported/NightSkyHDRI003_4K_HDR.exr-0e20ad0d6ba89c0330da9e9f11ad122e.bptc.ctex"
+
 [sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_default"]
-panorama = ExtResource("3_sky_tex")
+panorama = SubResource("CompressedTexture2D_vxd74")
 
 [sub_resource type="Sky" id="Sky_nu31w"]
 sky_material = SubResource("PanoramaSkyMaterial_default")
@@ -38,10 +40,37 @@ ambient_light_source = 2
 ambient_light_color = Color(0.5, 0.5, 0.5, 1)
 ambient_light_sky_contribution = 0.5
 tonemap_mode = 2
+tonemap_exposure = 0.5
+ssr_enabled = true
+ssr_max_steps = 32
+ssao_enabled = true
+ssao_intensity = 3.18
+ssao_power = 7.9170485
+ssao_horizon = 0.28
+ssil_enabled = true
+ssil_radius = 3.0
+ssil_intensity = 0.1
+ssil_sharpness = 0.53
+ssil_normal_rejection = 0.8
 sdfgi_enabled = true
 sdfgi_use_occlusion = true
 glow_enabled = true
+glow_intensity = 0.65
+glow_bloom = 0.5
+volumetric_fog_enabled = true
 volumetric_fog_density = 0.01
+volumetric_fog_albedo = Color(0, 0, 0, 1)
+volumetric_fog_emission = Color(0.012180077, 0.005632854, 0.004087274, 1)
+volumetric_fog_emission_energy = 197.47
+volumetric_fog_gi_inject = 4.7
+volumetric_fog_anisotropy = 0.34
+volumetric_fog_length = 1024.0
+volumetric_fog_detail_spread = 1.5000006
+volumetric_fog_ambient_inject = 8.26
+adjustment_enabled = true
+adjustment_brightness = 0.85
+adjustment_contrast = 1.15
+adjustment_saturation = 0.85
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_gas"]
 shader = ExtResource("14_gas_shader")
@@ -160,9 +189,13 @@ environment = SubResource("Environment_default")
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=2106531217]
 transform = Transform3D(-0.866023, -0.433016, 0.250001, 0, 0.499998, 0.866027, -0.500003, 0.749999, -0.43301, 0, 0, 0)
 light_color = Color(1, 0.95, 0.9, 1)
-light_energy = 1.5
+light_indirect_energy = 0.1
+light_bake_mode = 1
 shadow_enabled = true
-shadow_opacity = 0.8
+shadow_bias = 0.595
+shadow_normal_bias = 5.242
+shadow_opacity = 0.17
+shadow_blur = 0.725
 
 [node name="Floor" type="CSGBox3D" parent="." unique_id=1229859552]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0.7739258)
@@ -171,7 +204,7 @@ size = Vector3(35.288086, 1, 46.45508)
 material = ExtResource("2_floor_mat")
 
 [node name="Player" parent="." unique_id=1129234290 instance=ExtResource("3_5t8nk")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -2.376791)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -9.407364)
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=2005998870]
 script = ExtResource("5_inventory_ui")
@@ -707,6 +740,8 @@ skeleton = NodePath("")
 
 [node name="DetectionArea" type="Area3D" parent="KAMERA" unique_id=2003004008]
 transform = Transform3D(-0.12970169, -2.220446e-16, 1.1338882e-08, 0, 0.12970169, -6.195479e-17, -1.1338882e-08, -6.6325836e-17, -0.12970169, 0, 0.056700215, -0.015192777)
+collision_layer = 0
+monitorable = false
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="KAMERA/DetectionArea" unique_id=2003004009]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -5)

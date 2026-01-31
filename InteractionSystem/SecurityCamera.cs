@@ -100,6 +100,7 @@ public partial class SecurityCamera : Node3D
 
 		if (_detectionArea != null)
 		{
+			_detectionArea.Monitorable = false; // Prevent it from being "hit" by other physics bodies
 			if (!_detectionArea.IsConnected(Area3D.SignalName.BodyEntered, new Callable(this, MethodName.OnBodyEntered)))
 				_detectionArea.BodyEntered += OnBodyEntered;
 			if (!_detectionArea.IsConnected(Area3D.SignalName.BodyExited, new Callable(this, MethodName.OnBodyExited)))

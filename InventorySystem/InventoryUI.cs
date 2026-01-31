@@ -12,14 +12,16 @@ public partial class InventoryUI : CanvasLayer
     {
         _gridContainer = GetNode<GridContainer>("Control/GridContainer");
         
-        // Try to find the Player node first, then Ball as fallback
-        Node root = GetTree().Root.GetNodeOrNull("Node3D");
-        if (root != null)
+        // Find player/ball and inventory robustly
+        var window = GetTree().Root;
+        for (int i = 0; i < window.GetChildCount(); i++)
         {
-            Node playerNode = root.GetNodeOrNull("Player") ?? root.GetNodeOrNull("Ball");
+            var sceneRoot = window.GetChild(i);
+            Node playerNode = sceneRoot.FindChild("Player", true, false) ?? sceneRoot.FindChild("Ball", true, false);
             if (playerNode != null)
             {
                 _inventory = playerNode.GetNodeOrNull<Inventory>("Inventory");
+                if (_inventory != null) break;
             }
         }
 

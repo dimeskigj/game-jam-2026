@@ -19,50 +19,75 @@ public partial class SetupNavigation : Node
 
 	private void SetupAndBake()
 	{
-		SceneTree tree = GetTree();
-		Node root = tree.CurrentScene;
+		_navRegion = GetNodeOrNull<NavigationRegion3D>("../RuntimeNavRegion");
 		
-		_navRegion = root.GetNodeOrNull<NavigationRegion3D>("NavigationRegion3D");
 		if (_navRegion == null)
 		{
-			// Fallback: Create one if not in scene
-			_navRegion = new NavigationRegion3D();
-			_navRegion.Name = "NavigationRegion3D";
-			root.AddChild(_navRegion);
-			GD.Print("SetupNavigation: Created new NavigationRegion3D.");
-		}
-		else
-		{
-			GD.Print("SetupNavigation: Found existing NavigationRegion3D.");
+			// Try root fallback
+			foreach(Node child in GetTree().CurrentScene.GetChildren())
+			{
+				if (child is NavigationRegion3D nr) { _navRegion = nr; break; }
+			}
 		}
 
-		if (_navRegion.NavigationMesh == null)
+		if (_navRegion == null)
 		{
-			var navMesh = new NavigationMesh();
-			navMesh.CellSize = CellSize;
-			navMesh.AgentRadius = AgentRadius;
-			navMesh.AgentHeight = 1.8f;
-			navMesh.AgentMaxClimb = 0.5f;
-			navMesh.GeometryParsedGeometryType = NavigationMesh.ParsedGeometryType.MeshInstances; 
-			// Use SourceGeometryModeEnum.GroupsWithChildren if we reparent things under it (Default)
-			// Or RootNode if we prefer. 
-			// If we put static objects UNDER the Region in the scene, the Default (RootNode of the Region?) NO.
-			// Default 'SourceGeometryMode' for Region is: "Root Node Children" (implied).
-			// Let's explicitly set it to parse its children.
-			
-			// Actually, let's stick to Parsing STATIC COLLIDERS for robustness with CSG if they bake collisions
-			// But MeshInstances is better for CSG visual baking.
-			
-			_navRegion.NavigationMesh = navMesh;
+			GD.PrintErr("Navigation: No NavigationRegion3D found! Cannot bake.");
+			return;
 		}
 
-		_navRegion.BakeFinished += OnBakeFinished;
-		GD.Print("SetupNavigation: Baking NavigationMesh...");
-		_navRegion.BakeNavigationMesh(true);
-	}
-	
-	private void OnBakeFinished()
-	{
-		GD.Print("SetupNavigation: Navigation Mesh Baked Successfully!");
+		GD.Print("Navigation: Starting ROBUST runtime bake...");
+		
+		// 1. Configure the Navigation Mesh Resource
+		var navMesh = new NavigationMesh();
+		navMesh.CellSize = 0.25f;
+		navMesh.AgentRadius = 0.5f;
+		navMesh.AgentHeight = 1.0f; // Friendly height
+		navMesh.AgentMaxClimb = 0.5f;
+		navMesh.AgentMaxSlope = 50.0f;
+		
+		// STRATEGY: Parse STATIC COLLIDERS only.
+		// Walls/Floors = StaticBody3D (Layer 1).
+		// Doors = RigidBody3D (Layer 3 or 4) -> Ignored by 'StaticColliders' type.
+		// Pickups = RigidBody3D -> Ignored.
+		// This ensures the navmesh is walkable THROUGH doors.
+		
+		navMesh.GeometryParsedGeometryType = NavigationMesh.ParsedGeometryType.StaticColliders;
+		navMesh.GeometryCollisionMask = 1; // Only parse Layer 1 (World)
+		
+		// 2. Create Source Geometry Data
+		var sourceGeometry = new NavigationMeshSourceGeometryData3D();
+		
+		// 3. Parse the entire Current Scene
+		Node rootNode = GetTree().CurrentScene;
+		NavigationServer3D.ParseSourceGeometryData(navMesh, sourceGeometry, rootNode);
+		
+		// SAFETY CHECK: If we found no geometry, maybe the world uses Meshes but no collision?
+		// Try parsing meshes if data is empty? (Hard to check count on SourceGeometry in C# easily without internals)
+		// Instead, we just trust the Static Colliders strategy first.
+		
+		GD.Print("Navigation: Geometry Parsed (Static Colliders). Baking...");
+		
+		// 4. Bake
+		NavigationServer3D.BakeFromSourceGeometryData(navMesh, sourceGeometry);
+		
+		// Fallback: If 0 polygons, try parsing Meshes as backup
+		if (navMesh.GetPolygonCount() == 0)
+		{
+			GD.Print("Navigation: Static bake yielded 0 polygons. Retrying with MeshInstances...");
+			navMesh.GeometryParsedGeometryType = NavigationMesh.ParsedGeometryType.MeshInstances;
+			// Note: This risks baking Doors as obstacles if they have meshes on Layer 1.
+			// Ideally, Door Meshes should be on a visual layer or we mask them.
+			NavigationServer3D.ParseSourceGeometryData(navMesh, sourceGeometry, rootNode);
+			NavigationServer3D.BakeFromSourceGeometryData(navMesh, sourceGeometry);
+		}
+		
+		// 5. Assign to region
+		_navRegion.NavigationMesh = navMesh;
+		
+		GD.Print("========================================");
+		GD.Print("Navigation: BAKING COMPLETE!");
+		GD.Print("Navigation Mesh Polygons: " + navMesh.GetPolygonCount());
+		GD.Print("========================================");
 	}
 }

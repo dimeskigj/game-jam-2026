@@ -5,87 +5,89 @@ public partial class EnemyAI : CharacterBody3D
 {
 	[Export] public float PatrolSpeed = 3.0f;
 	[Export] public float ChaseSpeed = 6.0f;
-	[Export] public float RotationSpeed = 10.0f; 
-	[Export] public float ModelRotationOffset = 0.0f; // Adjusted to 0 since model internal rotation is handled
-
-	[ExportCategory("Detection")]
 	[Export] public float DetectionRange = 10.0f;
+	[Export] public float ChaseLoseTime = 3.0f;
 	
 	[ExportCategory("Patrol")]
 	[Export] public Godot.Collections.Array<Node3D> Waypoints;
 	[Export] public PatrolType MovementType = PatrolType.Loop;
 	[Export] public float WaitTimeAtWaypoint = 1.0f;
 
-	public enum PatrolType
-	{
-		Loop,
-		PingPong
-	}
+	public enum PatrolType { Loop, PingPong }
 
-	private int _currentWaypointIndex = 0;
-	private int _patrolDirection = 1; // 1 for forward, -1 for backward
-	private float _waitTimer = 0.0f;
-	private bool _isWaiting = false;
-
-	private PlayerController _targetPlayer;
-	
 	private enum State { Patrol, Chase, Investigate }
 	private State _currentState = State.Patrol;
+	
+	private int _currentWaypointIndex = 0;
+	private int _patrolDirection = 1;
+	private float _waitTimer = 0.0f;
+	private bool _isWaiting = false;
+	private float _chaseTimer = 0.0f;
+	
+	private PlayerController _targetPlayer;
 	private Vector3 _investigateTarget;
-
-	// Nodes
-	private AnimationPlayer _animPlayer;
-	private Area3D _visionArea;
-	private GeometryInstance3D _visualMesh; // For Debug Color
+	
 	private NavigationAgent3D _navAgent;
+	private Area3D _visionArea;
+	private RayCast3D _obstacleRay;
+	private AnimationPlayer _animPlayer;
 	private bool _mapReady = false;
 
-	public override async void _Ready()
+	public override void _Ready()
 	{
 		_navAgent = GetNode<NavigationAgent3D>("NavigationAgent3D");
-		
-		// Wait for the first physics frame to ensure the NavigationServer has synced the map
-		await ToSignal(GetTree(), SceneTree.SignalName.PhysicsFrame);
-		await ToSignal(GetTree(), SceneTree.SignalName.PhysicsFrame);
-		_mapReady = true;
-		GD.Print("EnemyAI: Map synced, navigation ready.");
+		_obstacleRay = GetNodeOrNull<RayCast3D>("ObstacleRay");
+		_visionArea = GetNodeOrNull<Area3D>("VisionArea");
 
-		// ... existing code ...
-		// Truncated for diff validity, rely on existing code context
+		// Find animation player
 		_animPlayer = GetNodeOrNull<AnimationPlayer>("Model/kit_player/AnimationPlayer");
 		if (_animPlayer == null)
 		{
-			foreach (Node child in GetNode("Model").GetChildren())
+			// Fallback search
+			Node model = GetNodeOrNull("Model");
+			if (model != null)
 			{
-				if (child is AnimationPlayer ap) { _animPlayer = ap; break; }
-				foreach (Node grandChild in child.GetChildren())
+				foreach (Node child in model.GetChildren())
 				{
-					if (grandChild is AnimationPlayer ap2) { _animPlayer = ap2; break; }
+					if (child is AnimationPlayer ap) { _animPlayer = ap; break; }
+					foreach (Node grandChild in child.GetChildren())
+					{
+						if (grandChild is AnimationPlayer ap2) { _animPlayer = ap2; break; }
+					}
 				}
 			}
 		}
-
-		if (_animPlayer != null)
-		{
-			GD.Print("Enemy AnimationPlayer found. Available animations:");
-			foreach (string animName in _animPlayer.GetAnimationList())
-			{
-				GD.Print("- " + animName);
-			}
-		}
-		else 
-		{
-			GD.PrintErr("Enemy AnimationPlayer NOT found!");
-		}
-
-		_visionArea = GetNodeOrNull<Area3D>("VisionArea");
-		// Fallback for visual debugging
-		_visualMesh = GetNodeOrNull<GeometryInstance3D>("Model/Body"); 
 		
 		if (_visionArea != null)
 		{
 			_visionArea.BodyEntered += OnBodyEnteredVision;
 			_visionArea.BodyExited += OnBodyExitedVision;
+		}
+
+		// Improve navigation parameters
+		_navAgent.PathDesiredDistance = 1.0f;
+		_navAgent.TargetDesiredDistance = 1.0f;
+		_navAgent.PathMaxDistance = 3.0f; // Allow snapping to mesh from further away 
+
+		// Defer setup to ensuring physics is ready
+		CallDeferred(MethodName.ActorSetup);
+	}
+
+	private async void ActorSetup()
+	{
+		// Wait for the first physics frame so the NavigationServer can sync.
+		await ToSignal(GetTree(), SceneTree.SignalName.PhysicsFrame);
+		await ToSignal(GetTree(), SceneTree.SignalName.PhysicsFrame);
+
+		_mapReady = true;
+		GD.Print("EnemyAI: ActorSetup complete. Navigation ready.");
+		
+		// Force initial path (re)calculation now that map is present
+		if (Waypoints != null && Waypoints.Count > 0)
+		{
+			_currentWaypointIndex = 0;
+			_navAgent.TargetPosition = Waypoints[0].GlobalPosition;
+			GD.Print($"EnemyAI: Initial target set to {Waypoints[0].GlobalPosition}");
 		}
 	}
 
@@ -94,48 +96,40 @@ public partial class EnemyAI : CharacterBody3D
 		if (!_mapReady) return;
 		
 		Vector3 velocity = Velocity;
-
-		// Gravity
+		
+		// Apply gravity
 		if (!IsOnFloor())
 			velocity.Y -= 9.8f * (float)delta;
-			
-		// Continuous Vision Check
-		// This ensures we spot the player if they decloak while already inside our vision area
+		
+		// Check vision when not chasing
 		if (_currentState == State.Patrol || _currentState == State.Investigate)
 		{
 			CheckVision();
 		}
-
+		
+		// Process current state
 		switch (_currentState)
 		{
 			case State.Patrol:
 				ProcessPatrol(ref velocity, (float)delta);
 				break;
 			case State.Chase:
-				ProcessChase(ref velocity);
+				ProcessChase(ref velocity, (float)delta);
 				break;
 			case State.Investigate:
-				ProcessInvestigate(ref velocity);
+				ProcessInvestigate(ref velocity, (float)delta);
 				break;
 		}
-
+		
 		Velocity = velocity;
 		MoveAndSlide();
-
-		// Push RigidBodies
-		for (int i = 0; i < GetSlideCollisionCount(); i++)
-		{
-			KinematicCollision3D collision = GetSlideCollision(i);
-			if (collision.GetCollider() is RigidBody3D rb)
-			{
-				Vector3 pushDir = -collision.GetNormal();
-				pushDir.Y = 0; // Keep horizontal
-				// Apply impulse at collision point, or central impulse
-				// rb.ApplyCentralImpulse(pushDir * 2.0f);
-				rb.ApplyImpulse(pushDir * 2.0f, collision.GetPosition() - rb.GlobalPosition);
-			}
-		}
-
+		
+		// Handle door collisions
+		HandleDoorCollisions();
+		
+		// Push items gently
+		ApplyKickForce();
+		
 		// Face movement direction
 		Vector3 flatVelocity = new Vector3(velocity.X, 0, velocity.Z);
 		if (flatVelocity.LengthSquared() > 0.1f)
@@ -144,45 +138,38 @@ public partial class EnemyAI : CharacterBody3D
 			LookAt(lookTarget, Vector3.Up);
 		}
 		
-		// Apply Visual Offset Correction
-		if (GetNodeOrNull<Node3D>("Model") is Node3D modelNode)
-		{
-			modelNode.RotationDegrees = new Vector3(0, ModelRotationOffset, 0);
-		}
-		
 		UpdateAnimation(velocity);
 	}
-	
+
 	private void CheckVision()
 	{
 		if (_visionArea == null) return;
 		
 		var bodies = _visionArea.GetOverlappingBodies();
-		foreach(var body in bodies)
+		foreach (var body in bodies)
 		{
 			if (body is PlayerController player)
 			{
 				if (player.CurrentMaskEffect == MaskEffect.Invisibility) continue;
 				if (player.IsDead) continue;
-
-				// Raycast Check
+				
+				// Raycast line of sight check
 				var spaceState = GetWorld3D().DirectSpaceState;
-				var query = PhysicsRayQueryParameters3D.Create(GlobalPosition + Vector3.Up * 1.5f, player.GlobalPosition + Vector3.Up * 0.5f);
-				query.Exclude = new Godot.Collections.Array<Rid> { GetRid() }; 
+				var query = PhysicsRayQueryParameters3D.Create(
+					GlobalPosition + Vector3.Up * 1.5f,
+					player.GlobalPosition + Vector3.Up * 0.5f
+				);
+				query.Exclude = new Godot.Collections.Array<Rid> { GetRid() };
 				
 				var result = spaceState.IntersectRay(query);
-
-				if (result.Count > 0)
+				if (result.Count > 0 && result["collider"].Obj == player)
 				{
-					Node3D hitNode = result["collider"].Obj as Node3D;
-					if (hitNode == player)
-					{
-						_targetPlayer = player;
-						_currentState = State.Chase;
-						_targetPlayer.SetAlert(true, this);
-						GD.Print("ENEMY SPOTTED PLAYER! Switching to Chase.");
-						return; // Found target, stop checking
-					}
+					_targetPlayer = player;
+					_currentState = State.Chase;
+					_chaseTimer = 0.0f;
+					_targetPlayer.SetAlert(true, this);
+					GD.Print("Enemy spotted player!");
+					return;
 				}
 			}
 		}
@@ -192,11 +179,12 @@ public partial class EnemyAI : CharacterBody3D
 	{
 		if (Waypoints == null || Waypoints.Count == 0)
 		{
-			velocity.X = Mathf.MoveToward(velocity.X, 0, PatrolSpeed * delta);
-			velocity.Z = Mathf.MoveToward(velocity.Z, 0, PatrolSpeed * delta);
+			GD.Print("Enemy: No waypoints assigned!");
+			velocity.X = 0;
+			velocity.Z = 0;
 			return;
 		}
-
+		
 		if (_isWaiting)
 		{
 			velocity.X = 0;
@@ -206,21 +194,32 @@ public partial class EnemyAI : CharacterBody3D
 			{
 				_isWaiting = false;
 				AdvanceWaypoint();
+				GD.Print($"Enemy: Moving to waypoint {_currentWaypointIndex}");
 			}
 			return;
 		}
-
-		Node3D target = Waypoints[_currentWaypointIndex];
 		
-		// Optimization: Only update target if it changed significantly
-		if (_navAgent.TargetPosition.DistanceSquaredTo(target.GlobalPosition) > 0.1f)
+		Node3D target = Waypoints[_currentWaypointIndex];
+		Vector3 targetPos = target.GlobalPosition;
+		_navAgent.TargetPosition = targetPos;
+		
+		float distanceToTarget = GlobalPosition.DistanceTo(targetPos);
+		bool navFinished = _navAgent.IsNavigationFinished();
+		
+		// Debug output every 60 frames (about once per second)
+		if (Engine.GetPhysicsFrames() % 60 == 0)
 		{
-			_navAgent.TargetPosition = target.GlobalPosition;
+			GD.Print($"Enemy Patrol Debug:");
+			GD.Print($"  Position: {GlobalPosition}");
+			GD.Print($"  Target: {targetPos}");
+			GD.Print($"  Distance: {distanceToTarget:F2}");
+			GD.Print($"  Nav Finished: {navFinished}");
+			GD.Print($"  Is On Floor: {IsOnFloor()}");
 		}
 		
-		if (_navAgent.IsNavigationFinished())
+		if (navFinished || distanceToTarget < 1.0f)
 		{
-			// Reached waypoint
+			GD.Print($"Enemy: Reached waypoint {_currentWaypointIndex}");
 			_isWaiting = true;
 			_waitTimer = WaitTimeAtWaypoint;
 			velocity.X = 0;
@@ -231,22 +230,234 @@ public partial class EnemyAI : CharacterBody3D
 			Vector3 nextPos = _navAgent.GetNextPathPosition();
 			Vector3 direction = (nextPos - GlobalPosition);
 			direction.Y = 0;
-			direction = direction.Normalized();
 			
-			velocity.X = direction.X * PatrolSpeed;
-			velocity.Z = direction.Z * PatrolSpeed;
+			if (direction.LengthSquared() < 0.01f)
+			{
+				GD.Print($"Enemy: No valid direction! NextPos: {nextPos}, MyPos: {GlobalPosition}");
+			}
+			else
+			{
+				direction = direction.Normalized();
+				velocity.X = direction.X * PatrolSpeed;
+				velocity.Z = direction.Z * PatrolSpeed;
+			}
+		}
+	}
+
+	private void ProcessChase(ref Vector3 velocity, float delta)
+	{
+		if (_targetPlayer == null)
+		{
+			_currentState = State.Patrol;
+			return;
+		}
+		
+		// Check if player is still visible
+		bool canSeePlayer = IsPlayerVisible();
+		
+		if (canSeePlayer)
+		{
+			_chaseTimer = 0.0f;
+			_targetPlayer.SetAlert(true, this);
+			// Update last known position
+			_investigateTarget = _targetPlayer.GlobalPosition;
+		}
+		else
+		{
+			_chaseTimer += delta;
+			if (_chaseTimer >= ChaseLoseTime)
+			{
+				GD.Print($"Enemy: Lost sight for {ChaseLoseTime}s. Investigating last known pos: {_investigateTarget}");
+				_targetPlayer.SetAlert(false, this);
+				_targetPlayer = null;
+				_currentState = State.Investigate;
+				return;
+			}
+		}
+		
+		// Check for invisibility
+		if (_targetPlayer.CurrentMaskEffect == MaskEffect.Invisibility)
+		{
+			GD.Print("Enemy: Player turned invisible. Returning to Patrol.");
+			_targetPlayer.SetAlert(false, this);
+			_targetPlayer = null;
+			_currentState = State.Patrol;
+			return;
+		}
+		
+		// Check for locked door ahead
+		if (_obstacleRay != null && _obstacleRay.IsColliding())
+		{
+			if (_obstacleRay.GetCollider() is Door door && door.IsLocked)
+			{
+				GD.Print("Enemy blocked by locked door. Investigating current location.");
+				_investigateTarget = GlobalPosition;
+				_targetPlayer.SetAlert(false, this);
+				_targetPlayer = null;
+				_currentState = State.Investigate;
+				return;
+			}
+		}
+		
+		// Navigate to player
+		_navAgent.TargetPosition = _targetPlayer.GlobalPosition;
+		
+		// Optional: If path is invalid, maybe look at player?
+		
+		Vector3 nextPos = _navAgent.GetNextPathPosition();
+		Vector3 direction = (nextPos - GlobalPosition).Normalized();
+		direction.Y = 0;
+		
+		velocity.X = direction.X * ChaseSpeed;
+		velocity.Z = direction.Z * ChaseSpeed;
+	}
+
+	private void ProcessInvestigate(ref Vector3 velocity, float delta)
+	{
+		_navAgent.TargetPosition = _investigateTarget;
+		
+		if (_navAgent.IsNavigationFinished())
+		{
+			GD.Print("Enemy finished investigation. Returning to Patrol.");
+			_currentState = State.Patrol;
+			velocity.X = 0;
+			velocity.Z = 0;
+		}
+		else
+		{
+			Vector3 nextPos = _navAgent.GetNextPathPosition();
+			Vector3 direction = (nextPos - GlobalPosition).Normalized();
+			direction.Y = 0;
+			
+			velocity.X = direction.X * ChaseSpeed;
+			velocity.Z = direction.Z * ChaseSpeed;
+		}
+	}
+
+	private bool IsPlayerVisible()
+	{
+		if (_targetPlayer == null || _visionArea == null) return false;
+		
+		var bodies = _visionArea.GetOverlappingBodies();
+		bool inArea = false;
+		foreach (var body in bodies)
+		{
+			if (body == _targetPlayer)
+			{
+				inArea = true;
+				break;
+			}
+		}
+		
+		if (!inArea) return false;
+		
+		// Raycast check
+		var spaceState = GetWorld3D().DirectSpaceState;
+		var query = PhysicsRayQueryParameters3D.Create(
+			GlobalPosition + Vector3.Up * 1.5f,
+			_targetPlayer.GlobalPosition + Vector3.Up * 0.5f
+		);
+		query.Exclude = new Godot.Collections.Array<Rid> { GetRid() };
+		
+		// Mask: Layer 1 (World/Player) + Layer 3 (Doors). Exclude Layer 2 (Pickups).
+		// 1 = Bit 0, 4 = Bit 2. Sum = 5.
+		query.CollisionMask = 5; 
+		
+		var result = spaceState.IntersectRay(query);
+		return result.Count > 0 && result["collider"].Obj == _targetPlayer;
+	}
+
+	private void HandleDoorCollisions()
+	{
+		for (int i = 0; i < GetSlideCollisionCount(); i++)
+		{
+			KinematicCollision3D collision = GetSlideCollision(i);
+			if (collision.GetCollider() is Door door)
+			{
+				if (door.IsLocked)
+				{
+					// Stop chasing if we hit a locked door
+					if (_currentState == State.Chase && _targetPlayer != null)
+					{
+						GD.Print("Enemy hit locked door - abandoning chase");
+						_investigateTarget = GlobalPosition;
+						_targetPlayer.SetAlert(false, this);
+						_targetPlayer = null;
+						_currentState = State.Investigate;
+					}
+				}
+				else
+				{
+					// Try to open unlocked door
+					door.EnemyInteract();
+					
+					// Apply gentle push
+					if (door is RigidBody3D rb)
+					{
+						Vector3 pushDir = -collision.GetNormal();
+						pushDir.Y = 0;
+						rb.ApplyImpulse(pushDir * 0.5f * rb.Mass, collision.GetPosition() - rb.GlobalPosition);
+					}
+				}
+			}
+		}
+	}
+
+	private void ApplyKickForce()
+	{
+		var spaceState = GetWorld3D().DirectSpaceState;
+		var query = new PhysicsShapeQueryParameters3D();
+		var shape = new SphereShape3D();
+		shape.Radius = 1.0f;
+		query.ShapeRid = shape.GetRid();
+		query.Transform = GlobalTransform;
+		query.CollisionMask = 2; // Layer 2: Pickups
+		
+		var results = spaceState.IntersectShape(query);
+		foreach (var result in results)
+		{
+			var collider = (Variant)result["collider"];
+			if (collider.As<Node>() is RigidBody3D rb)
+			{
+				Vector3 pushDirection = (rb.GlobalPosition - GlobalPosition).Normalized();
+				pushDirection.Y = 0;
+				rb.ApplyImpulse(pushDirection * 0.2f * rb.Mass);
+			}
+		}
+	}
+
+	private void UpdateAnimation(Vector3 velocity)
+	{
+		if (_animPlayer == null) return;
+		
+		Vector2 horizontalVel = new Vector2(velocity.X, velocity.Z);
+		string animToPlay = "idle";
+		
+		if (horizontalVel.Length() > 0.1f)
+		{
+			if (_currentState == State.Chase && _animPlayer.HasAnimation("run"))
+				animToPlay = "run";
+			else if (_animPlayer.HasAnimation("walk"))
+				animToPlay = "walk";
+			else if (_animPlayer.HasAnimation("run"))
+				animToPlay = "run";
+		}
+		
+		if (_animPlayer.CurrentAnimation != animToPlay && _animPlayer.HasAnimation(animToPlay))
+		{
+			_animPlayer.Play(animToPlay, 0.2f);
 		}
 	}
 
 	private void AdvanceWaypoint()
 	{
 		if (Waypoints.Count <= 1) return;
-
+		
 		if (MovementType == PatrolType.Loop)
 		{
 			_currentWaypointIndex = (_currentWaypointIndex + 1) % Waypoints.Count;
 		}
-		else if (MovementType == PatrolType.PingPong)
+		else // PingPong
 		{
 			if (_patrolDirection == 1)
 			{
@@ -275,145 +486,11 @@ public partial class EnemyAI : CharacterBody3D
 		}
 	}
 
-	private void ProcessChase(ref Vector3 velocity)
-	{
-		if (_targetPlayer == null)
-		{
-			_currentState = State.Patrol;
-			return;
-		}
-
-		if (_targetPlayer.CurrentMaskEffect == MaskEffect.Invisibility)
-		{
-			_targetPlayer.SetAlert(false, this);
-			_targetPlayer = null;
-			_currentState = State.Patrol;
-			return;
-		}
-
-		// Ensure we signal we see them
-		_targetPlayer.SetAlert(true, this);
-
-		// Navigation
-		_navAgent.TargetPosition = _targetPlayer.GlobalPosition;
-		Vector3 nextPos = _navAgent.GetNextPathPosition();
-		Vector3 direction = (nextPos - GlobalPosition);
-		direction.Y = 0;
-		direction = direction.Normalized();
-
-		velocity.X = direction.X * ChaseSpeed;
-		velocity.Z = direction.Z * ChaseSpeed;
-		
-		// If player too far, lose aggro
-		float distanceToPlayer = GlobalPosition.DistanceTo(_targetPlayer.GlobalPosition);
-		float chaseLimit = Mathf.Max(DetectionRange, 10.0f) * 1.5f;
-		
-		if (distanceToPlayer > chaseLimit)
-		{
-			// Debug why we lost aggro
-			// GD.Print($"Enemy Lost Aggro: Dist {distance:F1} > Limit {chaseLimit:F1}");
-			_targetPlayer.SetAlert(false, this);
-			_targetPlayer = null;
-			_currentState = State.Patrol;
-		}
-	}
-
-	private void UpdateAnimation(Vector3 velocity)
-	{
-		if (_animPlayer == null) return;
-
-		Vector2 horizontalVel = new Vector2(velocity.X, velocity.Z);
-		string animToPlay = "idle"; // Default lowercase for kit_player
-
-		if (horizontalVel.Length() > 0.1f)
-		{
-			// The kit_player usually has "run" or "walk". 
-			// We'll try "run" for chase, "walk" for patrol if available.
-			if ((_currentState == State.Chase || _currentState == State.Investigate) && _animPlayer.HasAnimation("run"))
-				animToPlay = "run";
-			else if (_animPlayer.HasAnimation("walk"))
-				animToPlay = "walk";
-			else if (_animPlayer.HasAnimation("run"))
-				animToPlay = "run";
-		}
-		
-		// Fallback if specific lowercase names don't exist, try Title Case
-		if (!_animPlayer.HasAnimation(animToPlay))
-		{
-			string titleCase = char.ToUpper(animToPlay[0]) + animToPlay.Substring(1);
-			if (_animPlayer.HasAnimation(titleCase))
-				animToPlay = titleCase;
-		}
-
-		if (_animPlayer.CurrentAnimation != animToPlay)
-		{
-			if (_animPlayer.HasAnimation(animToPlay))
-			{
-				_animPlayer.Play(animToPlay, 0.2f);
-			}
-		}
-	}
-
-	private void OnBodyEnteredVision(Node3D body)
-	{
-		GD.Print($"Body entered vision: {body.Name} ({body.GetType().Name})");
-
-		if (body is PlayerController player)
-		{
-			if (player.CurrentMaskEffect == MaskEffect.Invisibility) return;
-
-			GD.Print("Body is PlayerController. Checking Raycast...");
-			
-			// Check Line of Sight
-			var spaceState = GetWorld3D().DirectSpaceState;
-			// Aim at player position. PlayerController (CharacterBody3D) pivot is usually feet.
-			// Let's aim slightly up to avoid ground checking or low obstacles.
-			var query = PhysicsRayQueryParameters3D.Create(GlobalPosition + Vector3.Up * 1.5f, player.GlobalPosition + Vector3.Up * 0.5f);
-			
-			// Add exceptions
-			query.Exclude = new Godot.Collections.Array<Rid> { GetRid() }; 
-			
-			var result = spaceState.IntersectRay(query);
-
-			if (result.Count > 0)
-			{
-				Node3D hitNode = result["collider"].Obj as Node3D;
-				// GD.Print($"Raycast hit: {hitNode?.Name}");
-				
-				if (hitNode == player)
-				{
-					_targetPlayer = player;
-					_currentState = State.Chase;
-					GD.Print("ENEMY SPOTTED PLAYER! Chasing...");
-				}
-				else
-				{
-					GD.Print("Raycast blocked by: " + hitNode?.Name);
-				}
-			}
-			else
-			{
-				// If nothing hit (open air?), it usually means we didn't hit anything, so we see nothing?
-				// Or did we mess up the query? IntersectRay returns nothing if it doesn't hit a collider.
-				// If we don't hit a collider, we theoretically don't see the player (unless the player has no collider, which is impossible for CharacterBody3D)
-				// So count == 0 means blocked? No, count == 0 means "ray went to infinity" or "hit nothing matching mask".
-				// IF we aim AT the player, and hit nothing, it implies the player is not hittable?
-				// BUT player usually has collision layer.
-				// We need to ensure Raycast Mask includes Player.
-				GD.Print("Raycast hit nothing. Is player collider masked check?");
-			}
-		}
-	}
-	
 	public void AlertToLocation(Vector3 location)
 	{
-		// If we are already chasing the player, we have better info (visual contact)
 		if (_currentState == State.Chase) return;
-
-		// Update investigation target
-		_investigateTarget = location;
 		
-		// If already investigating, just update target (no print spam)
+		_investigateTarget = location;
 		if (_currentState != State.Investigate)
 		{
 			GD.Print($"Enemy alerted to location: {location}");
@@ -421,32 +498,16 @@ public partial class EnemyAI : CharacterBody3D
 		}
 	}
 
-	private void ProcessInvestigate(ref Vector3 velocity)
+	private void OnBodyEnteredVision(Node3D body)
 	{
-		_navAgent.TargetPosition = _investigateTarget;
-		
-		if (_navAgent.IsNavigationFinished())
+		if (body is PlayerController)
 		{
-			// Reached investigation point.
-			GD.Print("Enemy reached alert location. Resuming patrol.");
-			_currentState = State.Patrol;
-			velocity.X = 0;
-			velocity.Z = 0;
-		}
-		else
-		{
-			Vector3 nextPos = _navAgent.GetNextPathPosition();
-			Vector3 direction = (nextPos - GlobalPosition);
-			direction.Y = 0;
-			direction = direction.Normalized();
-
-			velocity.X = direction.X * ChaseSpeed;
-			velocity.Z = direction.Z * ChaseSpeed;
+			CheckVision();
 		}
 	}
-	
+
 	private void OnBodyExitedVision(Node3D body)
 	{
-		// Keep chasing logic handled in ProcessChase
+		// Chase timeout handles this
 	}
 }

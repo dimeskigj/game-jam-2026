@@ -11,7 +11,6 @@ height = 1.8
 points = PackedVector3Array(0, 0, 0, 5, 2, -7, -5, 2, -7, 5, -2, -7, -5, -2, -7)
 
 [node name="Enemy" type="CharacterBody3D" unique_id=209923709 node_paths=PackedStringArray("Waypoints")]
-collision_layer = 4
 script = ExtResource("1_enemy")
 DetectionRange = 5.0
 Waypoints = []
@@ -29,10 +28,14 @@ transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 
 [node name="VisionArea" type="Area3D" parent="." unique_id=1946592985]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8541241, 0.25853693)
 collision_layer = 0
-collision_mask = 3
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="VisionArea" unique_id=937449206]
 shape = SubResource("ConvexPolygonShape3D_vision")
 
 [node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=837264910]
 
+[node name="ObstacleRay" type="RayCast3D" parent="." unique_id=998877665]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+target_position = Vector3(0, 0, -2)
+debug_shape_custom_color = Color(1, 0, 1, 1)
+debug_shape_thickness = 5

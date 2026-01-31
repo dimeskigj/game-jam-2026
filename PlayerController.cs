@@ -61,6 +61,8 @@ public partial class PlayerController : CharacterBody3D
 	[Export]
 	public float GrabPower = 10.0f;
 	[Export]
+	public float PushForce = 1.0f;
+	[Export]
 	public float HoldDistance = 3.0f;
 
 	public float gravity = ProjectSettings.GetSetting("physics/3d/default_gravity").AsSingle();
@@ -89,6 +91,7 @@ public partial class PlayerController : CharacterBody3D
 	
 	private XRayManager _xRayManager;
 	private Label _interactionLabel;
+	private Label _statusLabel;
 	private ProgressBar _sanityBar;
 	private Label _gameOverLabel;
 	
@@ -118,6 +121,7 @@ public partial class PlayerController : CharacterBody3D
 		_detectionOverlay = GetNodeOrNull<ColorRect>("../UI/DetectionOverlay"); 
 		
 		_interactionLabel = GetNode<Label>("../UI/InteractionLabel");
+		_statusLabel = GetNodeOrNull<Label>("../UI/StatusLabel");
 		_sanityBar = GetNode<ProgressBar>("../UI/SanityBar");
 		_gameOverLabel = GetNode<Label>("../UI/GameOverLabel");
 		_detectionLabel = GetNodeOrNull<Label>("../UI/DetectionLabel"); 
@@ -136,6 +140,9 @@ public partial class PlayerController : CharacterBody3D
 			_detectionOverlay.Material = alertMat;
 			_detectionOverlay.Visible = false; // Start hidden
 		}
+
+		// Ensure interaction cast sees Layer 1 (Static), Layer 2 (Pickups), Layer 3 (Doors)
+		_interactionCast.CollisionMask = 1 | 2 | 4; 
 
 		// Connect Signals
 		_input.LookInput += OnLookInput;
@@ -241,8 +248,14 @@ public partial class PlayerController : CharacterBody3D
 		}
 	}
 
+	// Notification State
+	private double _notificationTime = 0.0;
+	private string _notificationText = "";
+
 	public override void _PhysicsProcess(double delta)
 	{
+		if (_notificationTime > 0) _notificationTime -= delta;
+
 		UpdateAlertOverlay(delta);
 		UpdateSanity(delta);
 		if (IsDead) return;
@@ -307,13 +320,53 @@ public partial class PlayerController : CharacterBody3D
 
 		Velocity = velocity;
 		MoveAndSlide();
+		
+		ApplyKickForce();
+
 		HandleHeadBob(delta, isSprinting);
+	}
+
+	private void ApplyKickForce()
+	{
+		var spaceState = GetWorld3D().DirectSpaceState;
+		var query = new PhysicsShapeQueryParameters3D();
+		var shape = new SphereShape3D();
+		shape.Radius = 1.0f; 
+		query.ShapeRid = shape.GetRid();
+		query.Transform = GlobalTransform;
+		query.CollisionMask = 2; // Layer 2: Pickups
+
+		var results = spaceState.IntersectShape(query);
+		foreach (var result in results)
+		{
+			var collider = (Variant)result["collider"];
+			if (collider.As<Node>() is RigidBody3D rb)
+			{
+				Vector3 pushDirection = (rb.GlobalPosition - GlobalPosition).Normalized();
+				pushDirection.Y = 0;
+				rb.ApplyImpulse(pushDirection * PushForce * 0.2f * rb.Mass);
+			}
+		}
 	}
 
 	private void UpdateInteractionPrompt()
 	{
 		_interactionLabel.Text = "";
 		_interactionLabel.Visible = false;
+
+		if (_statusLabel != null)
+		{
+			if (_notificationTime > 0)
+			{
+				_statusLabel.Text = _notificationText;
+				_statusLabel.Visible = true;
+			}
+			else
+			{
+				_statusLabel.Visible = false;
+				_statusLabel.Text = "";
+			}
+		}
 		
 		if (_currentOutlineObj != null && IsInstanceValid(_currentOutlineObj))
 		{
@@ -365,7 +418,31 @@ public partial class PlayerController : CharacterBody3D
 			}
 			else if (bestInteractable is Door door)
 			{
-				_interactionLabel.Text = "Right Click to Open/Close";
+				InventoryItem heldItem = _inventory.items[_inventory.selectedSlot];
+				bool hasKeyInHand = heldItem != null && heldItem.Name == door.KeyName;
+
+				if (door.IsLocked)
+				{
+					if (hasKeyInHand)
+					{
+						_interactionLabel.Text = "Right Click to Unlock";
+					}
+					else
+					{
+						_interactionLabel.Text = "Right Click (Locked)";
+					}
+				}
+				else
+				{
+					if (hasKeyInHand)
+					{
+						_interactionLabel.Text = "Right Click to Lock";
+					}
+					else
+					{
+						_interactionLabel.Text = "Right Click to Open/Close";
+					}
+				}
 				_interactionLabel.Visible = true;
 			}
 			else if (bestInteractable is Radio radio)
@@ -419,6 +496,12 @@ public partial class PlayerController : CharacterBody3D
 		Input.MouseMode = captured ? Input.MouseModeEnum.Captured : Input.MouseModeEnum.Visible;
 	}
 
+	private void ShowNotification(string text)
+	{
+		_notificationText = text;
+		_notificationTime = 2.0; // 2 seconds
+	}
+
 	private void OnInteract()
 	{
 		if (_interactionCast.IsColliding())
@@ -453,7 +536,11 @@ public partial class PlayerController : CharacterBody3D
 
 			if (bestInteractable is Pickup pickup) pickup.Interact(_inventory);
 			else if (bestInteractable is Node nodePickup && nodePickup.GetParent() is Pickup parentPickup) parentPickup.Interact(_inventory);
-			else if (bestInteractable is Door door) door.Interact(_inventory);
+			else if (bestInteractable is Door door)
+			{
+				string msg = door.Interact(_inventory);
+				if (!string.IsNullOrEmpty(msg)) ShowNotification(msg);
+			}
 			else if (bestInteractable is Radio radio) radio.Interact(_inventory);
 		}
 	}

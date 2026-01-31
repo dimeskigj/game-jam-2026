@@ -6,6 +6,11 @@ public partial class Pickup : RigidBody3D
 	[Export]
 	public InventoryItem ItemResource;
 
+	public override void _Ready()
+	{
+		Mass = 0.5f; // Lightweight but stable
+	}
+
 	public void Interact(Inventory inventory)
 	{
 		if (ItemResource != null)

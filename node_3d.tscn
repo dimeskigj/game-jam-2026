@@ -571,35 +571,33 @@ shape = SubResource("BoxShape3D_pickup")
 [node name="Mesh" type="MeshInstance3D" parent="HiddenItem" unique_id=1447599221]
 mesh = SubResource("BoxMesh_gold")
 
-[node name="SecurityCamera" type="Node3D" parent="." unique_id=2003004005]
-transform = Transform3D(-4.371139e-08, 0.25881904, -0.9659258, 0, 0.9659258, 0.25881904, 1, 1.131334e-08, -4.222196e-08, -2.0343962, 2.5, 7)
+[node name="KAMERA" parent="." unique_id=1498223709 instance=ExtResource("21_s0gvp")]
+transform = Transform3D(-3.1404778e-07, 1.9954948, 7.447288, 1.744517e-07, 7.447288, -1.9954948, -7.71, 8.722585e-08, -3.4849828e-07, -2.0343962, 2.5, 7)
 script = ExtResource("19_camera_script")
-SweepAngle = 60.0
-Range = 12.0
 
-[node name="KAMERA" parent="SecurityCamera" unique_id=1498223709 instance=ExtResource("21_s0gvp")]
-transform = Transform3D(-7.71, 0, -6.740296e-07, 0, 7.71, 0, 6.740296e-07, 0, -7.71, 0, 0, 0)
-
-[node name="ViewCone" type="SpotLight3D" parent="SecurityCamera" unique_id=2003004007 groups=["XRayable"]]
-transform = Transform3D(1, -1.7763568e-15, 3.5527137e-15, 0, 1.0000001, 2.9802322e-08, 0, -2.9802322e-08, 1.0000001, 0, 0.41743243, 0.11185074)
+[node name="ViewCone" type="SpotLight3D" parent="KAMERA" unique_id=2003004007 groups=["XRayable"]]
+transform = Transform3D(-1, -5.1928816e-15, 1.509958e-07, -8.5598196e-16, 1, 2.8721988e-08, -1.509958e-07, 2.8721988e-08, -1, 0, 0.054141685, -0.014507204)
 light_color = Color(1, 0, 0, 1)
 light_energy = 5.0
 shadow_enabled = true
 spot_range = 12.0
 spot_angle = 30.0
 
-[node name="VisionConeMesh" type="MeshInstance3D" parent="SecurityCamera" unique_id=293847560 groups=["XRayInvisible"]]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, -5)
+[node name="VisionConeMesh" type="MeshInstance3D" parent="KAMERA" unique_id=293847560 groups=["XRayInvisible"]]
+transform = Transform3D(-0.12970169, 1.1338882e-08, -3.330669e-16, -1.110223e-16, -3.7252903e-09, -0.12970169, -1.1338882e-08, -0.12970169, 3.7252903e-09, 0, -1.4901161e-08, 0.6485084)
 visible = false
 mesh = SubResource("CylinderMesh_vision_cone")
+skeleton = NodePath("")
 
-[node name="DetectionArea" type="Area3D" parent="SecurityCamera" unique_id=2003004008]
+[node name="DetectionArea" type="Area3D" parent="KAMERA" unique_id=2003004008]
+transform = Transform3D(-0.12970169, -1.110223e-16, 1.1338882e-08, -1.110223e-16, 0.12970169, -6.195478e-17, -1.1338882e-08, -6.6325836e-17, -0.12970169, 0, 0, 0)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="SecurityCamera/DetectionArea" unique_id=2003004009]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="KAMERA/DetectionArea" unique_id=2003004009]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -5)
 shape = SubResource("BoxShape3D_camera_detection")
 
-[node name="LOSRay" type="RayCast3D" parent="SecurityCamera" unique_id=2003004010]
+[node name="LOSRay" type="RayCast3D" parent="KAMERA" unique_id=2003004010]
+transform = Transform3D(-0.12970169, 1.110223e-16, 1.1338882e-08, -1.110223e-16, 0.1297017, -6.195478e-17, -1.1338882e-08, -6.6325836e-17, -0.1297017, 0, 0.057036564, -0.015282899)
 target_position = Vector3(0, 0, -12)
 
 [node name="Enemy" parent="." unique_id=577585736 node_paths=PackedStringArray("Waypoints") groups=["Enemies"] instance=ExtResource("17_tuemg")]
@@ -618,4 +616,4 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 7)
 [node name="Waypoint3" type="Marker3D" parent="." unique_id=821892749]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.7981987, 0, 1.0790443)
 
-[editable path="SecurityCamera/KAMERA"]
+[editable path="KAMERA"]

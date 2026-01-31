@@ -3,7 +3,6 @@ using Godot;
 public partial class PlayerInput : Node
 {
     public Vector2 MoveInput { get; private set; }
-    // LookInput removed to avoid conflict with Signal event
     public bool JumpPressed { get; private set; }
     public bool SprintPressed { get; private set; }
     public bool LeftClickHeld { get; private set; }
@@ -12,6 +11,8 @@ public partial class PlayerInput : Node
     public delegate void InteractEventHandler();
     [Signal]
     public delegate void UseItemEventHandler();
+    [Signal]
+    public delegate void DropItemEventHandler();
     [Signal]
     public delegate void SlotSelectedEventHandler(int slotIndex);
     [Signal]
@@ -58,13 +59,10 @@ public partial class PlayerInput : Node
             }
         }
         
-        if (Input.IsKeyPressed(Key.E)) // This is continuous if held? No, IsKeyPressed is check current state. For one-shot, use event.
-        {
-            // Ideally check @event for discrete press
-        }
         if (@event is InputEventKey k && k.Pressed && !k.Echo)
         {
              if (k.Keycode == Key.E) EmitSignal(SignalName.UseItem);
+             if (k.Keycode == Key.Q) EmitSignal(SignalName.DropItem);
              
              // Slots
              if (k.Keycode >= Key.Key1 && k.Keycode <= Key.Key8)
@@ -77,14 +75,18 @@ public partial class PlayerInput : Node
     public override void _Process(double delta)
     {
         // Continuous Inputs
-        MoveInput = Input.GetVector("ui_left", "ui_right", "ui_up", "ui_down"); // Using default UI actions for WASD usually works
-        // Or specific keys:
-        Vector2 inputDir = Vector2.Zero;
-        if (Input.IsKeyPressed(Key.W)) inputDir.Y -= 1;
-        if (Input.IsKeyPressed(Key.S)) inputDir.Y += 1;
-        if (Input.IsKeyPressed(Key.A)) inputDir.X -= 1;
-        if (Input.IsKeyPressed(Key.D)) inputDir.X += 1;
-        MoveInput = inputDir.Normalized();
+        MoveInput = Input.GetVector("ui_left", "ui_right", "ui_up", "ui_down"); 
+        
+        // Backup WASD check if input map not set
+        if (MoveInput == Vector2.Zero)
+        {
+            Vector2 inputDir = Vector2.Zero;
+            if (Input.IsKeyPressed(Key.W)) inputDir.Y -= 1;
+            if (Input.IsKeyPressed(Key.S)) inputDir.Y += 1;
+            if (Input.IsKeyPressed(Key.A)) inputDir.X -= 1;
+            if (Input.IsKeyPressed(Key.D)) inputDir.X += 1;
+            MoveInput = inputDir.Normalized();
+        }
 
         JumpPressed = Input.IsKeyPressed(Key.Space);
         LeftClickHeld = Input.IsMouseButtonPressed(MouseButton.Left);

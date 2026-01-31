@@ -1,5 +1,6 @@
 using Godot;
 
+// Ensure this script inherits RigidBody3D, as Pickups are physics objects.
 public partial class Pickup : RigidBody3D
 {
 	[Export]

@@ -210,6 +210,13 @@ public partial class EnemyAI : CharacterBody3D
 			return;
 		}
 
+		if (_targetPlayer.CurrentMaskEffect == MaskEffect.Invisibility)
+		{
+			_targetPlayer = null;
+			_currentState = State.Patrol;
+			return;
+		}
+
 		Vector3 direction = (_targetPlayer.GlobalPosition - GlobalPosition);
 		direction.Y = 0;
 		direction = direction.Normalized();
@@ -267,6 +274,8 @@ public partial class EnemyAI : CharacterBody3D
 
 		if (body is PlayerController player)
 		{
+			if (player.CurrentMaskEffect == MaskEffect.Invisibility) return;
+
 			GD.Print("Body is PlayerController. Checking Raycast...");
 			
 			// Check Line of Sight

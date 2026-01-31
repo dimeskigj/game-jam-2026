@@ -1,7 +1,7 @@
 using Godot;
 
 public enum ItemType { Generic, Mask }
-public enum MaskEffect { None, XRay, Gas }
+public enum MaskEffect { None, XRay, Gas, Invisibility }
 
 public partial class InventoryItem : Resource
 {
@@ -20,6 +20,9 @@ public partial class InventoryItem : Resource
     public ItemType Type { get; set; } = ItemType.Generic;
     [Export]
     public MaskEffect Effect { get; set; } = MaskEffect.None;
+	
+	[Export]
+	public PackedScene PickupScene { get; set; }
 
     public int CurrentStack { get; set; } = 1;
 

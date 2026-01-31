@@ -30,7 +30,15 @@ public partial class Inventory : Node
 			}
 		}
 
-		// Find empty slot
+		// Prefer Selected Slot if empty
+		if (items[selectedSlot] == null)
+		{
+			items[selectedSlot] = newItem.Clone();
+			EmitSignal(SignalName.InventoryUpdated);
+			return true;
+		}
+
+		// Find empty slot (Fallback)
 		for (int i = 0; i < MaxSlots; i++)
 		{
 			if (items[i] == null)
@@ -80,5 +88,16 @@ public partial class Inventory : Node
 				EmitSignal(SignalName.InventoryUpdated);
 			}
 		}
+	}
+	public InventoryItem RemoveItem(int slotIndex)
+	{
+		if (slotIndex >= 0 && slotIndex < MaxSlots)
+		{
+			InventoryItem item = items[slotIndex];
+			items[slotIndex] = null;
+			EmitSignal(SignalName.InventoryUpdated);
+			return item;
+		}
+		return null;
 	}
 }

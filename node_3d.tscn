@@ -25,6 +25,8 @@
 [ext_resource type="PackedScene" path="res://Radio.tscn" id="22_radio"]
 [ext_resource type="Script" uid="uid://c3kxsx5ujtgbq" path="res://InteractionSystem/SetupNavigation.cs" id="23_nav_setup"]
 [ext_resource type="Resource" uid="uid://cinl6dcub0s6t" path="res://InventorySystem/item_silverkey.tres" id="24_silverkey"]
+[ext_resource type="Script" uid="uid://dvjnuu11sqjgv" path="res://InteractionSystem/Drawer.cs" id="25_drawer"]
+[ext_resource type="Script" uid="uid://cq57csrn0m4qu" path="res://InteractionSystem/Note.cs" id="26_note"]
 
 [sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_default"]
 panorama = ExtResource("3_sky_tex")
@@ -38,7 +40,7 @@ sky = SubResource("Sky_default")
 tonemap_mode = 2
 glow_enabled = true
 
-[sub_resource type="SphereShape3D" id="SphereShape3D_ball"]
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_nu31w"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_shapecast"]
 radius = 0.1
@@ -72,6 +74,8 @@ radius = 0.3
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gold"]
 albedo_color = Color(1, 0.8, 0, 1)
+metallic = 1.0
+roughness = 0.2
 
 [sub_resource type="BoxMesh" id="BoxMesh_gold"]
 material = SubResource("StandardMaterial3D_gold")
@@ -135,6 +139,29 @@ size = Vector3(10, 5, 12)
 [sub_resource type="NavigationMesh" id="NavigationMesh_runtime"]
 geometry_collision_mask = 1
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_drawer_floor"]
+size = Vector3(0.85, 0.05, 0.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_drawer_front"]
+size = Vector3(0.85, 0.4, 0.029528808)
+
+[sub_resource type="BoxMesh" id="BoxMesh_key"]
+material = SubResource("StandardMaterial3D_gold")
+size = Vector3(0.1, 0.05, 0.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_key"]
+size = Vector3(0.1, 0.05, 0.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_paper"]
+albedo_color = Color(0.9, 0.9, 0.9, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_note"]
+material = SubResource("StandardMaterial3D_paper")
+size = Vector3(0.2, 0.01, 0.3)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_note"]
+size = Vector3(0.2, 0.01, 0.3)
+
 [node name="Node3D" type="Node3D" unique_id=1025875681]
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1572345889]
@@ -160,13 +187,13 @@ HoldDistance = 1.5
 script = ExtResource("1_input")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Ball" unique_id=1419102380]
-shape = SubResource("SphereShape3D_ball")
+shape = SubResource("CapsuleShape3D_nu31w")
 
 [node name="MeshInstance3D" type="CSGSphere3D" parent="Ball" unique_id=1333422521]
 radius = 0.001
 
 [node name="Camera3D" type="Camera3D" parent="Ball" unique_id=1247597468]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8866763, 0)
 
 [node name="ShapeCast3D" type="ShapeCast3D" parent="Ball/Camera3D" unique_id=883531826]
 shape = SubResource("SphereShape3D_shapecast")
@@ -380,11 +407,81 @@ show_percentage = false
 
 [node name="GameOverLabel" type="Label" parent="UI" unique_id=881234567]
 visible = false
+anchors_preset = -1
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = -11.5
+offset_right = 100.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+theme_override_font_sizes/font_size = 40
+text = "YOU DIED"
+horizontal_alignment = 1
+
+[node name="NoteOverlay" type="Control" parent="UI" unique_id=741029384]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="UI/NoteOverlay" unique_id=1527015829]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.8)
+
+[node name="NotePanel" type="ColorRect" parent="UI/NoteOverlay" unique_id=1984005366]
+layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -250.0
+offset_right = 200.0
+offset_bottom = 250.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.95, 0.95, 0.9, 1)
+
+[node name="NoteText" type="Label" parent="UI/NoteOverlay/NotePanel" unique_id=123984756]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.1, 0.1, 0.1, 1)
+text = "I don’t belong to what I see in the mirror or to what this world expects.
+There’s nothing growing here anymore—just hollow routines and borrowed faces.
+I’m leaving this version of myself behind, not out of drama, but out of exhaustion.
+If something changes after I’m gone, let it be silence.
+If nothing changes, that’s fine too.
+This was never a place meant to keep me."
+autowrap_mode = 3
+text_overrun_behavior = 3
+
+[node name="CloseLabel" type="Label" parent="UI/NoteOverlay" unique_id=566839129]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
 offset_left = -200.0
 offset_top = -50.0
 offset_right = 200.0
@@ -681,10 +778,9 @@ target_position = Vector3(0, 0, -12)
 transform = Transform3D(1, 1.7763568e-15, 0, -8.881784e-16, 1, -5.1137216e-16, -7.1054274e-15, -5.1137216e-16, 1, 0, 0.09512232, -0.02548793)
 
 [node name="Enemy" parent="." unique_id=577585736 node_paths=PackedStringArray("Waypoints") groups=["Enemies"] instance=ExtResource("17_tuemg")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.585043, 0.3294413, 1.7581491)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.778967, 0.3294413, 1.7581491)
 collision_mask = 5
 ChaseSpeed = 5.0
-DetectionRange = 10.0
 Waypoints = [NodePath("../Waypoint1"), NodePath("../Waypoint2"), NodePath("../Waypoint3")]
 
 [node name="Waypoint1" type="Marker3D" parent="." unique_id=812746639]
@@ -705,4 +801,92 @@ script = ExtResource("23_nav_setup")
 [node name="RuntimeNavRegion" type="NavigationRegion3D" parent="." unique_id=1234567891]
 navigation_mesh = SubResource("NavigationMesh_runtime")
 
-[editable path="KAMERA"]
+[node name="CabinetSetup" type="Node3D" parent="." unique_id=969819830]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.012434959, 2)
+
+[node name="CabinetBody" type="CSGBox3D" parent="CabinetSetup" unique_id=1567266291]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+use_collision = true
+size = Vector3(1, 1, 0.6)
+material = ExtResource("2_floor_mat")
+
+[node name="CabinetHollow" type="CSGBox3D" parent="CabinetSetup/CabinetBody" unique_id=1913093843]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.05)
+operation = 2
+size = Vector3(0.9, 0.9, 0.55)
+
+[node name="Drawer_Locked" type="RigidBody3D" parent="CabinetSetup" unique_id=956537449 groups=["Interactable"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+collision_layer = 4
+freeze = true
+script = ExtResource("25_drawer")
+_isLocked = true
+SlideDistance = 0.4
+
+[node name="DrawerMesh" type="CSGBox3D" parent="CabinetSetup/Drawer_Locked" unique_id=906277751]
+size = Vector3(0.85, 0.4, 0.5)
+material = ExtResource("2_floor_mat")
+
+[node name="DrawerHollow" type="CSGBox3D" parent="CabinetSetup/Drawer_Locked/DrawerMesh" unique_id=2038921831]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+operation = 2
+size = Vector3(0.75, 0.35, 0.4)
+material = ExtResource("2_floor_mat")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CabinetSetup/Drawer_Locked" unique_id=1921620293]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.175, 0)
+shape = SubResource("BoxShape3D_drawer_floor")
+
+[node name="CollisionShape3D_Front" type="CollisionShape3D" parent="CabinetSetup/Drawer_Locked" unique_id=2101025612]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.228302)
+shape = SubResource("BoxShape3D_drawer_front")
+
+[node name="Drawer_Unlocked" type="RigidBody3D" parent="CabinetSetup" unique_id=1245101275 groups=["Interactable"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+collision_layer = 4
+freeze = true
+script = ExtResource("25_drawer")
+SlideDistance = 0.4
+
+[node name="Pickup_SmallKey" type="RigidBody3D" parent="CabinetSetup/Drawer_Unlocked" unique_id=1080425226]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.05, 0)
+collision_layer = 2
+freeze = true
+script = ExtResource("6_pickup")
+ItemResource = ExtResource("8_key")
+
+[node name="KeyMesh" type="MeshInstance3D" parent="CabinetSetup/Drawer_Unlocked/Pickup_SmallKey" unique_id=1063385200]
+mesh = SubResource("BoxMesh_key")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CabinetSetup/Drawer_Unlocked/Pickup_SmallKey" unique_id=1832139648]
+shape = SubResource("BoxShape3D_key")
+
+[node name="DrawerMesh" type="CSGBox3D" parent="CabinetSetup/Drawer_Unlocked" unique_id=590886608]
+size = Vector3(0.85, 0.4, 0.5)
+material = ExtResource("2_floor_mat")
+
+[node name="DrawerHollow" type="CSGBox3D" parent="CabinetSetup/Drawer_Unlocked/DrawerMesh" unique_id=429441474]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+operation = 2
+size = Vector3(0.75, 0.35, 0.4)
+material = ExtResource("2_floor_mat")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CabinetSetup/Drawer_Unlocked" unique_id=1701561275]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.175, 0)
+shape = SubResource("BoxShape3D_drawer_floor")
+
+[node name="CollisionShape3D_Front" type="CollisionShape3D" parent="CabinetSetup/Drawer_Unlocked" unique_id=1198085560]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.23853755)
+shape = SubResource("BoxShape3D_drawer_front")
+
+[node name="Pickup_Note" type="RigidBody3D" parent="." unique_id=556677889 groups=["Interactable"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 1.02, 2)
+collision_layer = 4
+script = ExtResource("26_note")
+NoteText = "Day 4: They are locking everything now. I hid the small key in the bottom drawer. Hopefully they forget about it."
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Pickup_Note" unique_id=2004243602]
+mesh = SubResource("BoxMesh_note")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_Note" unique_id=32051481]
+shape = SubResource("BoxShape3D_note")

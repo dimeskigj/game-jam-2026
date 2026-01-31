@@ -94,6 +94,9 @@ public partial class PlayerController : CharacterBody3D
 	private Label _statusLabel;
 	private ProgressBar _sanityBar;
 	private Label _gameOverLabel;
+	private Control _noteOverlay;
+	private Label _noteLabel;
+	private bool _isReadingNote = false;
 	
 	// Interaction / Visuals
 	private ShaderMaterial _outlineMaterial;
@@ -122,8 +125,13 @@ public partial class PlayerController : CharacterBody3D
 		
 		_interactionLabel = GetNode<Label>("../UI/InteractionLabel");
 		_statusLabel = GetNodeOrNull<Label>("../UI/StatusLabel");
-		_sanityBar = GetNode<ProgressBar>("../UI/SanityBar");
-		_gameOverLabel = GetNode<Label>("../UI/GameOverLabel");
+		_sanityBar = GetNodeOrNull<ProgressBar>("%SanityBar");
+		_gameOverLabel = GetNodeOrNull<Label>("%GameOverLabel");
+		
+		_noteOverlay = GetNodeOrNull<Control>("../UI/NoteOverlay");
+		_noteLabel = GetNodeOrNull<Label>("../UI/NoteOverlay/NotePanel/NoteText");
+		if (_noteOverlay != null) _noteOverlay.Visible = false;
+
 		_detectionLabel = GetNodeOrNull<Label>("../UI/DetectionLabel"); 
 		
 		_xRayManager = GetNode<XRayManager>("../XRayManager");
@@ -259,6 +267,7 @@ public partial class PlayerController : CharacterBody3D
 		UpdateAlertOverlay(delta);
 		UpdateSanity(delta);
 		if (IsDead) return;
+		if (_isReadingNote) return; // Stop movement while reading
 
 		UpdateInteractionPrompt();
 		
@@ -402,6 +411,11 @@ public partial class PlayerController : CharacterBody3D
 					bestInteractable = collider;
 					break;
 				}
+				else if (collider is Drawer)
+				{
+					bestInteractable = collider;
+					break;
+				}
 			}
 
 			if (bestInteractable is Pickup pickup)
@@ -450,6 +464,30 @@ public partial class PlayerController : CharacterBody3D
 				_interactionLabel.Text = "Right Click to Toggle Radio";
 				_interactionLabel.Visible = true;
 				HighlightObject(radio);
+			}
+			else if (bestInteractable is Drawer drawer)
+			{
+				InventoryItem heldItem = _inventory.items[_inventory.selectedSlot];
+				bool hasKeyInHand = heldItem != null && heldItem.Name == drawer.KeyName;
+
+				if (drawer.IsLocked)
+				{
+					if (hasKeyInHand) _interactionLabel.Text = "Right Click to Unlock Drawer";
+					else _interactionLabel.Text = "Right Click (Locked)";
+				}
+				else
+				{
+					if (hasKeyInHand) _interactionLabel.Text = "Right Click to Lock Drawer";
+					else _interactionLabel.Text = "Right Click to Open/Close Drawer";
+				}
+				_interactionLabel.Visible = true;
+				HighlightObject(drawer);
+			}
+			else if (bestInteractable is Note note)
+			{
+				_interactionLabel.Text = "Right Click to Read";
+				_interactionLabel.Visible = true;
+				HighlightObject(note);
 			}
 		}
 	}
@@ -504,6 +542,12 @@ public partial class PlayerController : CharacterBody3D
 
 	private void OnInteract()
 	{
+		if (_isReadingNote)
+		{
+			CloseNote();
+			return;
+		}
+
 		if (_interactionCast.IsColliding())
 		{
 			Node bestInteractable = null;
@@ -532,6 +576,11 @@ public partial class PlayerController : CharacterBody3D
 					bestInteractable = collider;
 					break;
 				}
+				else if (collider is Drawer)
+				{
+					bestInteractable = collider;
+					break;
+				}
 			}
 
 			if (bestInteractable is Pickup pickup) pickup.Interact(_inventory);
@@ -542,7 +591,30 @@ public partial class PlayerController : CharacterBody3D
 				if (!string.IsNullOrEmpty(msg)) ShowNotification(msg);
 			}
 			else if (bestInteractable is Radio radio) radio.Interact(_inventory);
+			else if (bestInteractable is Drawer drawer)
+			{
+				string msg = drawer.Interact(_inventory);
+				if (!string.IsNullOrEmpty(msg)) ShowNotification(msg);
+			}
+			else if (bestInteractable is Note note)
+			{
+				ShowNote(note.NoteText);
+			}
 		}
+	}
+
+	private void ShowNote(string text)
+	{
+		_isReadingNote = true;
+		if (_noteLabel != null) _noteLabel.Text = text;
+		if (_noteOverlay != null) _noteOverlay.Visible = true;
+		_interactionLabel.Visible = false;
+	}
+
+	private void CloseNote()
+	{
+		_isReadingNote = false;
+		if (_noteOverlay != null) _noteOverlay.Visible = false;
 	}
 
 	private void OnUseItem() => _inventory.UseCurrentItem();

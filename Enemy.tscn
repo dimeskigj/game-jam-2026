@@ -12,7 +12,6 @@ points = PackedVector3Array(0, 0, 0, 5, 2, -7, -5, 2, -7, 5, -2, -7, -5, -2, -7)
 
 [node name="Enemy" type="CharacterBody3D" unique_id=209923709 node_paths=PackedStringArray("Waypoints")]
 script = ExtResource("1_enemy")
-DetectionRange = 5.0
 Waypoints = []
 MovementType = 1
 

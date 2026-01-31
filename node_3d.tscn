@@ -156,6 +156,7 @@ script = ExtResource("1_input")
 shape = SubResource("SphereShape3D_ball")
 
 [node name="MeshInstance3D" type="CSGSphere3D" parent="Ball" unique_id=1333422521]
+radius = 0.001
 
 [node name="Camera3D" type="Camera3D" parent="Ball" unique_id=1247597468]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)

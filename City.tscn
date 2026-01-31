@@ -1,0 +1,109 @@
+[gd_scene format=3 uid="uid://4qkema7sld40"]
+
+[ext_resource type="PackedScene" uid="uid://baqrhhrv87af5" path="res://Models/Blockout-City.fbx" id="1_blockout"]
+[ext_resource type="PackedScene" uid="uid://c0tyyklurux3p" path="res://Models/KRUCHEVKA.fbx" id="2_kruchevka"]
+[ext_resource type="PackedScene" uid="uid://b3plxmefuu0ij" path="res://Models/Wall_of_Apartments_1.fbx" id="3_wall_1"]
+[ext_resource type="PackedScene" uid="uid://brcckdynbxouv" path="res://Models/Wall_of_Apartments_2.fbx" id="4_wall_2"]
+[ext_resource type="PackedScene" uid="uid://dg533rgrcrh7c" path="res://Models/Workers_Housing_1.fbx" id="5_worker_1"]
+[ext_resource type="PackedScene" uid="uid://de613iqc0kuvs" path="res://Models/L_House_1.fbx" id="6_lhouse_1"]
+[ext_resource type="PackedScene" uid="uid://n3b561b4525m" path="res://Models/Construction_Building_1.fbx" id="7_const_1"]
+[ext_resource type="PackedScene" uid="uid://duow2gn6avnc5" path="res://Models/City_Wall_BIG.fbx" id="8_city_wall"]
+[ext_resource type="PackedScene" uid="uid://dt12ce3ewv5re" path="res://Models/House.fbx" id="9_house"]
+[ext_resource type="PackedScene" uid="uid://bdrnfduag2jtq" path="res://Models/Building-Test-1.fbx" id="10_test_build"]
+[ext_resource type="PackedScene" uid="uid://mm7cie41l3w" path="res://Models/Wall_of_Apartments_3.fbx" id="11_wall_3"]
+[ext_resource type="PackedScene" uid="uid://dnmh2rh3t7por" path="res://Models/Wall_of_Apartments_4.fbx" id="12_wall_4"]
+[ext_resource type="PackedScene" uid="uid://deyklkagmuwvp" path="res://Models/Workers_Housing_2.fbx" id="13_worker_2"]
+[ext_resource type="PackedScene" uid="uid://3trag7gb7tde" path="res://Models/Workers_Housing_3.fbx" id="14_worker_3"]
+[ext_resource type="PackedScene" uid="uid://1jkq35scskry" path="res://Models/L_House_2.fbx" id="15_lhouse_2"]
+[ext_resource type="PackedScene" uid="uid://qsp83du6pmj1" path="res://Models/Blockout-City-2.0.fbx" id="16_blockout_2"]
+[ext_resource type="PackedScene" uid="uid://cdwqmgpe7i2bh" path="res://Models/Floor.fbx" id="17_floor"]
+
+[node name="City" type="Node3D" unique_id=733049485]
+
+[node name="Ground" type="CSGBox3D" parent="." unique_id=1788725685]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+use_collision = true
+size = Vector3(500, 1, 500)
+
+[node name="Layouts" type="Node3D" parent="." unique_id=598005466]
+
+[node name="Blockout" parent="Layouts" unique_id=900168621 instance=ExtResource("1_blockout")]
+transform = Transform3D(20, 0, 0, 0, 20, 0, 0, 0, 20, 0, 0, -0.11059594)
+
+[node name="Blockout2" parent="Layouts" unique_id=38769952 instance=ExtResource("16_blockout_2")]
+transform = Transform3D(20, 0, 0, 0, 20, 0, 0, 0, 20, -100, 0, 0)
+
+[node name="ResidentialDistrict" type="Node3D" parent="." unique_id=676909867]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60, 0, 60)
+
+[node name="Kruchevka_1" parent="ResidentialDistrict" unique_id=727095585 instance=ExtResource("2_kruchevka")]
+
+[node name="Kruchevka_2" parent="ResidentialDistrict" unique_id=1887687835 instance=ExtResource("2_kruchevka")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 35)
+
+[node name="ApartmentBlocks" type="Node3D" parent="." unique_id=1877481805]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -70, 0, 60)
+
+[node name="Wall_1" parent="ApartmentBlocks" unique_id=735037534 instance=ExtResource("3_wall_1")]
+
+[node name="Wall_2" parent="ApartmentBlocks" unique_id=2091526295 instance=ExtResource("4_wall_2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 25)
+
+[node name="Wall_3" parent="ApartmentBlocks" unique_id=1315554879 instance=ExtResource("11_wall_3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 50)
+
+[node name="Wall_4" parent="ApartmentBlocks" unique_id=1274709529 instance=ExtResource("12_wall_4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 75)
+
+[node name="IndustrialDistrict" type="Node3D" parent="." unique_id=1390839366]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -80, 0, -60)
+
+[node name="Construction_1" parent="IndustrialDistrict" unique_id=762776644 instance=ExtResource("7_const_1")]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
+
+[node name="Worker1" parent="IndustrialDistrict" unique_id=1202698861 instance=ExtResource("5_worker_1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 0, 0)
+
+[node name="Worker2" parent="IndustrialDistrict" unique_id=1440168666 instance=ExtResource("13_worker_2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 0, 25)
+
+[node name="Worker3" parent="IndustrialDistrict" unique_id=1245936811 instance=ExtResource("14_worker_3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 0, 50)
+
+[node name="Suburbs" type="Node3D" parent="." unique_id=16437518]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 80, 0, -60)
+
+[node name="House1" parent="Suburbs" unique_id=1798070793 instance=ExtResource("9_house")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
+
+[node name="House2" parent="Suburbs" unique_id=528664172 instance=ExtResource("9_house")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 25, 0, 0)
+
+[node name="LHouse1" parent="Suburbs" unique_id=1682046328 instance=ExtResource("6_lhouse_1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 30)
+
+[node name="LHouse2" parent="Suburbs" unique_id=679070050 instance=ExtResource("15_lhouse_2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 0, 30)
+
+[node name="Plaza" type="Node3D" parent="." unique_id=1385492516]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -100)
+
+[node name="Tower" parent="Plaza" unique_id=982761879 instance=ExtResource("10_test_build")]
+transform = Transform3D(5, 0, 0, 0, 5, 0, 0, 0, 5, 0, 0, 0)
+
+[node name="CityWalls" type="Node3D" parent="." unique_id=1476543472]
+
+[node name="Wall_N" parent="CityWalls" unique_id=1344125380 instance=ExtResource("8_city_wall")]
+transform = Transform3D(20, 0, 0, 0, 20, 0, 0, 0, 20, 0, 0, -200)
+
+[node name="Wall_S" parent="CityWalls" unique_id=728428690 instance=ExtResource("8_city_wall")]
+transform = Transform3D(20, 0, 0, 0, 20, 0, 0, 0, 20, 0, 0, 200)
+
+[node name="Wall_E" parent="CityWalls" unique_id=978740943 instance=ExtResource("8_city_wall")]
+transform = Transform3D(-8.74228e-07, 0, 20, 0, 20, 0, -20, 0, -8.74228e-07, 200, 0, 0)
+
+[node name="Wall_W" parent="CityWalls" unique_id=2076733178 instance=ExtResource("8_city_wall")]
+transform = Transform3D(-8.74228e-07, 0, 20, 0, 20, 0, -20, 0, -8.74228e-07, -200, 0, 0)
+
+[node name="Detail" parent="." unique_id=48061281 instance=ExtResource("17_floor")]
+transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 0.1, 0)

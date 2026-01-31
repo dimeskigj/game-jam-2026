@@ -14,7 +14,11 @@ public partial class PlayerController : CharacterBody3D
 	public float SprintFov = 85.0f;
 	[Export]
 	public float FovChangeSpeed = 5.0f;
-	// ...
+
+	[ExportGroup("Head Bob")]
+	[Export] public float BobFreq = 2.0f;
+	[Export] public float BobAmp = 0.08f;
+	[Export] public float BobSprintMultiplier = 2.0f;
 	
 	// State for alerts
 	private HashSet<Node> _alertSources = new HashSet<Node>();
@@ -93,12 +97,15 @@ public partial class PlayerController : CharacterBody3D
 	private GeometryInstance3D _currentOutlineObj;
 
 	private RigidBody3D _heldBody;
+	private Vector3 _defaultCamPos;
+	private float _bobTime = 0.0f;
 
 	public override void _Ready()
 	{
 		CurrentSanity = MaxSanity;
 		Input.MouseMode = Input.MouseModeEnum.Captured;
 		_camera = GetNode<Camera3D>("Camera3D");
+		_defaultCamPos = _camera.Position;
 		_interactionCast = _camera.GetNode<ShapeCast3D>("ShapeCast3D");
 		_inventory = GetNode<Inventory>("Inventory");
 		_input = GetNode<PlayerInput>("PlayerInput");
@@ -255,6 +262,7 @@ public partial class PlayerController : CharacterBody3D
 
 		Velocity = velocity;
 		MoveAndSlide();
+		HandleHeadBob(delta, isSprinting);
 	}
 
 	private void UpdateInteractionPrompt()
@@ -423,5 +431,27 @@ public partial class PlayerController : CharacterBody3D
 			Input.MouseMode = Input.MouseModeEnum.Visible;
 			GD.Print("GAME OVER: Sanity Depleted.");
 		}
+	}
+
+	private void HandleHeadBob(double delta, bool isSprinting)
+	{
+		float horizontalVelocity = new Vector3(Velocity.X, 0, Velocity.Z).Length();
+		bool onFloor = IsOnFloor();
+		
+		if (!onFloor || horizontalVelocity < 0.1f)
+		{
+			_bobTime = 0.0f;
+			_camera.Position = _camera.Position.Lerp(_defaultCamPos, (float)delta * 10.0f);
+			return;
+		}
+
+		float multiplier = isSprinting ? BobSprintMultiplier : 1.0f;
+		_bobTime += (float)delta * horizontalVelocity * multiplier;
+		
+		Vector3 targetPos = _defaultCamPos;
+		targetPos.Y += Mathf.Sin(_bobTime * BobFreq) * BobAmp * multiplier;
+		targetPos.X += Mathf.Cos(_bobTime * BobFreq * 0.5f) * BobAmp * 0.5f * multiplier;
+		
+		_camera.Position = _camera.Position.Lerp(targetPos, (float)delta * 10.0f);
 	}
 }

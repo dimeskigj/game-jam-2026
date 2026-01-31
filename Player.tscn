@@ -1,0 +1,58 @@
+[gd_scene load_steps=5 format=3 uid="uid://d1p2l3m4n5o6p"]
+
+[ext_resource type="Script" path="res://PlayerController.cs" id="1_script"]
+[ext_resource type="Script" uid="uid://bugxpobj04nyw" path="res://PlayerInput.cs" id="2_input"]
+[ext_resource type="Script" uid="uid://dne8d4vd2mkxf" path="res://InventorySystem/Inventory.cs" id="3_inventory"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_player"]
+radius = 0.5
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_shapecast"]
+radius = 0.1
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_player"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:rotation")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+properties/2/path = NodePath(".:PlayerName")
+properties/2/spawn = true
+properties/2/replication_mode = 2
+properties/3/path = NodePath(".:PlayerColorVec")
+properties/3/spawn = true
+properties/3/replication_mode = 2
+
+[node name="Player" type="CharacterBody3D"]
+script = ExtResource("1_script")
+HoldDistance = 1.5
+
+[node name="PlayerInput" type="Node" parent="."]
+script = ExtResource("2_input")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_player")
+
+[node name="MeshInstance3D" type="CSGSphere3D" parent="."]
+radius = 0.5
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, 2.5, 4.5)
+
+[node name="ShapeCast3D" type="ShapeCast3D" parent="Camera3D"]
+shape = SubResource("SphereShape3D_shapecast")
+target_position = Vector3(0, 0, -2.5)
+collide_with_areas = true
+
+[node name="Label3D" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+billboard = 1
+text = "Player"
+font_size = 64
+
+[node name="Inventory" type="Node" parent="."]
+script = ExtResource("3_inventory")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_player")

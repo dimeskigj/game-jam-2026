@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://bju3mynfhp1pv"]
+[gd_scene format=3 uid="uid://c7w8f8x8x8x8x"]
 
 [ext_resource type="Script" uid="uid://g173b0n26ebf" path="res://MainMenu.cs" id="1_script"]
 
@@ -6,61 +6,44 @@
 bg_color = Color(0.05, 0.05, 0.07, 1)
 
 [sub_resource type="LabelSettings" id="LabelSettings_title"]
-font_size = 96
+font_size = 120
 font_color = Color(0.9, 0.9, 1, 1)
-outline_size = 12
-outline_color = Color(0.2, 0.2, 0.4, 1)
-shadow_size = 20
-shadow_color = Color(0, 0, 0, 0.5)
-shadow_offset = Vector2(4, 4)
+shadow_size = 0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
-bg_color = Color(0.15, 0.15, 0.2, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.3, 0.3, 0.5, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-expand_margin_left = 5.0
-expand_margin_top = 2.0
-expand_margin_right = 5.0
-expand_margin_bottom = 2.0
+bg_color = Color(0.2, 0.2, 0.25, 1)
+border_width_bottom = 4
+border_color = Color(0.1, 0.1, 0.15, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+expand_margin_left = 10.0
+expand_margin_right = 10.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_pressed"]
-bg_color = Color(0.1, 0.1, 0.15, 1)
-border_width_left = 2
+bg_color = Color(0.15, 0.15, 0.2, 1)
 border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.2, 0.2, 0.4, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
+border_color = Color(0.1, 0.1, 0.15, 0)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+expand_margin_left = 10.0
+expand_margin_right = 10.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
-bg_color = Color(0.25, 0.25, 0.4, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.5, 0.5, 0.8, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-expand_margin_left = 5.0
-expand_margin_top = 2.0
-expand_margin_right = 5.0
-expand_margin_bottom = 2.0
-shadow_color = Color(0.3, 0.3, 0.8, 0.2)
-shadow_size = 10
+bg_color = Color(0.3, 0.3, 0.35, 1)
+border_width_bottom = 4
+border_color = Color(0.15, 0.15, 0.2, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+expand_margin_left = 10.0
+expand_margin_right = 10.0
 
-[node name="MainMenu" type="Control" unique_id=873788376]
+[node name="MainMenu" type="Control" unique_id=644770177]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -69,7 +52,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_script")
 
-[node name="Background" type="Panel" parent="." unique_id=2005700279]
+[node name="Background" type="Panel" parent="." unique_id=1588308974]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -78,18 +61,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_bg")
 
-[node name="DecorativeRect" type="ColorRect" parent="Background" unique_id=1372759586]
-layout_mode = 1
-anchors_preset = 12
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = -4.0
-grow_horizontal = 2
-grow_vertical = 0
-color = Color(0.3, 0.3, 0.5, 0.5)
-
-[node name="CenterContainer" type="CenterContainer" parent="." unique_id=901018667]
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=160505521]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -97,32 +69,68 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer" unique_id=1880215321]
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer" unique_id=1764559760]
 layout_mode = 2
-theme_override_constants/separation = 60
+theme_override_constants/separation = 40
 
-[node name="TitleGroup" type="VBoxContainer" parent="CenterContainer/VBoxContainer" unique_id=1211886328]
+[node name="TitleGroup" type="VBoxContainer" parent="CenterContainer/VBoxContainer" unique_id=1082547427]
 layout_mode = 2
-theme_override_constants/separation = -10
+theme_override_constants/separation = 0
 
-[node name="Title" type="Label" parent="CenterContainer/VBoxContainer/TitleGroup" unique_id=743954673]
+[node name="Title" type="Label" parent="CenterContainer/VBoxContainer/TitleGroup" unique_id=573938484]
 layout_mode = 2
 text = "CITY ESCAPE"
 label_settings = SubResource("LabelSettings_title")
 horizontal_alignment = 1
 
-[node name="StartButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=1385038093]
-custom_minimum_size = Vector2(280, 70)
+[node name="InputsGroup" type="VBoxContainer" parent="CenterContainer/VBoxContainer" unique_id=1255285124]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="NameEdit" type="LineEdit" parent="CenterContainer/VBoxContainer/InputsGroup" unique_id=1612964946]
+custom_minimum_size = Vector2(300, 35)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 28
+placeholder_text = "NICKNAME"
+alignment = 1
+max_length = 12
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer/InputsGroup" unique_id=513775811]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="Label" type="Label" parent="CenterContainer/VBoxContainer/InputsGroup/HBoxContainer" unique_id=1015979644]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.6, 0.7, 1)
+text = "COLOR"
+
+[node name="ColorBtn" type="ColorPickerButton" parent="CenterContainer/VBoxContainer/InputsGroup/HBoxContainer" unique_id=1292520523]
+custom_minimum_size = Vector2(100, 30)
+layout_mode = 2
+color = Color(0.2, 0.6, 1, 1)
+edit_alpha = false
+
+[node name="IPEdit" type="LineEdit" parent="CenterContainer/VBoxContainer/InputsGroup" unique_id=295665738]
+custom_minimum_size = Vector2(300, 35)
+layout_mode = 2
+size_flags_horizontal = 4
+placeholder_text = "SERVER IP (Default: Local)"
+alignment = 1
+
+[node name="StartButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=366352341]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_font_sizes/font_size = 18
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/focus = SubResource("StyleBoxFlat_btn_hover")
-text = "START GAME"
+text = "JOIN SERVER"
 
-[node name="VersionLabel" type="Label" parent="." unique_id=1624429710]
+[node name="VersionLabel" type="Label" parent="." unique_id=1732328130]
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
@@ -135,7 +143,7 @@ offset_right = -20.0
 offset_bottom = -10.0
 grow_horizontal = 0
 grow_vertical = 0
-theme_override_colors/font_color = Color(0.4, 0.4, 0.5, 1)
-theme_override_font_sizes/font_size = 14
-text = "v1.0.0"
+theme_override_colors/font_color = Color(0.3, 0.3, 0.4, 1)
+theme_override_font_sizes/font_size = 12
+text = "v0.1-alpha"
 horizontal_alignment = 2

@@ -1,0 +1,897 @@
+diff --git a/InventorySystem/InventoryUI.cs b/InventorySystem/InventoryUI.cs
+index bc8505c..22428d2 100644
+--- a/InventorySystem/InventoryUI.cs
++++ b/InventorySystem/InventoryUI.cs
+@@ -11,13 +11,6 @@ public partial class InventoryUI : CanvasLayer
+     public override void _Ready()
+     {
+         _gridContainer = GetNode<GridContainer>("Control/GridContainer");
+-        _inventory = GetNode<Inventory>("/root/Node3D/Ball/Inventory"); // Adjust path if needed
+-
+-        if (_inventory != null)
+-        {
+-            _inventory.InventoryUpdated += UpdateUI;
+-            _inventory.SelectedSlotChanged += UpdateSelection;
+-        }
+ 
+         // Initialize UI slots
+         foreach (Node child in _gridContainer.GetChildren())
+@@ -28,13 +21,25 @@ public partial class InventoryUI : CanvasLayer
+                 _labels.Add(bg.GetNode<Label>("Label"));
+             }
+         }
+-        
+-        UpdateUI();
+-        UpdateSelection(0);
++    }
++
++    public void SetInventory(Inventory inventory)
++    {
++        _inventory = inventory;
++        if (_inventory != null)
++        {
++            _inventory.InventoryUpdated += UpdateUI;
++            _inventory.SelectedSlotChanged += UpdateSelection;
++            UpdateUI();
++            UpdateSelection(0);
++        }
+     }
+ 
+     private void UpdateUI()
+     {
++        // Guard against null inventory if called prematurely
++        if (_inventory == null) return;
++
+         for (int i = 0; i < Inventory.MaxSlots; i++)
+         {
+             if (i < _labels.Count)
+diff --git a/MainMenu.cs b/MainMenu.cs
+index 4e0831e..0d80cd9 100644
+--- a/MainMenu.cs
++++ b/MainMenu.cs
+@@ -4,20 +4,41 @@ public partial class MainMenu : Control
+ {
+ 	[Export]
+ 	public string StartScenePath = "res://node_3d.tscn";
++	[Export]
++	public string DefaultServerIP = "127.0.0.1";
+ 
+ 	private Button _startButton;
++	private LineEdit _nameEdit;
++	private ColorPickerButton _colorBtn;
++	private LineEdit _ipEdit;
++	private NetworkManager _net;
+ 
+ 	public override void _Ready()
+ 	{
++		_net = GetNode<NetworkManager>("/root/NetworkManager");
+ 		_startButton = GetNode<Button>("CenterContainer/VBoxContainer/StartButton");
++		_nameEdit = GetNode<LineEdit>("CenterContainer/VBoxContainer/InputsGroup/NameEdit");
++		_colorBtn = GetNode<ColorPickerButton>("CenterContainer/VBoxContainer/InputsGroup/HBoxContainer/ColorBtn");
++		_ipEdit = GetNode<LineEdit>("CenterContainer/VBoxContainer/InputsGroup/IPEdit");
++
+ 		_startButton.Pressed += OnStartButtonPressed;
++		_ipEdit.PlaceholderText = DefaultServerIP;
+ 		
+-		// Make sure mouse is visible for the menu
+ 		Input.MouseMode = Input.MouseModeEnum.Visible;
+ 	}
+ 
+ 	private void OnStartButtonPressed()
+ 	{
++		// Set player data in NetworkManager
++		_net.PlayerName = string.IsNullOrWhiteSpace(_nameEdit.Text) ? "Player" : _nameEdit.Text;
++		_net.PlayerColor = _colorBtn.Color;
++
++		// IMPORTANT: Load the map FIRST, then connect.
++		string address = string.IsNullOrWhiteSpace(_ipEdit.Text) ? DefaultServerIP : _ipEdit.Text;
++		
++		_net.TargetIP = address;
++		
++		// Change scene to game map. GameRoot.cs _Ready will handle the connection.
+ 		GetTree().ChangeSceneToFile(StartScenePath);
+ 	}
+ 
+diff --git a/MainMenu.tscn b/MainMenu.tscn
+index bd1c368..47e1b8f 100644
+--- a/MainMenu.tscn
++++ b/MainMenu.tscn
+@@ -1,4 +1,4 @@
+-[gd_scene format=3 uid="uid://bju3mynfhp1pv"]
++[gd_scene format=3 uid="uid://c7w8f8x8x8x8x"]
+ 
+ [ext_resource type="Script" uid="uid://g173b0n26ebf" path="res://MainMenu.cs" id="1_script"]
+ 
+@@ -6,61 +6,44 @@
+ bg_color = Color(0.05, 0.05, 0.07, 1)
+ 
+ [sub_resource type="LabelSettings" id="LabelSettings_title"]
+-font_size = 96
++font_size = 120
+ font_color = Color(0.9, 0.9, 1, 1)
+-outline_size = 12
+-outline_color = Color(0.2, 0.2, 0.4, 1)
+-shadow_size = 20
+-shadow_color = Color(0, 0, 0, 0.5)
+-shadow_offset = Vector2(4, 4)
++shadow_size = 0
+ 
+ [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
+-bg_color = Color(0.15, 0.15, 0.2, 1)
+-border_width_left = 2
+-border_width_top = 2
+-border_width_right = 2
+-border_width_bottom = 2
+-border_color = Color(0.3, 0.3, 0.5, 1)
+-corner_radius_top_left = 8
+-corner_radius_top_right = 8
+-corner_radius_bottom_right = 8
+-corner_radius_bottom_left = 8
+-expand_margin_left = 5.0
+-expand_margin_top = 2.0
+-expand_margin_right = 5.0
+-expand_margin_bottom = 2.0
++bg_color = Color(0.2, 0.2, 0.25, 1)
++border_width_bottom = 4
++border_color = Color(0.1, 0.1, 0.15, 1)
++corner_radius_top_left = 6
++corner_radius_top_right = 6
++corner_radius_bottom_right = 6
++corner_radius_bottom_left = 6
++expand_margin_left = 10.0
++expand_margin_right = 10.0
+ 
+ [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_pressed"]
+-bg_color = Color(0.1, 0.1, 0.15, 1)
+-border_width_left = 2
++bg_color = Color(0.15, 0.15, 0.2, 1)
+ border_width_top = 2
+-border_width_right = 2
+-border_width_bottom = 2
+-border_color = Color(0.2, 0.2, 0.4, 1)
+-corner_radius_top_left = 8
+-corner_radius_top_right = 8
+-corner_radius_bottom_right = 8
+-corner_radius_bottom_left = 8
++border_color = Color(0.1, 0.1, 0.15, 0)
++corner_radius_top_left = 6
++corner_radius_top_right = 6
++corner_radius_bottom_right = 6
++corner_radius_bottom_left = 6
++expand_margin_left = 10.0
++expand_margin_right = 10.0
+ 
+ [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
+-bg_color = Color(0.25, 0.25, 0.4, 1)
+-border_width_left = 2
+-border_width_top = 2
+-border_width_right = 2
+-border_width_bottom = 2
+-border_color = Color(0.5, 0.5, 0.8, 1)
+-corner_radius_top_left = 8
+-corner_radius_top_right = 8
+-corner_radius_bottom_right = 8
+-corner_radius_bottom_left = 8
+-expand_margin_left = 5.0
+-expand_margin_top = 2.0
+-expand_margin_right = 5.0
+-expand_margin_bottom = 2.0
+-shadow_color = Color(0.3, 0.3, 0.8, 0.2)
+-shadow_size = 10
+-
+-[node name="MainMenu" type="Control" unique_id=873788376]
++bg_color = Color(0.3, 0.3, 0.35, 1)
++border_width_bottom = 4
++border_color = Color(0.15, 0.15, 0.2, 1)
++corner_radius_top_left = 6
++corner_radius_top_right = 6
++corner_radius_bottom_right = 6
++corner_radius_bottom_left = 6
++expand_margin_left = 10.0
++expand_margin_right = 10.0
++
++[node name="MainMenu" type="Control" unique_id=644770177]
+ layout_mode = 3
+ anchors_preset = 15
+ anchor_right = 1.0
+@@ -69,7 +52,7 @@ grow_horizontal = 2
+ grow_vertical = 2
+ script = ExtResource("1_script")
+ 
+-[node name="Background" type="Panel" parent="." unique_id=2005700279]
++[node name="Background" type="Panel" parent="." unique_id=1588308974]
+ layout_mode = 1
+ anchors_preset = 15
+ anchor_right = 1.0
+@@ -78,18 +61,7 @@ grow_horizontal = 2
+ grow_vertical = 2
+ theme_override_styles/panel = SubResource("StyleBoxFlat_bg")
+ 
+-[node name="DecorativeRect" type="ColorRect" parent="Background" unique_id=1372759586]
+-layout_mode = 1
+-anchors_preset = 12
+-anchor_top = 1.0
+-anchor_right = 1.0
+-anchor_bottom = 1.0
+-offset_top = -4.0
+-grow_horizontal = 2
+-grow_vertical = 0
+-color = Color(0.3, 0.3, 0.5, 0.5)
+-
+-[node name="CenterContainer" type="CenterContainer" parent="." unique_id=901018667]
++[node name="CenterContainer" type="CenterContainer" parent="." unique_id=160505521]
+ layout_mode = 1
+ anchors_preset = 15
+ anchor_right = 1.0
+@@ -97,32 +69,68 @@ anchor_bottom = 1.0
+ grow_horizontal = 2
+ grow_vertical = 2
+ 
+-[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer" unique_id=1880215321]
++[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer" unique_id=1764559760]
+ layout_mode = 2
+-theme_override_constants/separation = 60
++theme_override_constants/separation = 40
+ 
+-[node name="TitleGroup" type="VBoxContainer" parent="CenterContainer/VBoxContainer" unique_id=1211886328]
++[node name="TitleGroup" type="VBoxContainer" parent="CenterContainer/VBoxContainer" unique_id=1082547427]
+ layout_mode = 2
+-theme_override_constants/separation = -10
++theme_override_constants/separation = 0
+ 
+-[node name="Title" type="Label" parent="CenterContainer/VBoxContainer/TitleGroup" unique_id=743954673]
++[node name="Title" type="Label" parent="CenterContainer/VBoxContainer/TitleGroup" unique_id=573938484]
+ layout_mode = 2
+ text = "CITY ESCAPE"
+ label_settings = SubResource("LabelSettings_title")
+ horizontal_alignment = 1
+ 
+-[node name="StartButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=1385038093]
+-custom_minimum_size = Vector2(280, 70)
++[node name="InputsGroup" type="VBoxContainer" parent="CenterContainer/VBoxContainer" unique_id=1255285124]
++layout_mode = 2
++theme_override_constants/separation = 15
++
++[node name="NameEdit" type="LineEdit" parent="CenterContainer/VBoxContainer/InputsGroup" unique_id=1612964946]
++custom_minimum_size = Vector2(300, 35)
++layout_mode = 2
++size_flags_horizontal = 4
++placeholder_text = "NICKNAME"
++alignment = 1
++max_length = 12
++
++[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer/InputsGroup" unique_id=513775811]
++layout_mode = 2
++theme_override_constants/separation = 10
++alignment = 1
++
++[node name="Label" type="Label" parent="CenterContainer/VBoxContainer/InputsGroup/HBoxContainer" unique_id=1015979644]
++layout_mode = 2
++theme_override_colors/font_color = Color(0.6, 0.6, 0.7, 1)
++text = "COLOR"
++
++[node name="ColorBtn" type="ColorPickerButton" parent="CenterContainer/VBoxContainer/InputsGroup/HBoxContainer" unique_id=1292520523]
++custom_minimum_size = Vector2(100, 30)
++layout_mode = 2
++color = Color(0.2, 0.6, 1, 1)
++edit_alpha = false
++
++[node name="IPEdit" type="LineEdit" parent="CenterContainer/VBoxContainer/InputsGroup" unique_id=295665738]
++custom_minimum_size = Vector2(300, 35)
++layout_mode = 2
++size_flags_horizontal = 4
++placeholder_text = "SERVER IP (Default: Local)"
++alignment = 1
++
++[node name="StartButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=366352341]
++custom_minimum_size = Vector2(200, 50)
+ layout_mode = 2
+ size_flags_horizontal = 4
+-theme_override_font_sizes/font_size = 28
++theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
++theme_override_font_sizes/font_size = 18
+ theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+ theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+ theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+ theme_override_styles/focus = SubResource("StyleBoxFlat_btn_hover")
+-text = "START GAME"
++text = "JOIN SERVER"
+ 
+-[node name="VersionLabel" type="Label" parent="." unique_id=1624429710]
++[node name="VersionLabel" type="Label" parent="." unique_id=1732328130]
+ layout_mode = 1
+ anchors_preset = 3
+ anchor_left = 1.0
+@@ -135,7 +143,7 @@ offset_right = -20.0
+ offset_bottom = -10.0
+ grow_horizontal = 0
+ grow_vertical = 0
+-theme_override_colors/font_color = Color(0.4, 0.4, 0.5, 1)
+-theme_override_font_sizes/font_size = 14
+-text = "v1.0.0"
++theme_override_colors/font_color = Color(0.3, 0.3, 0.4, 1)
++theme_override_font_sizes/font_size = 12
++text = "v0.1-alpha"
+ horizontal_alignment = 2
+diff --git a/node_3d.tscn b/node_3d.tscn
+index 209eb78..cb2ab30 100644
+--- a/node_3d.tscn
++++ b/node_3d.tscn
+@@ -1,10 +1,8 @@
+-[gd_scene format=3 uid="uid://clsgsyq4e35in"]
++[gd_scene load_steps=29 format=3 uid="uid://clsgsyq4e35in"]
+ 
+-[ext_resource type="Script" uid="uid://bugxpobj04nyw" path="res://PlayerInput.cs" id="1_input"]
+-[ext_resource type="Script" uid="uid://6pc13djetn7y" path="res://PlayerController.cs" id="1_script"]
++[ext_resource type="Script" path="res://GameRoot.cs" id="1_root_script"]
+ [ext_resource type="Material" path="res://floor_material.tres" id="2_floor_mat"]
+ [ext_resource type="Texture2D" uid="uid://8d0uj6envljt" path="res://textures/sky.exr" id="3_sky_tex"]
+-[ext_resource type="Script" uid="uid://dne8d4vd2mkxf" path="res://InventorySystem/Inventory.cs" id="4_inventory"]
+ [ext_resource type="Script" uid="uid://cx8x1mac1t274" path="res://InventorySystem/InventoryUI.cs" id="5_inventory_ui"]
+ [ext_resource type="Script" uid="uid://36lhpbg631ox" path="res://InteractionSystem/Pickup.cs" id="6_pickup"]
+ [ext_resource type="Resource" path="res://InventorySystem/item_potion.tres" id="7_potion"]
+@@ -12,22 +10,17 @@
+ [ext_resource type="Script" uid="uid://cr346gptxty8" path="res://InteractionSystem/Door.cs" id="9_door"]
+ [ext_resource type="Script" uid="uid://c7hr6yy3se2ag" path="res://InteractionSystem/XRayManager.cs" id="10_xray_mgr"]
+ [ext_resource type="Script" uid="uid://cdbpfbdo62j00" path="res://InteractionSystem/RadioactiveZone.cs" id="11_rad_zone"]
+-[ext_resource type="Resource" path="res://InventorySystem/item_mask_gas.tres" id="12_gas"]
+-[ext_resource type="Resource" path="res://InventorySystem/item_mask_xray.tres" id="13_xray"]
+ [ext_resource type="Shader" uid="uid://s4g4lednjbcy" path="res://Shaders/gas_mask.gdshader" id="14_gas_shader"]
+-[ext_resource type="Resource" path="res://InventorySystem/item_mask_invisibility.tres" id="14_stealth"]
+ [ext_resource type="Shader" uid="uid://bi2pcl63pfjp4" path="res://Shaders/xray_mask.gdshader" id="15_xray_shader"]
+ [ext_resource type="Shader" uid="uid://bwplect3jwpmg" path="res://Shaders/stealth_mask.gdshader" id="16_stealth_shader"]
+ [ext_resource type="Shader" uid="uid://crgke0qi3gsvd" path="res://Shaders/sanity_distortion.gdshader" id="17_sanity_shader"]
+-[ext_resource type="PackedScene" uid="uid://bvmujkt7g26vc" path="res://Enemy.tscn" id="17_tuemg"]
+-[ext_resource type="Script" uid="uid://bycgccef6qxd0" path="res://InteractionSystem/SecurityCamera.cs" id="19_camera_script"]
+-[ext_resource type="PackedScene" uid="uid://b8d5477s0d1d6" path="res://Models/KAMERA.fbx" id="21_s0gvp"]
+ 
+-[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_default"]
+-panorama = ExtResource("3_sky_tex")
++[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_default"]
++sky_top_color = Color(0.384314, 0.454902, 0.54902, 1)
++sky_horizon_color = Color(0.646275, 0.655686, 0.670588, 1)
+ 
+ [sub_resource type="Sky" id="Sky_default"]
+-sky_material = SubResource("PanoramaSkyMaterial_default")
++sky_material = SubResource("ProceduralSkyMaterial_default")
+ 
+ [sub_resource type="Environment" id="Environment_default"]
+ background_mode = 2
+@@ -35,11 +28,6 @@ sky = SubResource("Sky_default")
+ tonemap_mode = 2
+ glow_enabled = true
+ 
+-[sub_resource type="SphereShape3D" id="SphereShape3D_ball"]
+-
+-[sub_resource type="SphereShape3D" id="SphereShape3D_shapecast"]
+-radius = 0.1
+-
+ [sub_resource type="ShaderMaterial" id="ShaderMaterial_gas"]
+ shader = ExtResource("14_gas_shader")
+ 
+@@ -98,80 +86,34 @@ size = Vector3(10, 5, 10)
+ transparency = 1
+ albedo_color = Color(0.2, 1, 0.2, 0.1)
+ 
+-[sub_resource type="BoxMesh" id="BoxMesh_red_small"]
+-material = SubResource("StandardMaterial3D_red")
+-size = Vector3(0.4, 0.4, 0.4)
+-
+-[sub_resource type="BoxMesh" id="BoxMesh_gold_small"]
+-material = SubResource("StandardMaterial3D_gold")
+-size = Vector3(0.4, 0.4, 0.4)
+-
+-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_blue"]
+-albedo_color = Color(0.2, 0.2, 1, 1)
++[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_floor"]
++albedo_color = Color(0.3, 0.35, 0.4, 1)
++roughness = 0.8
+ 
+-[sub_resource type="BoxMesh" id="BoxMesh_blue_small"]
+-material = SubResource("StandardMaterial3D_blue")
+-size = Vector3(0.4, 0.4, 0.4)
+-
+-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_transparent_red"]
+-transparency = 1
+-shading_mode = 0
+-albedo_color = Color(1, 0, 0, 0.3)
++[node name="Node3D" type="Node3D"]
++script = ExtResource("1_root_script")
+ 
+-[sub_resource type="CylinderMesh" id="CylinderMesh_vision_cone"]
+-material = SubResource("StandardMaterial3D_transparent_red")
+-top_radius = 0.0
+-bottom_radius = 4.0
+-height = 10.0
+-radial_segments = 16
+-rings = 1
+-
+-[sub_resource type="BoxShape3D" id="BoxShape3D_camera_detection"]
+-size = Vector3(10, 5, 12)
+-
+-[node name="Node3D" type="Node3D" unique_id=1025875681]
+-
+-[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1572345889]
++[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+ environment = SubResource("Environment_default")
+ 
+-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=2106531217]
++[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+ transform = Transform3D(-0.866023, -0.433016, 0.250001, 0, 0.499998, 0.866027, -0.500003, 0.749999, -0.43301, 0, 0, 0)
+ shadow_enabled = true
++light_energy = 1.5
++
++[node name="DefaultCamera" type="Camera3D" parent="."]
++transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, 5, 10)
+ 
+-[node name="Floor" type="CSGBox3D" parent="." unique_id=1229859552]
++[node name="Floor" type="CSGBox3D" parent="."]
+ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+ use_collision = true
+ size = Vector3(20, 1, 20)
+-material = ExtResource("2_floor_mat")
+-
+-[node name="Ball" type="CharacterBody3D" parent="." unique_id=1249645612]
+-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -2.376791)
+-script = ExtResource("1_script")
+-HoldDistance = 1.5
+-
+-[node name="PlayerInput" type="Node" parent="Ball" unique_id=145355438]
+-script = ExtResource("1_input")
+-
+-[node name="CollisionShape3D" type="CollisionShape3D" parent="Ball" unique_id=1419102380]
+-shape = SubResource("SphereShape3D_ball")
++material = SubResource("StandardMaterial3D_floor")
+ 
+-[node name="MeshInstance3D" type="CSGSphere3D" parent="Ball" unique_id=1333422521]
+-
+-[node name="Camera3D" type="Camera3D" parent="Ball" unique_id=1247597468]
+-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+-
+-[node name="ShapeCast3D" type="ShapeCast3D" parent="Ball/Camera3D" unique_id=883531826]
+-shape = SubResource("SphereShape3D_shapecast")
+-target_position = Vector3(0, 0, -2.5)
+-collide_with_areas = true
+-
+-[node name="Inventory" type="Node" parent="Ball" unique_id=2095621343]
+-script = ExtResource("4_inventory")
+-
+-[node name="UI" type="CanvasLayer" parent="." unique_id=2005998870]
++[node name="UI" type="CanvasLayer" parent="."]
+ script = ExtResource("5_inventory_ui")
+ 
+-[node name="InteractionLabel" type="Label" parent="UI" unique_id=293848234]
++[node name="InteractionLabel" type="Label" parent="UI"]
+ custom_minimum_size = Vector2(200, 30)
+ anchors_preset = 8
+ anchor_left = 0.5
+@@ -188,7 +130,7 @@ text = "Press E to Pickup"
+ horizontal_alignment = 1
+ vertical_alignment = 1
+ 
+-[node name="Control" type="Control" parent="UI" unique_id=1160298769]
++[node name="Control" type="Control" parent="UI"]
+ layout_mode = 3
+ anchors_preset = 15
+ anchor_right = 1.0
+@@ -196,7 +138,7 @@ anchor_bottom = 1.0
+ grow_horizontal = 2
+ grow_vertical = 2
+ 
+-[node name="GridContainer" type="GridContainer" parent="UI/Control" unique_id=751471897]
++[node name="GridContainer" type="GridContainer" parent="UI/Control"]
+ layout_mode = 1
+ anchors_preset = 7
+ anchor_left = 0.5
+@@ -211,12 +153,12 @@ grow_horizontal = 2
+ grow_vertical = 0
+ columns = 8
+ 
+-[node name="Slot1" type="ColorRect" parent="UI/Control/GridContainer" unique_id=2013721968]
++[node name="Slot1" type="ColorRect" parent="UI/Control/GridContainer"]
+ custom_minimum_size = Vector2(50, 50)
+ layout_mode = 2
+ color = Color(0.2, 0.2, 0.2, 0.8)
+ 
+-[node name="Label" type="Label" parent="UI/Control/GridContainer/Slot1" unique_id=1850638493]
++[node name="Label" type="Label" parent="UI/Control/GridContainer/Slot1"]
+ layout_mode = 1
+ anchors_preset = 15
+ anchor_right = 1.0
+@@ -227,12 +169,12 @@ horizontal_alignment = 1
+ vertical_alignment = 1
+ autowrap_mode = 3
+ 
+-[node name="Slot2" type="ColorRect" parent="UI/Control/GridContainer" unique_id=889359463]
++[node name="Slot2" type="ColorRect" parent="UI/Control/GridContainer"]
+ custom_minimum_size = Vector2(50, 50)
+ layout_mode = 2
+ color = Color(0.2, 0.2, 0.2, 0.8)
+ 
+-[node name="Label" type="Label" parent="UI/Control/GridContainer/Slot2" unique_id=198238984]
++[node name="Label" type="Label" parent="UI/Control/GridContainer/Slot2"]
+ layout_mode = 1
+ anchors_preset = 15
+ anchor_right = 1.0
+@@ -243,12 +185,12 @@ horizontal_alignment = 1
+ vertical_alignment = 1
+ autowrap_mode = 3
+ 
+-[node name="Slot3" type="ColorRect" parent="UI/Control/GridContainer" unique_id=292027137]
++[node name="Slot3" type="ColorRect" parent="UI/Control/GridContainer"]
+ custom_minimum_size = Vector2(50, 50)
+ layout_mode = 2
+ color = Color(0.2, 0.2, 0.2, 0.8)
+ 
+-[node name="Label" type="Label" parent="UI/Control/GridContainer/Slot3" unique_id=1036987448]
++[node name="Label" type="Label" parent="UI/Control/GridContainer/Slot3"]
+ layout_mode = 1
+ anchors_preset = 15
+ anchor_right = 1.0
+@@ -259,12 +201,12 @@ horizontal_alignment = 1
+ vertical_alignment = 1
+ autowrap_mode = 3
+ 
+-[node name="Slot4" type="ColorRect" parent="UI/Control/GridContainer" unique_id=516472064]
++[node name="Slot4" type="ColorRect" parent="UI/Control/GridContainer"]
+ custom_minimum_size = Vector2(50, 50)
+ layout_mode = 2
+ color = Color(0.2, 0.2, 0.2, 0.8)
+ 
+-[node name="Label" type="Label" parent="UI/Control/GridContainer/Slot4" unique_id=60902637]
++[node name="Label" type="Label" parent="UI/Control/GridContainer/Slot4"]
+ layout_mode = 1
+ anchors_preset = 15
+ anchor_right = 1.0
+@@ -275,12 +217,12 @@ horizontal_alignment = 1
+ vertical_alignment = 1
+ autowrap_mode = 3
+ 
+-[node name="Slot5" type="ColorRect" parent="UI/Control/GridContainer" unique_id=454721777]
++[node name="Slot5" type="ColorRect" parent="UI/Control/GridContainer"]
+ custom_minimum_size = Vector2(50, 50)
+ layout_mode = 2
+ color = Color(0.2, 0.2, 0.2, 0.8)
+ 
+-[node name="Label" type="Label" parent="UI/Control/GridContainer/Slot5" unique_id=1336268451]
++[node name="Label" type="Label" parent="UI/Control/GridContainer/Slot5"]
+ layout_mode = 1
+ anchors_preset = 15
+ anchor_right = 1.0
+@@ -291,12 +233,12 @@ horizontal_alignment = 1
+ vertical_alignment = 1
+ autowrap_mode = 3
+ 
+-[node name="Slot6" type="ColorRect" parent="UI/Control/GridContainer" unique_id=1624942022]
++[node name="Slot6" type="ColorRect" parent="UI/Control/GridContainer"]
+ custom_minimum_size = Vector2(50, 50)
+ layout_mode = 2
+ color = Color(0.2, 0.2, 0.2, 0.8)
+ 
+-[node name="Label" type="Label" parent="UI/Control/GridContainer/Slot6" unique_id=1525462817]
++[node name="Label" type="Label" parent="UI/Control/GridContainer/Slot6"]
+ layout_mode = 1
+ anchors_preset = 15
+ anchor_right = 1.0
+@@ -307,12 +249,12 @@ horizontal_alignment = 1
+ vertical_alignment = 1
+ autowrap_mode = 3
+ 
+-[node name="Slot7" type="ColorRect" parent="UI/Control/GridContainer" unique_id=33963411]
++[node name="Slot7" type="ColorRect" parent="UI/Control/GridContainer"]
+ custom_minimum_size = Vector2(50, 50)
+ layout_mode = 2
+ color = Color(0.2, 0.2, 0.2, 0.8)
+ 
+-[node name="Label" type="Label" parent="UI/Control/GridContainer/Slot7" unique_id=1154777434]
++[node name="Label" type="Label" parent="UI/Control/GridContainer/Slot7"]
+ layout_mode = 1
+ anchors_preset = 15
+ anchor_right = 1.0
+@@ -323,12 +265,12 @@ horizontal_alignment = 1
+ vertical_alignment = 1
+ autowrap_mode = 3
+ 
+-[node name="Slot8" type="ColorRect" parent="UI/Control/GridContainer" unique_id=226407523]
++[node name="Slot8" type="ColorRect" parent="UI/Control/GridContainer"]
+ custom_minimum_size = Vector2(50, 50)
+ layout_mode = 2
+ color = Color(0.2, 0.2, 0.2, 0.8)
+ 
+-[node name="Label" type="Label" parent="UI/Control/GridContainer/Slot8" unique_id=43236677]
++[node name="Label" type="Label" parent="UI/Control/GridContainer/Slot8"]
+ layout_mode = 1
+ anchors_preset = 15
+ anchor_right = 1.0
+@@ -339,7 +281,7 @@ horizontal_alignment = 1
+ vertical_alignment = 1
+ autowrap_mode = 3
+ 
+-[node name="SanityBar" type="ProgressBar" parent="UI" unique_id=991234567]
++[node name="SanityBar" type="ProgressBar" parent="UI"]
+ anchors_preset = 5
+ anchor_left = 0.5
+ anchor_right = 0.5
+@@ -351,7 +293,7 @@ grow_horizontal = 2
+ value = 100.0
+ show_percentage = false
+ 
+-[node name="GameOverLabel" type="Label" parent="UI" unique_id=881234567]
++[node name="GameOverLabel" type="Label" parent="UI"]
+ visible = false
+ anchors_preset = 8
+ anchor_left = 0.5
+@@ -370,7 +312,7 @@ text = "SANITY LOST"
+ horizontal_alignment = 1
+ vertical_alignment = 1
+ 
+-[node name="Crosshair" type="ColorRect" parent="UI" unique_id=180665215]
++[node name="Crosshair" type="ColorRect" parent="UI"]
+ anchors_preset = 8
+ anchor_left = 0.5
+ anchor_top = 0.5
+@@ -385,7 +327,7 @@ grow_vertical = 2
+ mouse_filter = 2
+ color = Color(1, 0, 0, 1)
+ 
+-[node name="GasMaskOverlay" type="ColorRect" parent="UI" unique_id=299549119]
++[node name="GasMaskOverlay" type="ColorRect" parent="UI"]
+ visible = false
+ material = SubResource("ShaderMaterial_gas")
+ anchors_preset = 15
+@@ -395,7 +337,7 @@ grow_horizontal = 2
+ grow_vertical = 2
+ mouse_filter = 2
+ 
+-[node name="XRayOverlay" type="ColorRect" parent="UI" unique_id=710413856]
++[node name="XRayOverlay" type="ColorRect" parent="UI"]
+ visible = false
+ material = SubResource("ShaderMaterial_xray")
+ anchors_preset = 15
+@@ -405,10 +347,10 @@ grow_horizontal = 2
+ grow_vertical = 2
+ mouse_filter = 2
+ 
+-[node name="BackBufferCopy_Stealth" type="BackBufferCopy" parent="UI" unique_id=533912780]
++[node name="BackBufferCopy_Stealth" type="BackBufferCopy" parent="UI"]
+ copy_mode = 2
+ 
+-[node name="StealthOverlay" type="ColorRect" parent="UI" unique_id=892341022]
++[node name="StealthOverlay" type="ColorRect" parent="UI"]
+ visible = false
+ material = SubResource("ShaderMaterial_stealth")
+ anchors_preset = 15
+@@ -418,10 +360,10 @@ grow_horizontal = 2
+ grow_vertical = 2
+ mouse_filter = 2
+ 
+-[node name="BackBufferCopy_Sanity" type="BackBufferCopy" parent="UI" unique_id=1047794809]
++[node name="BackBufferCopy_Sanity" type="BackBufferCopy" parent="UI"]
+ copy_mode = 2
+ 
+-[node name="SanityOverlay" type="ColorRect" parent="UI" unique_id=11223344]
++[node name="SanityOverlay" type="ColorRect" parent="UI"]
+ material = SubResource("ShaderMaterial_sanity")
+ anchors_preset = 15
+ anchor_right = 1.0
+@@ -430,7 +372,7 @@ grow_horizontal = 2
+ grow_vertical = 2
+ mouse_filter = 2
+ 
+-[node name="DetectionOverlay" type="ColorRect" parent="UI" unique_id=987654321]
++[node name="DetectionOverlay" type="ColorRect" parent="UI"]
+ visible = false
+ anchors_preset = 15
+ anchor_right = 1.0
+@@ -440,7 +382,7 @@ grow_vertical = 2
+ mouse_filter = 2
+ color = Color(1, 0, 0, 0.2)
+ 
+-[node name="DetectionLabel" type="Label" parent="UI" unique_id=123456789]
++[node name="DetectionLabel" type="Label" parent="UI"]
+ visible = false
+ anchors_preset = 5
+ anchor_left = 0.5
+@@ -454,167 +396,68 @@ theme_override_font_sizes/font_size = 64
+ text = "!"
+ horizontal_alignment = 1
+ 
+-[node name="Target" type="CSGBox3D" parent="." unique_id=302556415]
++[node name="Target" type="CSGBox3D" parent="."]
+ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -5)
+ use_collision = true
+ 
+-[node name="Pickup_Potion1" type="RigidBody3D" parent="." unique_id=1227574063]
++[node name="Pickup_Potion1" type="RigidBody3D" parent="."]
+ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.5, -3)
+ script = ExtResource("6_pickup")
+ ItemResource = ExtResource("7_potion")
+ 
+-[node name="MeshInstance3D" type="MeshInstance3D" parent="Pickup_Potion1" unique_id=2002314835]
++[node name="MeshInstance3D" type="MeshInstance3D" parent="Pickup_Potion1"]
+ mesh = SubResource("SphereMesh_red")
+ 
+-[node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_Potion1" unique_id=716408832]
++[node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_Potion1"]
+ shape = SubResource("SphereShape3D_pickup")
+ 
+-[node name="Pickup_Potion2" type="RigidBody3D" parent="." unique_id=2081942578]
++[node name="Pickup_Potion2" type="RigidBody3D" parent="."]
+ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0.5, -3.5)
+ script = ExtResource("6_pickup")
+ ItemResource = ExtResource("7_potion")
+ 
+-[node name="MeshInstance3D" type="MeshInstance3D" parent="Pickup_Potion2" unique_id=928566177]
++[node name="MeshInstance3D" type="MeshInstance3D" parent="Pickup_Potion2"]
+ mesh = SubResource("SphereMesh_red")
+ 
+-[node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_Potion2" unique_id=462182311]
++[node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_Potion2"]
+ shape = SubResource("SphereShape3D_pickup")
+ 
+-[node name="Pickup_Key" type="RigidBody3D" parent="." unique_id=1181565980]
++[node name="Pickup_Key" type="RigidBody3D" parent="."]
+ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.5, -3)
+ script = ExtResource("6_pickup")
+ ItemResource = ExtResource("8_key")
+ 
+-[node name="MeshInstance3D" type="MeshInstance3D" parent="Pickup_Key" unique_id=60037945]
++[node name="MeshInstance3D" type="MeshInstance3D" parent="Pickup_Key"]
+ mesh = SubResource("BoxMesh_gold")
+ 
+-[node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_Key" unique_id=463405520]
++[node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_Key"]
+ shape = SubResource("BoxShape3D_pickup")
+ 
+-[node name="Door" type="StaticBody3D" parent="." unique_id=218706111]
++[node name="Door" type="StaticBody3D" parent="."]
+ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.2, -4, 1.5, -4)
+ script = ExtResource("9_door")
+ 
+-[node name="MeshInstance3D" type="MeshInstance3D" parent="Door" unique_id=1214367948]
++[node name="MeshInstance3D" type="MeshInstance3D" parent="Door"]
+ mesh = SubResource("BoxMesh_door")
+ 
+-[node name="CollisionShape3D" type="CollisionShape3D" parent="Door" unique_id=161676663]
++[node name="CollisionShape3D" type="CollisionShape3D" parent="Door"]
+ shape = SubResource("BoxShape3D_door")
+ 
+-[node name="XRayManager" type="Node" parent="." unique_id=1030886837]
++[node name="XRayManager" type="Node" parent="."]
+ script = ExtResource("10_xray_mgr")
+ XRayOverlayMaterial = SubResource("StandardMaterial3D_xray_overlay")
+ 
+-[node name="RadioactiveZone" type="Area3D" parent="." unique_id=1478112542]
++[node name="RadioactiveZone" type="Area3D" parent="."]
+ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 2.5, 0)
+ script = ExtResource("11_rad_zone")
+ 
+-[node name="CollisionShape3D" type="CollisionShape3D" parent="RadioactiveZone" unique_id=1350302298]
++[node name="CollisionShape3D" type="CollisionShape3D" parent="RadioactiveZone"]
+ shape = SubResource("BoxShape3D_radzone")
+ 
+-[node name="Visual" type="CSGBox3D" parent="RadioactiveZone" unique_id=743153745]
++[node name="Visual" type="CSGBox3D" parent="RadioactiveZone"]
+ size = Vector3(10, 5, 10)
+ material = SubResource("StandardMaterial3D_radzone")
+ 
+-[node name="Pickup_GasMask" type="RigidBody3D" parent="." unique_id=1903511097]
+-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 3)
+-script = ExtResource("6_pickup")
+-ItemResource = ExtResource("12_gas")
+-
+-[node name="MeshInstance3D" type="MeshInstance3D" parent="Pickup_GasMask" unique_id=2135001966]
+-mesh = SubResource("BoxMesh_red_small")
+-
+-[node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_GasMask" unique_id=1189970334]
+-shape = SubResource("BoxShape3D_pickup")
+-
+-[node name="Pickup_XRayMask" type="RigidBody3D" parent="." unique_id=1649173418]
+-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.5, 3)
+-script = ExtResource("6_pickup")
+-ItemResource = ExtResource("13_xray")
+-
+-[node name="MeshInstance3D" type="MeshInstance3D" parent="Pickup_XRayMask" unique_id=2136574011]
+-mesh = SubResource("BoxMesh_gold_small")
+-
+-[node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_XRayMask" unique_id=719004815]
+-shape = SubResource("BoxShape3D_pickup")
+-
+-[node name="Pickup_StealthMask" type="RigidBody3D" parent="." unique_id=1649173499]
+-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.5, 3)
+-script = ExtResource("6_pickup")
+-ItemResource = ExtResource("14_stealth")
+-
+-[node name="MeshInstance3D" type="MeshInstance3D" parent="Pickup_StealthMask" unique_id=2136574999]
+-mesh = SubResource("BoxMesh_blue_small")
+-
+-[node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_StealthMask" unique_id=719004999]
+-shape = SubResource("BoxShape3D_pickup")
+-
+-[node name="WallHidingItem" type="CSGBox3D" parent="." unique_id=1079450384]
+-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.852402, 1.5, 0)
+-use_collision = true
+-size = Vector3(1, 3, 5)
+-
+-[node name="Wall" type="CSGBox3D" parent="." unique_id=1364616113]
+-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.495885, 1.6466911, 7.1931496)
+-use_collision = true
+-size = Vector3(0.51257324, 3.3914795, 2.4250488)
+-
+-[node name="HiddenItem" type="RigidBody3D" parent="." unique_id=131212969 groups=["XRayable"]]
+-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 1.5, 0)
+-script = ExtResource("6_pickup")
+-ItemResource = ExtResource("8_key")
+-
+-[node name="CollisionShape3D" type="CollisionShape3D" parent="HiddenItem" unique_id=1429999029]
+-shape = SubResource("BoxShape3D_pickup")
+-
+-[node name="Mesh" type="MeshInstance3D" parent="HiddenItem" unique_id=1447599221]
+-mesh = SubResource("BoxMesh_gold")
+-
+-[node name="SecurityCamera" type="Node3D" parent="." unique_id=2003004005]
+-transform = Transform3D(-4.371139e-08, 0.25881904, -0.9659258, 0, 0.9659258, 0.25881904, 1, 1.131334e-08, -4.222196e-08, -2.0343962, 2.5, 7)
+-script = ExtResource("19_camera_script")
+-SweepAngle = 60.0
+-Range = 12.0
+-
+-[node name="KAMERA" parent="SecurityCamera" unique_id=1498223709 instance=ExtResource("21_s0gvp")]
+-transform = Transform3D(-7.71, 0, -6.740296e-07, 0, 7.71, 0, 6.740296e-07, 0, -7.71, 0, 0, 0)
+-
+-[node name="ViewCone" type="SpotLight3D" parent="SecurityCamera" unique_id=2003004007 groups=["XRayable"]]
+-transform = Transform3D(1, -1.7763568e-15, 3.5527137e-15, 0, 1.0000001, 2.9802322e-08, 0, -2.9802322e-08, 1.0000001, 0, 0.41743243, 0.11185074)
+-light_color = Color(1, 0, 0, 1)
+-light_energy = 5.0
+-shadow_enabled = true
+-spot_range = 12.0
+-spot_angle = 30.0
+-
+-[node name="VisionConeMesh" type="MeshInstance3D" parent="SecurityCamera" unique_id=293847560 groups=["XRayInvisible"]]
+-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, -5)
+-visible = false
+-mesh = SubResource("CylinderMesh_vision_cone")
+-
+-[node name="DetectionArea" type="Area3D" parent="SecurityCamera" unique_id=2003004008]
+-
+-[node name="CollisionShape3D" type="CollisionShape3D" parent="SecurityCamera/DetectionArea" unique_id=2003004009]
+-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -5)
+-shape = SubResource("BoxShape3D_camera_detection")
+-
+-[node name="LOSRay" type="RayCast3D" parent="SecurityCamera" unique_id=2003004010]
+-target_position = Vector3(0, 0, -12)
+-
+-[node name="Enemy" parent="." unique_id=577585736 node_paths=PackedStringArray("Waypoints") groups=["Enemies"] instance=ExtResource("17_tuemg")]
+-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.585043, 0, 1.7581491)
+-collision_layer = 1
+-PatrolSpeed = 1.0
+-ChaseSpeed = 2.0
+-Waypoints = [NodePath("../Waypoint1"), NodePath("../Waypoint2"), NodePath("../Waypoint3")]
+-
+-[node name="Waypoint1" type="Marker3D" parent="." unique_id=812746639]
+-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 7)
+-
+-[node name="Waypoint2" type="Marker3D" parent="." unique_id=104456816]
+-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 7)
+-
+-[node name="Waypoint3" type="Marker3D" parent="." unique_id=821892749]
+-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.7981987, 0, 1.0790443)
+-
+-[editable path="SecurityCamera/KAMERA"]
++[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
++_spawnable_scenes = PackedStringArray("res://Player.tscn")
++spawn_path = NodePath("..")
+diff --git a/project.godot b/project.godot
+index a4b8ecd..327c5e0 100644
+--- a/project.godot
++++ b/project.godot
+@@ -19,6 +19,10 @@ run/main_scene="res://MainMenu.tscn"
+ config/features=PackedStringArray("4.6", "C#", "Forward Plus")
+ config/icon="res://icon.svg"
+ 
++[autoload]
++
++NetworkManager="*res://NetworkManager.cs"
++
+ [dotnet]
+ 
+ project/assembly_name="game-jam-2026"

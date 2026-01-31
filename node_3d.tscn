@@ -1,10 +1,8 @@
-[gd_scene format=3 uid="uid://clsgsyq4e35in"]
+[gd_scene load_steps=42 format=3 uid="uid://clsgsyq4e35in"]
 
-[ext_resource type="Script" uid="uid://bugxpobj04nyw" path="res://PlayerInput.cs" id="1_input"]
-[ext_resource type="Script" uid="uid://6pc13djetn7y" path="res://PlayerController.cs" id="1_script"]
+[ext_resource type="Script" path="res://GameRoot.cs" id="1_gameroot"]
 [ext_resource type="Material" path="res://floor_material.tres" id="2_floor_mat"]
 [ext_resource type="Texture2D" uid="uid://8d0uj6envljt" path="res://textures/sky.exr" id="3_sky_tex"]
-[ext_resource type="Script" uid="uid://dne8d4vd2mkxf" path="res://InventorySystem/Inventory.cs" id="4_inventory"]
 [ext_resource type="Script" uid="uid://cx8x1mac1t274" path="res://InventorySystem/InventoryUI.cs" id="5_inventory_ui"]
 [ext_resource type="Script" uid="uid://36lhpbg631ox" path="res://InteractionSystem/Pickup.cs" id="6_pickup"]
 [ext_resource type="Resource" path="res://InventorySystem/item_potion.tres" id="7_potion"]
@@ -34,11 +32,6 @@ background_mode = 2
 sky = SubResource("Sky_default")
 tonemap_mode = 2
 glow_enabled = true
-
-[sub_resource type="SphereShape3D" id="SphereShape3D_ball"]
-
-[sub_resource type="SphereShape3D" id="SphereShape3D_shapecast"]
-radius = 0.1
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_gas"]
 shader = ExtResource("14_gas_shader")
@@ -98,14 +91,6 @@ size = Vector3(10, 5, 10)
 transparency = 1
 albedo_color = Color(0.2, 1, 0.2, 0.1)
 
-[sub_resource type="BoxMesh" id="BoxMesh_red_small"]
-material = SubResource("StandardMaterial3D_red")
-size = Vector3(0.4, 0.4, 0.4)
-
-[sub_resource type="BoxMesh" id="BoxMesh_gold_small"]
-material = SubResource("StandardMaterial3D_gold")
-size = Vector3(0.4, 0.4, 0.4)
-
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_blue"]
 albedo_color = Color(0.2, 0.2, 1, 1)
 
@@ -129,49 +114,26 @@ rings = 1
 [sub_resource type="BoxShape3D" id="BoxShape3D_camera_detection"]
 size = Vector3(10, 5, 12)
 
-[node name="Node3D" type="Node3D" unique_id=1025875681]
+[node name="Node3D" type="Node3D"]
+script = ExtResource("1_gameroot")
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1572345889]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_default")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=2106531217]
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(-0.866023, -0.433016, 0.250001, 0, 0.499998, 0.866027, -0.500003, 0.749999, -0.43301, 0, 0, 0)
 shadow_enabled = true
 
-[node name="Floor" type="CSGBox3D" parent="." unique_id=1229859552]
+[node name="Floor" type="CSGBox3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 use_collision = true
 size = Vector3(20, 1, 20)
 material = ExtResource("2_floor_mat")
 
-[node name="Ball" type="CharacterBody3D" parent="." unique_id=1249645612]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -2.376791)
-script = ExtResource("1_script")
-HoldDistance = 1.5
-
-[node name="PlayerInput" type="Node" parent="Ball" unique_id=145355438]
-script = ExtResource("1_input")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Ball" unique_id=1419102380]
-shape = SubResource("SphereShape3D_ball")
-
-[node name="MeshInstance3D" type="CSGSphere3D" parent="Ball" unique_id=1333422521]
-
-[node name="Camera3D" type="Camera3D" parent="Ball" unique_id=1247597468]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
-
-[node name="ShapeCast3D" type="ShapeCast3D" parent="Ball/Camera3D" unique_id=883531826]
-shape = SubResource("SphereShape3D_shapecast")
-target_position = Vector3(0, 0, -2.5)
-collide_with_areas = true
-
-[node name="Inventory" type="Node" parent="Ball" unique_id=2095621343]
-script = ExtResource("4_inventory")
-
-[node name="UI" type="CanvasLayer" parent="." unique_id=2005998870]
+[node name="UI" type="CanvasLayer" parent="."]
 script = ExtResource("5_inventory_ui")
 
-[node name="InteractionLabel" type="Label" parent="UI" unique_id=293848234]
+[node name="InteractionLabel" type="Label" parent="UI"]
 custom_minimum_size = Vector2(200, 30)
 anchors_preset = 8
 anchor_left = 0.5
@@ -188,7 +150,7 @@ text = "Press E to Pickup"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Control" type="Control" parent="UI" unique_id=1160298769]
+[node name="Control" type="Control" parent="UI"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -196,7 +158,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="GridContainer" type="GridContainer" parent="UI/Control" unique_id=751471897]
+[node name="GridContainer" type="GridContainer" parent="UI/Control"]
 layout_mode = 1
 anchors_preset = 7
 anchor_left = 0.5
@@ -211,12 +173,12 @@ grow_horizontal = 2
 grow_vertical = 0
 columns = 8
 
-[node name="Slot1" type="ColorRect" parent="UI/Control/GridContainer" unique_id=2013721968]
+[node name="Slot1" type="ColorRect" parent="UI/Control/GridContainer"]
 custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
 color = Color(0.2, 0.2, 0.2, 0.8)
 
-[node name="Label" type="Label" parent="UI/Control/GridContainer/Slot1" unique_id=1850638493]
+[node name="Label" type="Label" parent="UI/Control/GridContainer/Slot1"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -227,12 +189,12 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
 
-[node name="Slot2" type="ColorRect" parent="UI/Control/GridContainer" unique_id=889359463]
+[node name="Slot2" type="ColorRect" parent="UI/Control/GridContainer"]
 custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
 color = Color(0.2, 0.2, 0.2, 0.8)
 
-[node name="Label" type="Label" parent="UI/Control/GridContainer/Slot2" unique_id=198238984]
+[node name="Label" type="Label" parent="UI/Control/GridContainer/Slot2"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -243,12 +205,12 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
 
-[node name="Slot3" type="ColorRect" parent="UI/Control/GridContainer" unique_id=292027137]
+[node name="Slot3" type="ColorRect" parent="UI/Control/GridContainer"]
 custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
 color = Color(0.2, 0.2, 0.2, 0.8)
 
-[node name="Label" type="Label" parent="UI/Control/GridContainer/Slot3" unique_id=1036987448]
+[node name="Label" type="Label" parent="UI/Control/GridContainer/Slot3"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -259,12 +221,12 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
 
-[node name="Slot4" type="ColorRect" parent="UI/Control/GridContainer" unique_id=516472064]
+[node name="Slot4" type="ColorRect" parent="UI/Control/GridContainer"]
 custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
 color = Color(0.2, 0.2, 0.2, 0.8)
 
-[node name="Label" type="Label" parent="UI/Control/GridContainer/Slot4" unique_id=60902637]
+[node name="Label" type="Label" parent="UI/Control/GridContainer/Slot4"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -275,12 +237,12 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
 
-[node name="Slot5" type="ColorRect" parent="UI/Control/GridContainer" unique_id=454721777]
+[node name="Slot5" type="ColorRect" parent="UI/Control/GridContainer"]
 custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
 color = Color(0.2, 0.2, 0.2, 0.8)
 
-[node name="Label" type="Label" parent="UI/Control/GridContainer/Slot5" unique_id=1336268451]
+[node name="Label" type="Label" parent="UI/Control/GridContainer/Slot5"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -291,12 +253,12 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
 
-[node name="Slot6" type="ColorRect" parent="UI/Control/GridContainer" unique_id=1624942022]
+[node name="Slot6" type="ColorRect" parent="UI/Control/GridContainer"]
 custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
 color = Color(0.2, 0.2, 0.2, 0.8)
 
-[node name="Label" type="Label" parent="UI/Control/GridContainer/Slot6" unique_id=1525462817]
+[node name="Label" type="Label" parent="UI/Control/GridContainer/Slot6"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -307,12 +269,12 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
 
-[node name="Slot7" type="ColorRect" parent="UI/Control/GridContainer" unique_id=33963411]
+[node name="Slot7" type="ColorRect" parent="UI/Control/GridContainer"]
 custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
 color = Color(0.2, 0.2, 0.2, 0.8)
 
-[node name="Label" type="Label" parent="UI/Control/GridContainer/Slot7" unique_id=1154777434]
+[node name="Label" type="Label" parent="UI/Control/GridContainer/Slot7"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -323,12 +285,12 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
 
-[node name="Slot8" type="ColorRect" parent="UI/Control/GridContainer" unique_id=226407523]
+[node name="Slot8" type="ColorRect" parent="UI/Control/GridContainer"]
 custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
 color = Color(0.2, 0.2, 0.2, 0.8)
 
-[node name="Label" type="Label" parent="UI/Control/GridContainer/Slot8" unique_id=43236677]
+[node name="Label" type="Label" parent="UI/Control/GridContainer/Slot8"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -339,7 +301,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
 
-[node name="SanityBar" type="ProgressBar" parent="UI" unique_id=991234567]
+[node name="SanityBar" type="ProgressBar" parent="UI"]
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
@@ -351,7 +313,7 @@ grow_horizontal = 2
 value = 100.0
 show_percentage = false
 
-[node name="GameOverLabel" type="Label" parent="UI" unique_id=881234567]
+[node name="GameOverLabel" type="Label" parent="UI"]
 visible = false
 anchors_preset = 8
 anchor_left = 0.5
@@ -370,7 +332,7 @@ text = "SANITY LOST"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Crosshair" type="ColorRect" parent="UI" unique_id=180665215]
+[node name="Crosshair" type="ColorRect" parent="UI"]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -385,7 +347,7 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(1, 0, 0, 1)
 
-[node name="GasMaskOverlay" type="ColorRect" parent="UI" unique_id=299549119]
+[node name="GasMaskOverlay" type="ColorRect" parent="UI"]
 visible = false
 material = SubResource("ShaderMaterial_gas")
 anchors_preset = 15
@@ -395,7 +357,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="XRayOverlay" type="ColorRect" parent="UI" unique_id=710413856]
+[node name="XRayOverlay" type="ColorRect" parent="UI"]
 visible = false
 material = SubResource("ShaderMaterial_xray")
 anchors_preset = 15
@@ -405,10 +367,10 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="BackBufferCopy_Stealth" type="BackBufferCopy" parent="UI" unique_id=533912780]
+[node name="BackBufferCopy_Stealth" type="BackBufferCopy" parent="UI"]
 copy_mode = 2
 
-[node name="StealthOverlay" type="ColorRect" parent="UI" unique_id=892341022]
+[node name="StealthOverlay" type="ColorRect" parent="UI"]
 visible = false
 material = SubResource("ShaderMaterial_stealth")
 anchors_preset = 15
@@ -418,10 +380,10 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="BackBufferCopy_Sanity" type="BackBufferCopy" parent="UI" unique_id=1047794809]
+[node name="BackBufferCopy_Sanity" type="BackBufferCopy" parent="UI"]
 copy_mode = 2
 
-[node name="SanityOverlay" type="ColorRect" parent="UI" unique_id=11223344]
+[node name="SanityOverlay" type="ColorRect" parent="UI"]
 material = SubResource("ShaderMaterial_sanity")
 anchors_preset = 15
 anchor_right = 1.0
@@ -430,7 +392,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="DetectionOverlay" type="ColorRect" parent="UI" unique_id=987654321]
+[node name="DetectionOverlay" type="ColorRect" parent="UI"]
 visible = false
 anchors_preset = 15
 anchor_right = 1.0
@@ -440,7 +402,7 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(1, 0, 0, 0.2)
 
-[node name="DetectionLabel" type="Label" parent="UI" unique_id=123456789]
+[node name="DetectionLabel" type="Label" parent="UI"]
 visible = false
 anchors_preset = 5
 anchor_left = 0.5
@@ -454,132 +416,110 @@ theme_override_font_sizes/font_size = 64
 text = "!"
 horizontal_alignment = 1
 
-[node name="Target" type="CSGBox3D" parent="." unique_id=302556415]
+[node name="Target" type="CSGBox3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -5)
 use_collision = true
 
-[node name="Pickup_Potion1" type="RigidBody3D" parent="." unique_id=1227574063]
+[node name="Pickup_Potion1" type="RigidBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.5, -3)
 script = ExtResource("6_pickup")
 ItemResource = ExtResource("7_potion")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Pickup_Potion1" unique_id=2002314835]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Pickup_Potion1"]
 mesh = SubResource("SphereMesh_red")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_Potion1" unique_id=716408832]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_Potion1"]
 shape = SubResource("SphereShape3D_pickup")
 
-[node name="Pickup_Potion2" type="RigidBody3D" parent="." unique_id=2081942578]
+[node name="Pickup_Potion2" type="RigidBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0.5, -3.5)
 script = ExtResource("6_pickup")
 ItemResource = ExtResource("7_potion")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Pickup_Potion2" unique_id=928566177]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Pickup_Potion2"]
 mesh = SubResource("SphereMesh_red")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_Potion2" unique_id=462182311]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_Potion2"]
 shape = SubResource("SphereShape3D_pickup")
 
-[node name="Pickup_Key" type="RigidBody3D" parent="." unique_id=1181565980]
+[node name="Pickup_Key" type="RigidBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.5, -3)
 script = ExtResource("6_pickup")
 ItemResource = ExtResource("8_key")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Pickup_Key" unique_id=60037945]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Pickup_Key"]
 mesh = SubResource("BoxMesh_gold")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_Key" unique_id=463405520]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_Key"]
 shape = SubResource("BoxShape3D_pickup")
 
-[node name="Door" type="StaticBody3D" parent="." unique_id=218706111]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.2, -4, 1.5, -4)
-script = ExtResource("9_door")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Door" unique_id=1214367948]
-mesh = SubResource("BoxMesh_door")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Door" unique_id=161676663]
-shape = SubResource("BoxShape3D_door")
-
-[node name="XRayManager" type="Node" parent="." unique_id=1030886837]
-script = ExtResource("10_xray_mgr")
-XRayOverlayMaterial = SubResource("StandardMaterial3D_xray_overlay")
-
-[node name="RadioactiveZone" type="Area3D" parent="." unique_id=1478112542]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 2.5, 0)
-script = ExtResource("11_rad_zone")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="RadioactiveZone" unique_id=1350302298]
-shape = SubResource("BoxShape3D_radzone")
-
-[node name="Visual" type="CSGBox3D" parent="RadioactiveZone" unique_id=743153745]
-size = Vector3(10, 5, 10)
-material = SubResource("StandardMaterial3D_radzone")
-
-[node name="Pickup_GasMask" type="RigidBody3D" parent="." unique_id=1903511097]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 3)
-script = ExtResource("6_pickup")
-ItemResource = ExtResource("12_gas")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Pickup_GasMask" unique_id=2135001966]
-mesh = SubResource("BoxMesh_red_small")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_GasMask" unique_id=1189970334]
-shape = SubResource("BoxShape3D_pickup")
-
-[node name="Pickup_XRayMask" type="RigidBody3D" parent="." unique_id=1649173418]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.5, 3)
-script = ExtResource("6_pickup")
-ItemResource = ExtResource("13_xray")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Pickup_XRayMask" unique_id=2136574011]
-mesh = SubResource("BoxMesh_gold_small")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_XRayMask" unique_id=719004815]
-shape = SubResource("BoxShape3D_pickup")
-
-[node name="Pickup_StealthMask" type="RigidBody3D" parent="." unique_id=1649173499]
+[node name="Pickup_StealthMask" type="RigidBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.5, 3)
 script = ExtResource("6_pickup")
 ItemResource = ExtResource("14_stealth")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Pickup_StealthMask" unique_id=2136574999]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Pickup_StealthMask"]
 mesh = SubResource("BoxMesh_blue_small")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_StealthMask" unique_id=719004999]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_StealthMask"]
 shape = SubResource("BoxShape3D_pickup")
 
-[node name="WallHidingItem" type="CSGBox3D" parent="." unique_id=1079450384]
+[node name="Door" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.2, -4, 1.5, -4)
+script = ExtResource("9_door")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Door"]
+mesh = SubResource("BoxMesh_door")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Door"]
+shape = SubResource("BoxShape3D_door")
+
+[node name="XRayManager" type="Node" parent="."]
+script = ExtResource("10_xray_mgr")
+XRayOverlayMaterial = SubResource("StandardMaterial3D_xray_overlay")
+
+[node name="RadioactiveZone" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 2.5, 0)
+script = ExtResource("11_rad_zone")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RadioactiveZone"]
+shape = SubResource("BoxShape3D_radzone")
+
+[node name="Visual" type="CSGBox3D" parent="RadioactiveZone"]
+size = Vector3(10, 5, 10)
+material = SubResource("StandardMaterial3D_radzone")
+
+[node name="WallHidingItem" type="CSGBox3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.852402, 1.5, 0)
 use_collision = true
 size = Vector3(1, 3, 5)
 
-[node name="Wall" type="CSGBox3D" parent="." unique_id=1364616113]
+[node name="Wall" type="CSGBox3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.495885, 1.6466911, 7.1931496)
 use_collision = true
 size = Vector3(0.51257324, 3.3914795, 2.4250488)
 
-[node name="HiddenItem" type="RigidBody3D" parent="." unique_id=131212969 groups=["XRayable"]]
+[node name="HiddenItem" type="RigidBody3D" parent="." groups=["XRayable"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 1.5, 0)
 script = ExtResource("6_pickup")
 ItemResource = ExtResource("8_key")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="HiddenItem" unique_id=1429999029]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HiddenItem"]
 shape = SubResource("BoxShape3D_pickup")
 
-[node name="Mesh" type="MeshInstance3D" parent="HiddenItem" unique_id=1447599221]
+[node name="Mesh" type="MeshInstance3D" parent="HiddenItem"]
 mesh = SubResource("BoxMesh_gold")
 
-[node name="SecurityCamera" type="Node3D" parent="." unique_id=2003004005]
+[node name="SecurityCamera" type="Node3D" parent="."]
 transform = Transform3D(-4.371139e-08, 0.25881904, -0.9659258, 0, 0.9659258, 0.25881904, 1, 1.131334e-08, -4.222196e-08, -2.0343962, 2.5, 7)
 script = ExtResource("19_camera_script")
 SweepAngle = 60.0
 Range = 12.0
 
-[node name="KAMERA" parent="SecurityCamera" unique_id=1498223709 instance=ExtResource("21_s0gvp")]
+[node name="KAMERA" parent="SecurityCamera" instance=ExtResource("21_s0gvp")]
 transform = Transform3D(-7.71, 0, -6.740296e-07, 0, 7.71, 0, 6.740296e-07, 0, -7.71, 0, 0, 0)
 
-[node name="ViewCone" type="SpotLight3D" parent="SecurityCamera" unique_id=2003004007 groups=["XRayable"]]
+[node name="ViewCone" type="SpotLight3D" parent="SecurityCamera" groups=["XRayable"]]
 transform = Transform3D(1, -1.7763568e-15, 3.5527137e-15, 0, 1.0000001, 2.9802322e-08, 0, -2.9802322e-08, 1.0000001, 0, 0.41743243, 0.11185074)
 light_color = Color(1, 0, 0, 1)
 light_energy = 5.0
@@ -587,34 +527,36 @@ shadow_enabled = true
 spot_range = 12.0
 spot_angle = 30.0
 
-[node name="VisionConeMesh" type="MeshInstance3D" parent="SecurityCamera" unique_id=293847560 groups=["XRayInvisible"]]
+[node name="VisionConeMesh" type="MeshInstance3D" parent="SecurityCamera" groups=["XRayInvisible"]]
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, -5)
 visible = false
 mesh = SubResource("CylinderMesh_vision_cone")
 
-[node name="DetectionArea" type="Area3D" parent="SecurityCamera" unique_id=2003004008]
+[node name="DetectionArea" type="Area3D" parent="SecurityCamera"]
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="SecurityCamera/DetectionArea" unique_id=2003004009]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SecurityCamera/DetectionArea"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -5)
 shape = SubResource("BoxShape3D_camera_detection")
 
-[node name="LOSRay" type="RayCast3D" parent="SecurityCamera" unique_id=2003004010]
+[node name="LOSRay" type="RayCast3D" parent="SecurityCamera"]
 target_position = Vector3(0, 0, -12)
 
-[node name="Enemy" parent="." unique_id=577585736 node_paths=PackedStringArray("Waypoints") groups=["Enemies"] instance=ExtResource("17_tuemg")]
+[node name="Enemy" parent="." node_paths=PackedStringArray("Waypoints") groups=["Enemies"] instance=ExtResource("17_tuemg")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.585043, 0, 1.7581491)
 collision_layer = 1
 PatrolSpeed = 1.0
 ChaseSpeed = 2.0
 Waypoints = [NodePath("../Waypoint1"), NodePath("../Waypoint2"), NodePath("../Waypoint3")]
 
-[node name="Waypoint1" type="Marker3D" parent="." unique_id=812746639]
+[node name="Waypoint1" type="Marker3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 7)
 
-[node name="Waypoint2" type="Marker3D" parent="." unique_id=104456816]
+[node name="Waypoint2" type="Marker3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 7)
 
-[node name="Waypoint3" type="Marker3D" parent="." unique_id=821892749]
+[node name="Waypoint3" type="Marker3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.7981987, 0, 1.0790443)
 
-[editable path="SecurityCamera/KAMERA"]
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("res://Player.tscn")
+spawn_path = NodePath("..")

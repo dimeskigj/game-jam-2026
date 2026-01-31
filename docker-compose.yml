@@ -1,0 +1,10 @@
+services:
+  game-server:
+    build:
+      context: .
+      dockerfile: Server/Dockerfile
+    ports:
+      - "10567:10567/udp"
+    environment:
+      - SERVER_PORT=10567
+    restart: always

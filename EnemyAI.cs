@@ -311,7 +311,11 @@ public partial class EnemyAI : CharacterBody3D
 				animToPlay = titleCase;
 		}
 
-		if (_animPlayer.CurrentAnimation != animToPlay)
+		// Use Get().AsString() to avoid Linkage/MissingMethodException between string/StringName types in different Godot versions
+		// This bypasses the C# property and uses the dynamic property system.
+		string currentAnim = _animPlayer.Get("current_animation").AsString();
+		
+		if (currentAnim != animToPlay)
 		{
 			if (_animPlayer.HasAnimation(animToPlay))
 			{

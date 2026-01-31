@@ -11,13 +11,6 @@ public partial class InventoryUI : CanvasLayer
     public override void _Ready()
     {
         _gridContainer = GetNode<GridContainer>("Control/GridContainer");
-        _inventory = GetNode<Inventory>("/root/Node3D/Ball/Inventory"); // Adjust path if needed
-
-        if (_inventory != null)
-        {
-            _inventory.InventoryUpdated += UpdateUI;
-            _inventory.SelectedSlotChanged += UpdateSelection;
-        }
 
         // Initialize UI slots
         foreach (Node child in _gridContainer.GetChildren())
@@ -28,13 +21,25 @@ public partial class InventoryUI : CanvasLayer
                 _labels.Add(bg.GetNode<Label>("Label"));
             }
         }
-        
-        UpdateUI();
-        UpdateSelection(0);
+    }
+
+    public void SetInventory(Inventory inventory)
+    {
+        _inventory = inventory;
+        if (_inventory != null)
+        {
+            _inventory.InventoryUpdated += UpdateUI;
+            _inventory.SelectedSlotChanged += UpdateSelection;
+            UpdateUI();
+            UpdateSelection(0);
+        }
     }
 
     private void UpdateUI()
     {
+        // Guard against null inventory if called prematurely
+        if (_inventory == null) return;
+
         for (int i = 0; i < Inventory.MaxSlots; i++)
         {
             if (i < _labels.Count)

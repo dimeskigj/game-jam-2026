@@ -778,6 +778,7 @@ skeleton = NodePath("")
 [node name="DetectionArea" type="Area3D" parent="KAMERA" unique_id=2003004008]
 transform = Transform3D(-0.12970169, -2.220446e-16, 1.1338882e-08, 0, 0.12970169, -6.195479e-17, -1.1338882e-08, -6.6325836e-17, -0.12970169, 0, 0.056700215, -0.015192777)
 collision_layer = 0
+collision_mask = 1
 monitorable = false
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="KAMERA/DetectionArea" unique_id=2003004009]

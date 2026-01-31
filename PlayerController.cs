@@ -21,6 +21,13 @@ public partial class PlayerController : CharacterBody3D
 
 	public MaskEffect CurrentMaskEffect { get; private set; } = MaskEffect.None;
 
+	[Export] public float MaxSanity = 100.0f;
+	[Export] public float SanityDrainRate = 5.0f; // Slower drain (was 10)
+	[Export] public float SanityRegenRate = 10.0f; // Faster regen relative to drain 
+	
+	public float CurrentSanity { get; private set; } = 100.0f;
+	public bool IsDead { get; private set; } = false;
+
 	private Camera3D _camera;
 	private ShapeCast3D _interactionCast;
 	private Inventory _inventory;
@@ -30,8 +37,11 @@ public partial class PlayerController : CharacterBody3D
 	private ColorRect _gasMaskOverlay;
 	private ColorRect _xRayOverlay;
 	private ColorRect _stealthOverlay;
+	private ColorRect _sanityOverlay; // New
 	private XRayManager _xRayManager;
 	private Label _interactionLabel;
+	private ProgressBar _sanityBar;
+	private Label _gameOverLabel;
 	
 	// Interaction / Visuals
 	private ShaderMaterial _outlineMaterial;
@@ -41,6 +51,7 @@ public partial class PlayerController : CharacterBody3D
 
 	public override void _Ready()
 	{
+		CurrentSanity = MaxSanity;
 		Input.MouseMode = Input.MouseModeEnum.Captured;
 		_camera = GetNode<Camera3D>("Camera3D");
 		_interactionCast = _camera.GetNode<ShapeCast3D>("ShapeCast3D");
@@ -51,7 +62,11 @@ public partial class PlayerController : CharacterBody3D
 		_gasMaskOverlay = GetNode<ColorRect>("../UI/GasMaskOverlay");
 		_xRayOverlay = GetNode<ColorRect>("../UI/XRayOverlay");
 		_stealthOverlay = GetNode<ColorRect>("../UI/StealthOverlay");
+		_sanityOverlay = GetNode<ColorRect>("../UI/SanityOverlay");
 		_interactionLabel = GetNode<Label>("../UI/InteractionLabel");
+		_sanityBar = GetNode<ProgressBar>("../UI/SanityBar");
+		_gameOverLabel = GetNode<Label>("../UI/GameOverLabel");
+		
 		_xRayManager = GetNode<XRayManager>("../XRayManager");
 
 		// Setup Outline Material
@@ -147,6 +162,9 @@ public partial class PlayerController : CharacterBody3D
 
 	public override void _PhysicsProcess(double delta)
 	{
+		UpdateSanity(delta);
+		if (IsDead) return;
+
 		// Interaction UI & Outline
 		UpdateInteractionPrompt();
 		
@@ -380,5 +398,49 @@ public partial class PlayerController : CharacterBody3D
 		if (newSlot < 0) newSlot = Inventory.MaxSlots - 1;
 		if (newSlot >= Inventory.MaxSlots) newSlot = 0;
 		_inventory.SelectSlot(newSlot);
+	}
+	
+	private void UpdateSanity(double delta)
+	{
+		if (IsDead) return;
+
+		if (CurrentMaskEffect != MaskEffect.None)
+		{
+			// Drain
+			CurrentSanity -= SanityDrainRate * (float)delta;
+		}
+		else
+		{
+			// Regen
+			CurrentSanity += SanityRegenRate * (float)delta;
+		}
+		
+		CurrentSanity = Mathf.Clamp(CurrentSanity, 0, MaxSanity);
+		
+		// Update UI Bar
+		if (_sanityBar != null)
+		{
+			_sanityBar.Value = CurrentSanity;
+		}
+		
+		// Update Shader Intensity (0.0 at full sanity, 1.0 at 0 sanity)
+		if (_sanityOverlay != null)
+		{
+			float intensity = 1.0f - (CurrentSanity / MaxSanity);
+			var material = _sanityOverlay.Material as ShaderMaterial;
+			if (material != null)
+			{
+				material.SetShaderParameter("intensity", intensity);
+			}
+		}
+
+		if (CurrentSanity <= 0)
+		{
+			IsDead = true;
+			_gameOverLabel.Visible = true;
+			Input.MouseMode = Input.MouseModeEnum.Visible;
+			// Optional: play sound
+			GD.Print("GAME OVER: Sanity Depleted.");
+		}
 	}
 }

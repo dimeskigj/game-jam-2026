@@ -92,8 +92,8 @@ shader_parameter/scanline_count = 50.0
 shader = ExtResource("17_sanity_shader")
 shader_parameter/intensity = 0.0
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_pickup"]
-size = Vector3(0.6542969, 0.6760254, 0.61328125)
+[sub_resource type="BoxShape3D" id="BoxShape3D_key_large"]
+size = Vector3(1, 0.5, 1)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gold"]
 albedo_color = Color(1, 0.8, 0, 1)
@@ -120,6 +120,9 @@ size = Vector3(10, 5, 10)
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_radzone"]
 transparency = 1
 albedo_color = Color(0.2, 1, 0.2, 0.3)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_pickup"]
+size = Vector3(0.6542969, 0.6760254, 0.61328125)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_transparent_red"]
 transparency = 1
@@ -588,7 +591,7 @@ ItemResource = ExtResource("8_key")
 transform = Transform3D(25, 0, 0, 0, 25, 0, 0, 0, 25, 0, 0, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_Key" unique_id=463405520]
-shape = SubResource("BoxShape3D_pickup")
+shape = SubResource("BoxShape3D_key_large")
 
 [node name="Pickup_SilverKey" type="RigidBody3D" parent="." unique_id=1181565981]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.5, -5)
@@ -600,7 +603,7 @@ ItemResource = ExtResource("24_silverkey")
 transform = Transform3D(25, 0, 0, 0, 25, 0, 0, 0, 25, 0, 0, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_SilverKey" unique_id=463405521]
-shape = SubResource("BoxShape3D_pickup")
+shape = SubResource("BoxShape3D_key_large")
 
 [node name="DoorObject_Locked" type="RigidBody3D" parent="." unique_id=218706111]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.2, -4, 1.5, -4)
@@ -710,7 +713,7 @@ script = ExtResource("6_pickup")
 ItemResource = ExtResource("8_key")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="HiddenItem" unique_id=1429999029]
-shape = SubResource("BoxShape3D_pickup")
+shape = SubResource("BoxShape3D_key_large")
 
 [node name="KeyModel" parent="HiddenItem" unique_id=107222891 instance=ExtResource("27_key_model")]
 transform = Transform3D(25, 0, 0, 0, 25, 0, 0, 0, 25, 0, 0, 0)
@@ -737,6 +740,7 @@ skeleton = NodePath("")
 
 [node name="DetectionArea" type="Area3D" parent="KAMERA" unique_id=2003004008]
 transform = Transform3D(-0.12970169, -2.220446e-16, 1.1338882e-08, 0, 0.12970169, -6.195479e-17, -1.1338882e-08, -6.6325836e-17, -0.12970169, 0, 0.056700215, -0.015192777)
+collision_layer = 0
 monitorable = false
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="KAMERA/DetectionArea" unique_id=2003004009]

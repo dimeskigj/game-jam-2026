@@ -10,7 +10,7 @@
 radius = 0.1
 
 [node name="Player" type="CharacterBody3D" unique_id=1129234290]
-collision_mask = 7
+collision_mask = 13
 script = ExtResource("1_m0ta0")
 HoldDistance = 1.5
 
@@ -28,7 +28,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8866763, 0)
 
 [node name="ShapeCast3D" type="ShapeCast3D" parent="Camera3D" unique_id=298029791]
 shape = SubResource("SphereShape3D_shapecast")
-target_position = Vector3(0, 0, -2.5)
+target_position = Vector3(0, 0, -4)
 collision_mask = 3
 collide_with_areas = true
 

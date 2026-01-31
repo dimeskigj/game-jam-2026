@@ -100,11 +100,10 @@ public partial class InventoryUI : CanvasLayer
                     {
                         var model = item.ModelScene.Instantiate<Node3D>();
                         viewport.AddChild(model);
-                        model.Scale = Vector3.One * 0.5f; // Scale down for slot
+                        model.Scale = Vector3.One * 0.05f; // Scale down to fit slot properly
                         
                         // Add rotation animation node
-                        var timer = GetTree().CreateTimer(0.1f);
-                        UpdateModelRotation(model);
+                        UpdateModelRotation(viewport, model);
                     }
                 }
                 else
@@ -116,10 +115,11 @@ public partial class InventoryUI : CanvasLayer
         UpdateSelection(_inventory.selectedSlot);
     }
 
-    private async void UpdateModelRotation(Node3D model)
+    private async void UpdateModelRotation(SubViewport viewport, Node3D model)
     {
-        while (IsInstanceValid(model))
+        while (IsInstanceValid(model) && IsInstanceValid(this) && IsInstanceValid(viewport))
         {
+            if (!viewport.IsAncestorOf(model)) break;
             model.RotateY(0.02f);
             await ToSignal(GetTree(), "process_frame");
         }

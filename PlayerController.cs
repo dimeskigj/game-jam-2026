@@ -129,6 +129,7 @@ public partial class PlayerController : CharacterBody3D
 		_xRayOverlay = GetNodeOrNull<ColorRect>("../UI/XRayOverlay");
 		_stealthOverlay = GetNodeOrNull<ColorRect>("../UI/StealthOverlay");
 		_sanityOverlay = GetNodeOrNull<ColorRect>("../UI/SanityOverlay");
+		_insectOverlay = GetNodeOrNull<ColorRect>("../UI/InsectOverlay");
 		_detectionOverlay = GetNodeOrNull<ColorRect>("../UI/DetectionOverlay"); 
 		
 		_interactionLabel = GetNodeOrNull<Label>("../UI/InteractionLabel");
@@ -215,6 +216,7 @@ public partial class PlayerController : CharacterBody3D
 			if (_xRayManager != null) _xRayManager.ToggleXRay(true);
 		}
 		else if (effect == MaskEffect.Invisibility && _stealthOverlay != null) _stealthOverlay.Visible = true;
+		else if (effect == MaskEffect.InsectRepellent && _insectOverlay != null) _insectOverlay.Visible = true;
 	}
 
 	public void UnequipMask()
@@ -225,6 +227,7 @@ public partial class PlayerController : CharacterBody3D
 		if (_gasMaskOverlay != null) _gasMaskOverlay.Visible = false;
 		if (_xRayOverlay != null) _xRayOverlay.Visible = false;
 		if (_stealthOverlay != null) _stealthOverlay.Visible = false;
+		if (_insectOverlay != null) _insectOverlay.Visible = false;
 	}
 
 	// SetAlert replaced SetDetected

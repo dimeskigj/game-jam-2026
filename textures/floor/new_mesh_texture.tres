@@ -1,0 +1,6 @@
+[gd_resource type="MeshTexture" format=3 uid="uid://brubmt4h58vg"]
+
+[ext_resource type="Texture2D" uid="uid://cb5aus6skac82" path="res://textures/floor/PavingStones075_1K-JPG_AmbientOcclusion.jpg" id="1_x4g1l"]
+
+[resource]
+base_texture = ExtResource("1_x4g1l")

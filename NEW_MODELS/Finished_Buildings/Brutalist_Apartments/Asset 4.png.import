@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cnukbkj6pjieo"
-path.s3tc="res://.godot/imported/PavingStones075_1K-JPG_Displacement.jpg-2f1bfd41eaeabf46b91f3179ff21c79c.s3tc.ctex"
+uid="uid://biuwen5jwcrfl"
+path.s3tc="res://.godot/imported/Asset 4.png-3cc53bfc8675a9fdd28aab57e8c435ab.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://textures/floor/PavingStones075_1K-JPG_Displacement.jpg"
-dest_files=["res://.godot/imported/PavingStones075_1K-JPG_Displacement.jpg-2f1bfd41eaeabf46b91f3179ff21c79c.s3tc.ctex"]
+source_file="res://NEW_MODELS/Finished_Buildings/Brutalist_Apartments/Asset 4.png"
+dest_files=["res://.godot/imported/Asset 4.png-3cc53bfc8675a9fdd28aab57e8c435ab.s3tc.ctex"]
 
 [params]
 

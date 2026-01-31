@@ -1,12 +1,15 @@
 [gd_resource type="Resource" load_steps=2 format=3]
 
 [ext_resource type="Script" path="res://InventorySystem/InventoryItem.cs" id="1_script"]
+[ext_resource type="PackedScene" path="res://Models/maska3.fbx" id="2_mask_model"]
 
 [resource]
 script = ExtResource("1_script")
 Name = "Stealth Cloak"
+Description = "Makes you invisible to security cameras."
 Stackable = false
 MaxStack = 1
 Usable = true
 Type = 1
 Effect = 3
+ModelScene = ExtResource("2_mask_model")

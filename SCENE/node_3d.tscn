@@ -1,0 +1,41 @@
+[gd_scene format=3 uid="uid://bc6vrfi26lc2s"]
+
+[ext_resource type="PackedScene" uid="uid://cksm4gr08bems" path="res://NEW_MODELS/Finished_Buildings/Aparments/Aparment_1.fbx" id="1_ve6e6"]
+[ext_resource type="PackedScene" uid="uid://cohqk4i566kn1" path="res://NEW_MODELS/Finished_Buildings/Aparments/Aparment_2.fbx" id="2_1p576"]
+[ext_resource type="PackedScene" uid="uid://dkdqmq2vjjpx7" path="res://NEW_MODELS/Finished_Buildings/Brutalist_Apartments/Brutalist_Apartment_1.fbx" id="3_0qmbc"]
+[ext_resource type="PackedScene" uid="uid://c1hbbatnwvviv" path="res://NEW_MODELS/Finished_Buildings/Brutalist_Apartments/Brutalist_Apartment_2.fbx" id="4_ikwif"]
+[ext_resource type="PackedScene" uid="uid://btf0ddlss81j6" path="res://NEW_MODELS/Finished_Buildings/Brutalist_Apartments/Brutalist_Apartment_3.fbx" id="5_ivkpd"]
+[ext_resource type="PackedScene" uid="uid://dkd84x3rsrn0a" path="res://NEW_MODELS/Finished_Buildings/Construction_Building/Construction_Building.fbx" id="6_ijtpe"]
+[ext_resource type="PackedScene" uid="uid://dmaj5vteatvdt" path="res://NEW_MODELS/Finished_Buildings/W-Kruschev/Kruchevka.fbx" id="7_h0o5j"]
+[ext_resource type="PackedScene" uid="uid://cf6b8gt5rue1y" path="res://NEW_MODELS/Finished_Buildings/Workers_Housing/Workers_Housing_1.fbx" id="8_i1fei"]
+[ext_resource type="PackedScene" uid="uid://3gtceoon553g" path="res://NEW_MODELS/Finished_Buildings/Workers_Housing/Workers_Housing_2.fbx" id="9_mtmjk"]
+[ext_resource type="PackedScene" uid="uid://cgsaqs0orqvui" path="res://NEW_MODELS/Finished_Buildings/Workers_Housing/Workers_Housing_3.fbx" id="10_dq5np"]
+[ext_resource type="PackedScene" uid="uid://ci4p75ey4wi3c" path="res://NEW_MODELS/Finished_Buildings/WALL/Wall.fbx" id="11_lsvm8"]
+[ext_resource type="PackedScene" uid="uid://bpk5iwa4yg8e2" path="res://NEW_MODELS/Finished_Buildings/fmopasgmf.fbx" id="12_i5kv5"]
+
+[node name="Node3D" type="Node3D" unique_id=379405592]
+
+[node name="Aparment_1" parent="." unique_id=949401137 instance=ExtResource("1_ve6e6")]
+
+[node name="Aparment_2" parent="." unique_id=894202894 instance=ExtResource("2_1p576")]
+
+[node name="Brutalist_Apartment_1" parent="." unique_id=1830734141 instance=ExtResource("3_0qmbc")]
+
+[node name="Brutalist_Apartment_2" parent="." unique_id=582192063 instance=ExtResource("4_ikwif")]
+
+[node name="Brutalist_Apartment_3" parent="." unique_id=2145957896 instance=ExtResource("5_ivkpd")]
+
+[node name="Construction_Building" parent="." unique_id=1017354091 instance=ExtResource("6_ijtpe")]
+
+[node name="Kruchevka" parent="." unique_id=570762059 instance=ExtResource("7_h0o5j")]
+
+[node name="Workers_Housing_1" parent="." unique_id=1856614271 instance=ExtResource("8_i1fei")]
+
+[node name="Workers_Housing_2" parent="." unique_id=1665188472 instance=ExtResource("9_mtmjk")]
+
+[node name="Workers_Housing_3" parent="." unique_id=433006204 instance=ExtResource("10_dq5np")]
+
+[node name="Wall" parent="." unique_id=2077116835 instance=ExtResource("11_lsvm8")]
+transform = Transform3D(0.9271899, 0, 0, 0, 1, 0, 0, 0, 1.037994, 0, 12.432373, 1.3963575)
+
+[node name="fmopasgmf" parent="." unique_id=638228135 instance=ExtResource("12_i5kv5")]

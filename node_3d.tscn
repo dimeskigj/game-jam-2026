@@ -23,6 +23,12 @@
 [ext_resource type="Script" uid="uid://dvjnuu11sqjgv" path="res://InteractionSystem/Drawer.cs" id="25_drawer"]
 [ext_resource type="PackedScene" uid="uid://djedkheulovl3" path="res://SCENE/city.tscn" id="26_j3e5s"]
 [ext_resource type="Script" uid="uid://cq57csrn0m4qu" path="res://InteractionSystem/Note.cs" id="26_note"]
+[ext_resource type="PackedScene" path="res://Models/key.fbx" id="27_key_model"]
+[ext_resource type="PackedScene" path="res://Models/maska1gotova.fbx" id="28_mask1"]
+[ext_resource type="PackedScene" path="res://Models/maska2gotova.fbx" id="29_mask2"]
+[ext_resource type="PackedScene" path="res://Models/maska3.fbx" id="30_mask3"]
+[ext_resource type="PackedScene" path="res://Models/maska4.fbx" id="31_mask4"]
+[ext_resource type="PackedScene" path="res://Models/xray-mask.fbx" id="32_xray_mask"]
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_vxd74"]
 load_path = "res://.godot/imported/NightSkyHDRI003_4K_HDR.exr-0e20ad0d6ba89c0330da9e9f11ad122e.bptc.ctex"
@@ -251,6 +257,25 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="ItemDescription" type="Label" parent="UI/Control" unique_id=711234567]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -200.0
+offset_top = -100.0
+offset_right = 200.0
+offset_bottom = -70.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+text = "Select an item"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="GridContainer" type="GridContainer" parent="UI/Control" unique_id=751471897]
 layout_mode = 1
@@ -587,8 +612,8 @@ collision_layer = 2
 script = ExtResource("6_pickup")
 ItemResource = ExtResource("8_key")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Pickup_Key" unique_id=60037945]
-mesh = SubResource("BoxMesh_gold")
+[node name="KeyModel" parent="Pickup_Key" instance=ExtResource("27_key_model")]
+transform = Transform3D(25, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_Key" unique_id=463405520]
 shape = SubResource("BoxShape3D_pickup")
@@ -599,8 +624,8 @@ collision_layer = 2
 script = ExtResource("6_pickup")
 ItemResource = ExtResource("24_silverkey")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Pickup_SilverKey" unique_id=60037946]
-mesh = SubResource("BoxMesh_gold")
+[node name="KeyModel" parent="Pickup_SilverKey" instance=ExtResource("27_key_model")]
+transform = Transform3D(25, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_SilverKey" unique_id=463405521]
 shape = SubResource("BoxShape3D_pickup")
@@ -666,8 +691,8 @@ collision_layer = 2
 script = ExtResource("6_pickup")
 ItemResource = ExtResource("12_gas")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Pickup_GasMask" unique_id=2135001966]
-mesh = SubResource("BoxMesh_red_small")
+[node name="MaskModel" parent="Pickup_GasMask" instance=ExtResource("28_mask1")]
+transform = Transform3D(25, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_GasMask" unique_id=1189970334]
 shape = SubResource("BoxShape3D_pickup")
@@ -678,8 +703,8 @@ collision_layer = 2
 script = ExtResource("6_pickup")
 ItemResource = ExtResource("13_xray")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Pickup_XRayMask" unique_id=2136574011]
-mesh = SubResource("BoxMesh_gold_small")
+[node name="MaskModel" parent="Pickup_XRayMask" instance=ExtResource("32_xray_mask")]
+transform = Transform3D(25, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_XRayMask" unique_id=719004815]
 shape = SubResource("BoxShape3D_pickup")
@@ -690,8 +715,8 @@ collision_layer = 2
 script = ExtResource("6_pickup")
 ItemResource = ExtResource("14_stealth")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Pickup_StealthMask" unique_id=2136574999]
-mesh = SubResource("BoxMesh_blue_small")
+[node name="MaskModel" parent="Pickup_StealthMask" instance=ExtResource("30_mask3")]
+transform = Transform3D(25, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_StealthMask" unique_id=719004999]
 shape = SubResource("BoxShape3D_pickup")
@@ -715,8 +740,8 @@ ItemResource = ExtResource("8_key")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="HiddenItem" unique_id=1429999029]
 shape = SubResource("BoxShape3D_pickup")
 
-[node name="Mesh" type="MeshInstance3D" parent="HiddenItem" unique_id=1447599221]
-mesh = SubResource("BoxMesh_gold")
+[node name="KeyModel" parent="HiddenItem" instance=ExtResource("27_key_model")]
+transform = Transform3D(25, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="KAMERA" parent="." unique_id=1498223709 node_paths=PackedStringArray("CameraPivot", "ModelGeometry") instance=ExtResource("21_s0gvp")]
 transform = Transform3D(-3.1404778e-07, 1.9954948, 7.447288, 1.744517e-07, 7.447288, -1.9954948, -7.71, 8.722585e-08, -3.4849828e-07, -2.0343962, 2.5, 7)
@@ -826,8 +851,8 @@ freeze = true
 script = ExtResource("6_pickup")
 ItemResource = ExtResource("8_key")
 
-[node name="KeyMesh" type="MeshInstance3D" parent="CabinetSetup/Drawer_Unlocked/Pickup_SmallKey" unique_id=1063385200]
-mesh = SubResource("BoxMesh_key")
+[node name="KeyModel" parent="CabinetSetup/Drawer_Unlocked/Pickup_SmallKey" instance=ExtResource("27_key_model")]
+transform = Transform3D(25, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="CabinetSetup/Drawer_Unlocked/Pickup_SmallKey" unique_id=1832139648]
 shape = SubResource("BoxShape3D_key")

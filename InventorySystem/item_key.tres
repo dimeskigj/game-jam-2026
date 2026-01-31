@@ -2,10 +2,13 @@
 
 [ext_resource type="Texture2D" uid="uid://bnqavrktk7rji" path="res://Sprites/GUI/Key.jpg" id="1_ekbuc"]
 [ext_resource type="Script" uid="uid://1mr3eiapf6t" path="res://InventorySystem/InventoryItem.cs" id="1_script"]
+[ext_resource type="PackedScene" path="res://Models/key.fbx" id="2_key_model"]
 
 [resource]
 script = ExtResource("1_script")
 Name = "Small Key"
+Description = "A small rusty key. Might open a drawer."
 Icon = ExtResource("1_ekbuc")
 Stackable = false
 MaxStack = 1
+ModelScene = ExtResource("2_key_model")

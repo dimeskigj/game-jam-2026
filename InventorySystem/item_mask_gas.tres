@@ -1,12 +1,15 @@
 [gd_resource type="Resource" load_steps=2 format=3]
 
 [ext_resource type="Script" path="res://InventorySystem/InventoryItem.cs" id="1_script"]
+[ext_resource type="PackedScene" path="res://Models/maska1gotova.fbx" id="2_mask_model"]
 
 [resource]
 script = ExtResource("1_script")
 Name = "Gas Mask"
+Description = "Protects from toxic fumes in the radioactive zone."
 Stackable = false
 MaxStack = 1
 Usable = true
 Type = 1
 Effect = 2
+ModelScene = ExtResource("2_mask_model")

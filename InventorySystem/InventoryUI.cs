@@ -7,10 +7,13 @@ public partial class InventoryUI : CanvasLayer
     private Inventory _inventory;
     private List<Label> _labels = new List<Label>();
     private List<ColorRect> _backgrounds = new List<ColorRect>();
+    private List<SubViewport> _viewports = new List<SubViewport>();
+    private Label _descriptionLabel;
 
     public override void _Ready()
     {
         _gridContainer = GetNode<GridContainer>("Control/GridContainer");
+        _descriptionLabel = GetNodeOrNull<Label>("Control/ItemDescription");
         
         // Find player/ball and inventory robustly
         var window = GetTree().Root;
@@ -30,10 +33,6 @@ public partial class InventoryUI : CanvasLayer
             _inventory.InventoryUpdated += UpdateUI;
             _inventory.SelectedSlotChanged += UpdateSelection;
         }
-        else
-        {
-            GD.PrintErr("InventoryUI: Could not find Inventory node! UI will not update.");
-        }
 
         // Initialize UI slots
         foreach (Node child in _gridContainer.GetChildren())
@@ -41,7 +40,33 @@ public partial class InventoryUI : CanvasLayer
             if (child is ColorRect bg)
             {
                 _backgrounds.Add(bg);
-                _labels.Add(bg.GetNode<Label>("Label"));
+                var label = bg.GetNode<Label>("Label");
+                _labels.Add(label);
+
+                // Create Viewport Setup for 3D item preview
+                var container = new SubViewportContainer();
+                container.SetAnchorsPreset(Control.LayoutPreset.FullRect);
+                container.Stretch = true;
+                bg.AddChild(container);
+                
+                bg.MoveChild(label, -1); // Ensure label is on top of 3D preview
+
+                var viewport = new SubViewport();
+                viewport.TransparentBg = true;
+                viewport.OwnWorld3D = true;
+                viewport.Size = new Vector2I(128, 128);
+                container.AddChild(viewport);
+                _viewports.Add(viewport);
+
+                // Add Camera to Viewport
+                var camera = new Camera3D();
+                camera.Transform = new Transform3D(Basis.Identity, new Vector3(0, 0, 1.5f));
+                viewport.AddChild(camera);
+
+                // Add Light to Viewport
+                var light = new DirectionalLight3D();
+                light.Transform = new Transform3D(new Basis(Vector3.Right, -0.5f), Vector3.Zero);
+                viewport.AddChild(light);
             }
         }
         
@@ -51,20 +76,52 @@ public partial class InventoryUI : CanvasLayer
 
     private void UpdateUI()
     {
+        if (_inventory == null) return;
+
         for (int i = 0; i < Inventory.MaxSlots; i++)
         {
             if (i < _labels.Count)
             {
                 InventoryItem item = _inventory.items[i];
+                var viewport = _viewports[i];
+                
+                // Clear old model
+                foreach (var child in viewport.GetChildren())
+                {
+                    if (child is not Camera3D && child is not Light3D)
+                        child.QueueFree();
+                }
+
                 if (item != null)
                 {
-                    _labels[i].Text = $"{item.Name} ({item.CurrentStack})";
+                    _labels[i].Text = item.Stackable ? $"{item.CurrentStack}" : "";
+                    
+                    if (item.ModelScene != null)
+                    {
+                        var model = item.ModelScene.Instantiate<Node3D>();
+                        viewport.AddChild(model);
+                        model.Scale = Vector3.One * 0.5f; // Scale down for slot
+                        
+                        // Add rotation animation node
+                        var timer = GetTree().CreateTimer(0.1f);
+                        UpdateModelRotation(model);
+                    }
                 }
                 else
                 {
                     _labels[i].Text = "";
                 }
             }
+        }
+        UpdateSelection(_inventory.selectedSlot);
+    }
+
+    private async void UpdateModelRotation(Node3D model)
+    {
+        while (IsInstanceValid(model))
+        {
+            model.RotateY(0.02f);
+            await ToSignal(GetTree(), "process_frame");
         }
     }
 
@@ -75,6 +132,13 @@ public partial class InventoryUI : CanvasLayer
             if (i == slot)
             {
                 _backgrounds[i].Color = new Color(0.5f, 0.5f, 0.5f, 0.8f); // Selected
+                
+                // Update description
+                if (_descriptionLabel != null && _inventory != null)
+                {
+                    var item = _inventory.items[i];
+                    _descriptionLabel.Text = item != null ? $"{item.Name}\n{item.Description}" : "Empty Slot";
+                }
             }
             else
             {

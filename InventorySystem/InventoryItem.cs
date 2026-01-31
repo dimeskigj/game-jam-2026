@@ -15,12 +15,17 @@ public partial class InventoryItem : Resource
     public int MaxStack { get; set; } = 64;
     [Export]
     public bool Usable { get; set; } = false;
+    [Export]
+    public string Description { get; set; } = "";
     
     [Export]
     public ItemType Type { get; set; } = ItemType.Generic;
     [Export]
     public MaskEffect Effect { get; set; } = MaskEffect.None;
 	
+	[Export]
+	public PackedScene ModelScene { get; set; }
+
 	[Export]
 	public PackedScene PickupScene { get; set; }
 

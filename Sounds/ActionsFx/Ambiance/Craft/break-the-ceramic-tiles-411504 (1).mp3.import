@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://dwr6kedlm3dud"
+path="res://.godot/imported/break-the-ceramic-tiles-411504 (1).mp3-90a5545908de6870d0407e8128e4eb96.mp3str"
+
+[deps]
+
+source_file="res://Sounds/ActionsFx/Ambiance/Craft/break-the-ceramic-tiles-411504 (1).mp3"
+dest_files=["res://.godot/imported/break-the-ceramic-tiles-411504 (1).mp3-90a5545908de6870d0407e8128e4eb96.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

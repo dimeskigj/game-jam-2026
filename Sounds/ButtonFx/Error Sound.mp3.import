@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://btli4bc40ee1"
+path="res://.godot/imported/Error Sound.mp3-55c1fb86b690f1289b30356c3cb3d994.mp3str"
+
+[deps]
+
+source_file="res://Sounds/ButtonFx/Error Sound.mp3"
+dest_files=["res://.godot/imported/Error Sound.mp3-55c1fb86b690f1289b30356c3cb3d994.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

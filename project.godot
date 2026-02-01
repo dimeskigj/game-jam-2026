@@ -22,6 +22,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 GlobalSceneManager="*res://GlobalSceneManager.cs"
+SFXManager="*res://SFXManager.cs"
 
 [dotnet]
 

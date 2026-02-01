@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://dspsq8j6ui7jr" path="res://InteractionSystem/SceneDoor.cs" id="3_scene_door"]
 [ext_resource type="PackedScene" path="res://scenes/FlickeringLight.tscn" id="6_flicker"]
 [ext_resource type="PackedScene" uid="uid://1k3d1wsad8on" path="res://scenes/pickup_note.tscn" id="7_ame7c"]
+[ext_resource type="AudioStream" uid="uid://doso6ep3h5s40" path="res://Sounds/ActionsFx/ItemOpenClose/open-door-stock-sfx-454246.mp3" id="8_door_open"]
 [ext_resource type="PackedScene" uid="uid://cawb3lrlaxph1" path="res://scenes/UI.tscn" id="7_ui"]
 [ext_resource type="PackedScene" uid="uid://bqr8h3k2v5m6p" path="res://Radio.tscn" id="8_5v4v3"]
 [ext_resource type="Material" uid="uid://2ue4fowvhkgs" path="res://floor_material.tres" id="9_vilip"]
@@ -57,6 +58,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.229617, -3.0009131, -12.19
 collision_layer = 4
 freeze = true
 script = ExtResource("3_scene_door")
+OpenSounds = Array[AudioStream]([ExtResource("8_door_open")])
 DoorName = "Exit"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="ReturnDoor" unique_id=105233145]

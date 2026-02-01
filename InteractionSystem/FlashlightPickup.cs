@@ -10,7 +10,7 @@ public partial class FlashlightPickup : RigidBody3D
 		}
 	}
 
-	public void Interact(PlayerController player)
+	public bool Interact(PlayerController player)
 	{
 		player.CollectFlashlight();
 		if (GlobalSceneManager.Instance != null)
@@ -18,5 +18,6 @@ public partial class FlashlightPickup : RigidBody3D
 			GlobalSceneManager.Instance.CollectedItemPaths.Add(GetPath().ToString());
 		}
 		QueueFree();
+		return true;
 	}
 }

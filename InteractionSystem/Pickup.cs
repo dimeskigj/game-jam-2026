@@ -17,7 +17,7 @@ public partial class Pickup : RigidBody3D
 		}
 	}
 
-	public void Interact(Inventory inventory)
+	public bool Interact(Inventory inventory)
 	{
 		if (ItemResource != null)
 		{
@@ -28,11 +28,14 @@ public partial class Pickup : RigidBody3D
 					GlobalSceneManager.Instance.CollectedItemPaths.Add(GetPath().ToString());
 				}
 				QueueFree(); // Destroy pickup if added successfully
+				return true;
 			}
 			else
 			{
 				GD.Print("Inventory Full!");
+				return false;
 			}
 		}
+		return false;
 	}
 }

@@ -83,6 +83,9 @@ public partial class PlayerController : CharacterBody3D
 	public float CurrentSanity { get; private set; } = 100.0f;
 	public bool IsDead { get; private set; } = false;
 
+	[ExportGroup("Audio")]
+	[Export] public AudioStream PickupSound { get; set; }
+
 	private Camera3D _camera;
 	private ShapeCast3D _interactionCast;
 	private Inventory _inventory;
@@ -743,8 +746,20 @@ public partial class PlayerController : CharacterBody3D
 				}
 			}
 
-			if (bestInteractable is Pickup pickup) pickup.Interact(_inventory);
-			else if (bestInteractable is Node nodePickup && nodePickup.GetParent() is Pickup parentPickup) parentPickup.Interact(_inventory);
+			if (bestInteractable is Pickup pickup)
+			{
+				if (pickup.Interact(_inventory))
+				{
+					if (PickupSound != null) SFXManager.Instance.PlaySound3D(PickupSound, GlobalPosition);
+				}
+			}
+			else if (bestInteractable is Node nodePickup && nodePickup.GetParent() is Pickup parentPickup)
+			{
+				if (parentPickup.Interact(_inventory))
+				{
+					if (PickupSound != null) SFXManager.Instance.PlaySound3D(PickupSound, GlobalPosition);
+				}
+			}
 			else if (bestInteractable is Door door)
 			{
 				string msg = door.Interact(_inventory);
@@ -766,11 +781,17 @@ public partial class PlayerController : CharacterBody3D
 			}
 			else if (bestInteractable is FlashlightPickup flashlightPickup)
 			{
-				flashlightPickup.Interact(this);
+				if (flashlightPickup.Interact(this))
+				{
+					if (PickupSound != null) SFXManager.Instance.PlaySound3D(PickupSound, GlobalPosition);
+				}
 			}
 			else if (bestInteractable is BatteryPickup batteryPickup)
 			{
-				batteryPickup.Interact(this);
+				if (batteryPickup.Interact(this))
+				{
+					if (PickupSound != null) SFXManager.Instance.PlaySound3D(PickupSound, GlobalPosition);
+				}
 			}
 		}
 	}

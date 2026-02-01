@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://6pc13djetn7y" path="res://PlayerController.cs" id="1_m0ta0"]
 [ext_resource type="Script" uid="uid://bugxpobj04nyw" path="res://PlayerInput.cs" id="2_s47mi"]
 [ext_resource type="Script" uid="uid://dne8d4vd2mkxf" path="res://InventorySystem/Inventory.cs" id="3_74isj"]
+[ext_resource type="AudioStream" uid="uid://cm7vfkvpiskgw" path="res://Sounds/ActionsFx/ItemOpenClose/item-equip-6904.mp3" id="4_pickup"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_nu31w"]
 
@@ -12,6 +13,7 @@ radius = 0.1
 [node name="Player" type="CharacterBody3D" unique_id=1129234290]
 collision_mask = 13
 script = ExtResource("1_m0ta0")
+PickupSound = ExtResource("4_pickup")
 HoldDistance = 1.5
 
 [node name="PlayerInput" type="Node" parent="." unique_id=17684149]

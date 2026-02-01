@@ -29,6 +29,9 @@
 [ext_resource type="PackedScene" path="res://Models/FlashlightPickup.tscn" id="36_flashlight"]
 [ext_resource type="PackedScene" uid="uid://cyy3r7ee3ovo" path="res://Models/BatteryPickup.tscn" id="37_battery"]
 [ext_resource type="PackedScene" uid="uid://cawb3lrlaxph1" path="res://scenes/UI.tscn" id="38_ui"]
+[ext_resource type="AudioStream" uid="uid://doso6ep3h5s40" path="res://Sounds/ActionsFx/ItemOpenClose/open-door-stock-sfx-454246.mp3" id="40_door_open"]
+[ext_resource type="AudioStream" uid="uid://ddartf3q50o6b" path="res://Sounds/ActionsFx/Ambiance/CityNature/scarycityambiencesound.wav" id="39_ambience"]
+[ext_resource type="AudioStream" uid="uid://cah8qf2ky86c6" path="res://Sounds/ActionsFx/Ambiance/Maschinery/strong-howling-wind-132281.mp3" id="41_wind"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_key_large"]
 size = Vector3(1, 0.5, 1)
@@ -127,6 +130,7 @@ visible = false
 collision_layer = 4
 mass = 10.0
 script = ExtResource("9_door")
+OpenSounds = Array[AudioStream]([ExtResource("40_door_open")])
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="DoorObject_Locked" unique_id=1214367948]
 mesh = SubResource("BoxMesh_door")
@@ -140,6 +144,7 @@ visible = false
 collision_layer = 4
 mass = 10.0
 script = ExtResource("9_door")
+OpenSounds = Array[AudioStream]([ExtResource("40_door_open")])
 KeyName = "Silver Key"
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="DoorObject_Regular" unique_id=1214367949]
@@ -159,6 +164,7 @@ visible = false
 collision_layer = 4
 mass = 10.0
 script = ExtResource("9_door")
+OpenSounds = Array[AudioStream]([ExtResource("40_door_open")])
 KeyName = "Silver Key"
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="DoorObject_SilverLocked" unique_id=1214367950]
@@ -173,6 +179,7 @@ collision_layer = 4
 mass = 10.0
 script = ExtResource("33_scenedoor")
 TargetScenePath = "res://scenes/CellRoom.tscn"
+OpenSounds = Array[AudioStream]([ExtResource("40_door_open")])
 DoorName = "Cell Room"
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="DoorObject_Cell" unique_id=1703231217]
@@ -366,6 +373,7 @@ collision_layer = 4
 mass = 10.0
 script = ExtResource("33_scenedoor")
 TargetScenePath = "res://scenes/Room.tscn"
+OpenSounds = Array[AudioStream]([ExtResource("40_door_open")])
 DoorName = "Detective Room"
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="DoorObject_Cell2" unique_id=940712714]
@@ -381,3 +389,14 @@ Waypoints = [NodePath("../Waypoint4"), NodePath("../Waypoint5"), NodePath("../Wa
 [node name="Enemy4" parent="." unique_id=1948321441 node_paths=PackedStringArray("Waypoints") instance=ExtResource("17_tuemg")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.468204, 0.07678223, -21.536606)
 Waypoints = [NodePath("../Waypoint4"), NodePath("../Waypoint5"), NodePath("../Waypoint6")]
+
+[node name="CityAmbience" type="AudioStreamPlayer" parent="." unique_id=981273945]
+stream = ExtResource("39_ambience")
+volume_db = -17.3
+autoplay = true
+
+[node name="HowlingWind" type="AudioStreamPlayer" parent="." unique_id=981273946]
+stream = ExtResource("41_wind")
+volume_db = -31.0
+autoplay = true
+bus = &"SFX"

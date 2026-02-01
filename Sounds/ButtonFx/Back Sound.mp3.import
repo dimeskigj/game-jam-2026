@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://ctjo5n73fbae8"
+path="res://.godot/imported/Back Sound.mp3-c0f11ff007d4ade76f40622851fb7583.mp3str"
+
+[deps]
+
+source_file="res://Sounds/ButtonFx/Back Sound.mp3"
+dest_files=["res://.godot/imported/Back Sound.mp3-c0f11ff007d4ade76f40622851fb7583.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

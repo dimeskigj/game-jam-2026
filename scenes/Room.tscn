@@ -12,6 +12,7 @@
 [ext_resource type="PackedScene" uid="uid://m01a2075fgds" path="res://scenes/Masks/stealth_mask.tscn" id="10_b5ryx"]
 [ext_resource type="PackedScene" path="res://Models/FlashlightPickup.tscn" id="12_q8bdl"]
 [ext_resource type="PackedScene" uid="uid://1k3d1wsad8on" path="res://scenes/pickup_note.tscn" id="13_0gmcu"]
+[ext_resource type="AudioStream" uid="uid://doso6ep3h5s40" path="res://Sounds/ActionsFx/ItemOpenClose/open-door-stock-sfx-454246.mp3" id="8_door_open"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_door"]
 size = Vector3(1, 2, 0.1)
@@ -85,13 +86,14 @@ environment = ExtResource("7_env")
 [node name="Player" parent="." unique_id=1356078150 instance=ExtResource("2_ut7mc")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -5.7990737, -2.4589705, -1.5858053)
 
-[node name="UI" parent="." unique_id=1157725227 instance=ExtResource("7_ui")]
+[node name="UI" parent="." unique_id=1157725227 instance=ExtResource("9_ui")]
 
 [node name="ReturnDoor" type="RigidBody3D" parent="." unique_id=90983241]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -7.048153, -3.0009131, -1.591482)
 collision_layer = 4
 freeze = true
 script = ExtResource("4_ey61u")
+OpenSounds = Array[AudioStream]([ExtResource("8_door_open")])
 DoorName = "Exit"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="ReturnDoor" unique_id=105233145]

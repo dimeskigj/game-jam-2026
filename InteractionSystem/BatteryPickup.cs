@@ -12,7 +12,7 @@ public partial class BatteryPickup : RigidBody3D
 		}
 	}
 
-	public void Interact(PlayerController player)
+	public bool Interact(PlayerController player)
 	{
 		player.AddBattery(Amount);
 		if (GlobalSceneManager.Instance != null)
@@ -20,5 +20,6 @@ public partial class BatteryPickup : RigidBody3D
 			GlobalSceneManager.Instance.CollectedItemPaths.Add(GetPath().ToString());
 		}
 		QueueFree();
+		return true;
 	}
 }

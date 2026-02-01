@@ -3,6 +3,9 @@ using Godot;
 public partial class Door : RigidBody3D
 {
 	[Export]
+	public AudioStream[] OpenSounds { get; set; }
+
+	[Export]
 	public string KeyName { get; set; } = "Ancient Key";
 	
 	[Export]
@@ -52,7 +55,15 @@ public partial class Door : RigidBody3D
 			{
 				// Unlocked -> Toggle Open/Close
 				if (_isOpen) CloseDoor();
-				else OpenDoor();
+				else 
+				{
+					// Play Open Sound (Variety support)
+					if (OpenSounds != null && OpenSounds.Length > 0)
+					{
+						SFXManager.Instance.PlayRandomSound3D(OpenSounds, GlobalPosition);
+					}
+					OpenDoor();
+				}
 				return ""; // No message for standard open/close
 			}
 		}

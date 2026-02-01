@@ -6,10 +6,10 @@
 [ext_resource type="PackedScene" uid="uid://ccot2sqelnfee" path="res://NEW_MODELS/Room_Props/ROOMS_PROPS/CELL ROOM DONE.fbx" id="2_room_model"]
 [ext_resource type="Script" uid="uid://dspsq8j6ui7jr" path="res://InteractionSystem/SceneDoor.cs" id="3_scene_door"]
 [ext_resource type="PackedScene" path="res://scenes/FlickeringLight.tscn" id="6_flicker"]
-[ext_resource type="PackedScene" uid="uid://1k3d1wsad8on" path="res://scenes/pickup_note.tscn" id="7_ame7c"]
-[ext_resource type="AudioStream" uid="uid://doso6ep3h5s40" path="res://Sounds/ActionsFx/ItemOpenClose/open-door-stock-sfx-454246.mp3" id="8_door_open"]
-[ext_resource type="PackedScene" uid="uid://cawb3lrlaxph1" path="res://scenes/UI.tscn" id="7_ui"]
-[ext_resource type="PackedScene" uid="uid://bqr8h3k2v5m6p" path="res://Radio.tscn" id="8_5v4v3"]
+[ext_resource type="PackedScene" uid="uid://1k3d1wsad8on" path="res://scenes/pickup_note.tscn" id="50_note"]
+[ext_resource type="AudioStream" uid="uid://doso6ep3h5s40" path="res://Sounds/ActionsFx/ItemOpenClose/open-door-stock-sfx-454246.mp3" id="40_door_open"]
+[ext_resource type="PackedScene" uid="uid://cawb3lrlaxph1" path="res://scenes/UI.tscn" id="38_ui"]
+[ext_resource type="PackedScene" uid="uid://bqr8h3k2v5m6p" path="res://Radio.tscn" id="51_radio"]
 [ext_resource type="Material" uid="uid://2ue4fowvhkgs" path="res://floor_material.tres" id="9_vilip"]
 [ext_resource type="Script" uid="uid://dvjnuu11sqjgv" path="res://InteractionSystem/Drawer.cs" id="10_36isu"]
 [ext_resource type="PackedScene" uid="uid://cyy3r7ee3ovo" path="res://Models/BatteryPickup.tscn" id="11_w0rah"]
@@ -51,14 +51,14 @@ environment = ExtResource("2_36isu")
 [node name="Player" parent="." unique_id=1356078150 instance=ExtResource("1_player")]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -3.8556173, -3.1581116, -10.344799)
 
-[node name="UI" parent="." unique_id=1157725227 instance=ExtResource("7_ui")]
+[node name="UI" parent="." unique_id=1157725227 instance=ExtResource("38_ui")]
 
 [node name="ReturnDoor" type="RigidBody3D" parent="." unique_id=90983241]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.229617, -3.0009131, -12.190473)
 collision_layer = 4
 freeze = true
 script = ExtResource("3_scene_door")
-OpenSounds = Array[AudioStream]([ExtResource("8_door_open")])
+OpenSounds = Array[AudioStream]([ExtResource("40_door_open")])
 DoorName = "Exit"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="ReturnDoor" unique_id=105233145]
@@ -77,10 +77,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.3452318, 0.09278977, -6.99
 transform = Transform3D(-1, 8.742278e-08, 0, -8.742278e-08, -1, 0, 0, 0, 1, -8.991041, -0.53216827, -2.793456)
 mesh = SubResource("PlaneMesh_5qn5l")
 
-[node name="Pickup_Note" parent="." unique_id=610533629 instance=ExtResource("7_ame7c")]
+[node name="Pickup_Note" parent="." unique_id=610533629 instance=ExtResource("50_note")]
 transform = Transform3D(0.9366722, 0, 0.3502074, 0, 1, 0, -0.3502074, 0, 0.9366722, -11.055498, -2.8202527, -10.555708)
 
-[node name="Radio" parent="." unique_id=2081431176 instance=ExtResource("8_5v4v3")]
+[node name="Radio" parent="." unique_id=2081431176 instance=ExtResource("51_radio")]
 transform = Transform3D(-0.3746066, 0, 0.92718387, 0, 1, 0, -0.92718387, 0, -0.3746066, -12.757311, -2.8207877, -6.4793353)
 
 [node name="CabinetSetup" type="Node3D" parent="." unique_id=610435702]

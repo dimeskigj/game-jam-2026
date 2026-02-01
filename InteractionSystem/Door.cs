@@ -61,8 +61,16 @@ public partial class Door : RigidBody3D
 	public void EnemyInteract()
 	{
 		if (_isBusy) return;
-		if (_isLocked) return; // Enemy cannot open locked door
-		if (!_isOpen) OpenDoor();
+		if (_isLocked) 
+		{
+			// GD.Print("Door is locked, enemy cannot enter.");
+			return; 
+		}
+		if (!_isOpen) 
+		{
+			GD.Print("Enemy opening door.");
+			OpenDoor();
+		}
 	}
 
 	private void OpenDoor()

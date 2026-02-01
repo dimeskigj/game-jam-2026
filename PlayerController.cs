@@ -434,6 +434,11 @@ public partial class PlayerController : CharacterBody3D
 					bestInteractable = collider;
 					break;
 				}
+				else if (collider is SceneDoor)
+				{
+					bestInteractable = collider;
+					break;
+				}
 			}
 
 			if (bestInteractable is Pickup pickup)
@@ -531,6 +536,15 @@ public partial class PlayerController : CharacterBody3D
 				}
 				HighlightObject(note);
 			}
+			else if (bestInteractable is SceneDoor sceneDoor)
+			{
+				if (_interactionLabel != null)
+				{
+					_interactionLabel.Text = $"Right Click to Enter {sceneDoor.DoorName}";
+					_interactionLabel.Visible = true;
+				}
+				HighlightObject(sceneDoor);
+			}
 		}
 	}
 	
@@ -623,6 +637,11 @@ public partial class PlayerController : CharacterBody3D
 					bestInteractable = collider;
 					break;
 				}
+				else if (collider is SceneDoor)
+				{
+					bestInteractable = collider;
+					break;
+				}
 			}
 
 			if (bestInteractable is Pickup pickup) pickup.Interact(_inventory);
@@ -641,6 +660,10 @@ public partial class PlayerController : CharacterBody3D
 			else if (bestInteractable is Note note)
 			{
 				ShowNote(note.NoteText);
+			}
+			else if (bestInteractable is SceneDoor sceneDoor)
+			{
+				sceneDoor.Interact();
 			}
 		}
 	}

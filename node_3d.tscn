@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://clsgsyq4e35in"]
 
 [ext_resource type="Environment" uid="uid://dedlit5h2y2dx" path="res://Enviorment/foggy_enviorment.tres" id="1_1q667"]
-[ext_resource type="Material" path="res://floor_material.tres" id="2_floor_mat"]
+[ext_resource type="Material" uid="uid://2ue4fowvhkgs" path="res://floor_material.tres" id="2_floor_mat"]
 [ext_resource type="PackedScene" uid="uid://bw5pjdvnaigpr" path="res://SCENE/player.tscn" id="3_5t8nk"]
 [ext_resource type="Script" uid="uid://cx8x1mac1t274" path="res://InventorySystem/InventoryUI.cs" id="5_inventory_ui"]
 [ext_resource type="Script" uid="uid://36lhpbg631ox" path="res://InteractionSystem/Pickup.cs" id="6_pickup"]
@@ -11,6 +11,7 @@
 [ext_resource type="Script" uid="uid://cdbpfbdo62j00" path="res://InteractionSystem/RadioactiveZone.cs" id="11_rad_zone"]
 [ext_resource type="Resource" path="res://InventorySystem/item_mask_gas.tres" id="12_gas"]
 [ext_resource type="Resource" path="res://InventorySystem/item_mask_xray.tres" id="13_xray"]
+[ext_resource type="PackedScene" uid="uid://cduy4vtecfak2" path="res://NEW_MODELS/Room_Props/Door_4.fbx" id="13_ype4i"]
 [ext_resource type="Shader" uid="uid://s4g4lednjbcy" path="res://Shaders/gas_mask.gdshader" id="14_gas_shader"]
 [ext_resource type="Resource" path="res://InventorySystem/item_mask_invisibility.tres" id="14_stealth"]
 [ext_resource type="Shader" uid="uid://bi2pcl63pfjp4" path="res://Shaders/xray_mask.gdshader" id="15_xray_shader"]
@@ -32,6 +33,7 @@
 [ext_resource type="PackedScene" uid="uid://xxubkdsrtqqv" path="res://scenes/banderaubava.tscn" id="30_id0nj"]
 [ext_resource type="PackedScene" uid="uid://bqr8h3k2v5m6p" path="res://Radio.tscn" id="31_radio"]
 [ext_resource type="PackedScene" uid="uid://bc6vrfi26lc2s" path="res://SCENE/node_3d.tscn" id="32_ype4i"]
+[ext_resource type="Script" uid="uid://dspsq8j6ui7jr" path="res://InteractionSystem/SceneDoor.cs" id="33_scenedoor"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_gas"]
 shader = ExtResource("14_gas_shader")
@@ -68,7 +70,7 @@ material = SubResource("StandardMaterial3D_gold")
 size = Vector3(2, 3, 1)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_door"]
-size = Vector3(2, 3, 1)
+size = Vector3(1.6756592, 4.0509033, 1)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xray_overlay"]
 transparency = 1
@@ -600,10 +602,15 @@ script = ExtResource("9_door")
 KeyName = "Silver Key"
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="DoorObject_Regular" unique_id=1214367949]
+visible = false
 mesh = SubResource("BoxMesh_door")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="DoorObject_Regular" unique_id=161676664]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.050720215, 0.52545166, 0)
 shape = SubResource("BoxShape3D_door")
+
+[node name="Door_4" parent="DoorObject_Regular" unique_id=557086800 instance=ExtResource("13_ype4i")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.89435244, -1.6488895, 0)
 
 [node name="DoorObject_SilverLocked" type="RigidBody3D" parent="." unique_id=218706113]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.2, 4, 1.5, -4)
@@ -616,6 +623,20 @@ KeyName = "Silver Key"
 mesh = SubResource("BoxMesh_door")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="DoorObject_SilverLocked" unique_id=161676665]
+shape = SubResource("BoxShape3D_door")
+
+[node name="DoorObject_Cell" type="RigidBody3D" parent="." unique_id=999999999]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.2, 8, 1.5, -4)
+collision_layer = 4
+mass = 10.0
+script = ExtResource("33_scenedoor")
+TargetScenePath = "res://scenes/CellRoom.tscn"
+DoorName = "Cell Room"
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="DoorObject_Cell" unique_id=1703231217]
+mesh = SubResource("BoxMesh_door")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="DoorObject_Cell" unique_id=1309842063]
 shape = SubResource("BoxShape3D_door")
 
 [node name="XRayManager" type="Node" parent="." unique_id=1030886837]
@@ -846,8 +867,6 @@ mesh = SubResource("BoxMesh_note")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_Note" unique_id=32051481]
 shape = SubResource("BoxShape3D_note")
 
-[node name="banderaubava2" parent="." unique_id=925164897 instance=ExtResource("30_id0nj")]
-
 [node name="Enemy" parent="." unique_id=209923709 node_paths=PackedStringArray("Waypoints") instance=ExtResource("17_tuemg")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.028717, 0.07678223, 17.049515)
 Waypoints = [NodePath("../Waypoint1"), NodePath("../Waypoint2"), NodePath("../Waypoint3")]
@@ -869,10 +888,37 @@ Waypoints = [NodePath("../Waypoint4"), NodePath("../Waypoint5"), NodePath("../Wa
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.813255, 17.047724, -10.554663)
 
 [node name="banderaubava3" parent="." unique_id=1813153953 instance=ExtResource("30_id0nj")]
-transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, -11.9095955, 0, 5.614683)
-
-[node name="banderaubava4" parent="." unique_id=1486594182 instance=ExtResource("30_id0nj")]
-transform = Transform3D(-4.371139e-07, 0, -10, 0, 10, 0, 10, 0, -4.371139e-07, -0.71088505, 0, 19.41876)
+transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, -13.880697, 0, 5.614683)
 
 [node name="banderaubava5" parent="." unique_id=1256493276 instance=ExtResource("30_id0nj")]
-transform = Transform3D(-4.371139e-07, 0, -10, 0, 10, 0, 10, 0, -4.371139e-07, -0.71088505, 0, -14.507239)
+transform = Transform3D(-4.371139e-07, 0, 10, 0, 10, 0, -10, 0, -4.371139e-07, -8.83551, 0, -10.913092)
+
+[node name="Door_4" parent="." unique_id=1938907739 instance=ExtResource("13_ype4i")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.532412, 0.047723796, 7.4653587)
+
+[node name="banderaubava6" parent="." unique_id=43698682 instance=ExtResource("30_id0nj")]
+transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, -27.836756, 0, 5.614683)
+
+[node name="banderaubava7" parent="." unique_id=782862468 instance=ExtResource("30_id0nj")]
+transform = Transform3D(-4.371139e-07, 0, -10, 0, 10, 0, 10, 0, -4.371139e-07, -31.931477, 0, -6.0357995)
+
+[node name="banderaubava8" parent="." unique_id=1372185211 instance=ExtResource("30_id0nj")]
+transform = Transform3D(-10, 0, -8.742278e-07, 0, 10, 0, 8.742278e-07, 0, -10, -28.471363, 0, -17.570446)
+
+[node name="banderaubava9" parent="." unique_id=1198495225 instance=ExtResource("30_id0nj")]
+transform = Transform3D(-10, 0, -8.742278e-07, 0, 10, 0, 8.742278e-07, 0, -10, -13.94238, 0, -17.570446)
+
+[node name="banderaubava10" parent="." unique_id=755889960 instance=ExtResource("30_id0nj")]
+transform = Transform3D(-4.371139e-07, 0, 10, 0, 10, 0, -10, 0, -4.371139e-07, -8.83551, 0, -0.90253973)
+
+[node name="banderaubava13" parent="." unique_id=1683746739 instance=ExtResource("30_id0nj")]
+transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, -4.998285, 0, -34.642197)
+
+[node name="banderaubava14" parent="." unique_id=1150360184 instance=ExtResource("30_id0nj")]
+transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 2.9574776, 0, -34.642197)
+
+[node name="banderaubava15" parent="." unique_id=187154018 instance=ExtResource("30_id0nj")]
+transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 14.216732, 0, -34.642197)
+
+[node name="banderaubava16" parent="." unique_id=515447692 instance=ExtResource("30_id0nj")]
+transform = Transform3D(-10, 0, -8.742278e-07, 0, 10, 0, 8.742278e-07, 0, -10, 14.216732, 0, -21.942661)

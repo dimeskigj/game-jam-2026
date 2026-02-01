@@ -18,7 +18,7 @@ public partial class MainMenu : Control
 
 	private void OnStartButtonPressed()
 	{
-		GetTree().ChangeSceneToFile(StartScenePath);
+		GlobalSceneManager.Instance.LoadScene(StartScenePath);
 	}
 
 	public override void _Input(InputEvent @event)

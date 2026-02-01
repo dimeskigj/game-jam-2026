@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://yvedskp3bxhc" path="res://SCENE/SceneCollisionGenerator.cs" id="1_7ach4"]
 [ext_resource type="PackedScene" uid="uid://cksm4gr08bems" path="res://NEW_MODELS/Finished_Buildings/Aparments/Aparment_1.fbx" id="2_c4mwc"]
-[ext_resource type="Material" path="res://floor_material.tres" id="3_floor_mat"]
+[ext_resource type="Material" uid="uid://2ue4fowvhkgs" path="res://floor_material.tres" id="3_floor_mat"]
 [ext_resource type="PackedScene" uid="uid://cohqk4i566kn1" path="res://NEW_MODELS/Finished_Buildings/Aparments/Aparment_2.fbx" id="4_moreo"]
 [ext_resource type="PackedScene" uid="uid://dkdqmq2vjjpx7" path="res://NEW_MODELS/Finished_Buildings/Brutalist_Apartments/Brutalist_Apartment_1.fbx" id="5_457dm"]
 [ext_resource type="PackedScene" uid="uid://c1hbbatnwvviv" path="res://NEW_MODELS/Finished_Buildings/Brutalist_Apartments/Brutalist_Apartment_2.fbx" id="6_pbjnk"]
@@ -15,8 +15,8 @@
 [ext_resource type="PackedScene" uid="uid://ci4p75ey4wi3c" path="res://NEW_MODELS/Finished_Buildings/WALL/Wall.fbx" id="13_ad3bl"]
 [ext_resource type="PackedScene" uid="uid://bpk5iwa4yg8e2" path="res://NEW_MODELS/Finished_Buildings/fmopasgmf.fbx" id="14_6bssk"]
 [ext_resource type="PackedScene" uid="uid://xxubkdsrtqqv" path="res://scenes/banderaubava.tscn" id="15_light_prop"]
-[ext_resource type="Material" path="res://textures/road/asphalt_material.tres" id="16_road_mat"]
-[ext_resource type="Material" path="res://textures/road/sidewalk_material.tres" id="17_sidewalk_mat"]
+[ext_resource type="Material" uid="uid://1qhyyq65ax23" path="res://textures/new_standard_material_3d.tres" id="16_road_mat"]
+[ext_resource type="Material" uid="uid://1qhyyq65ax23" path="res://textures/new_standard_material_3d.tres" id="17_sidewalk_mat"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_floor"]
 size = Vector3(1000, 1, 1000)

@@ -28,3 +28,7 @@ project/assembly_name="game-jam-2026"
 3d_physics/layer_1="World"
 3d_physics/layer_2="Player"
 3d_physics/layer_3="Enemy"
+
+[autoload]
+
+GlobalSceneManager="*res://GlobalSceneManager.cs"

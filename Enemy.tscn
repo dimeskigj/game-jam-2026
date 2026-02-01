@@ -11,6 +11,7 @@ height = 1.8
 points = PackedVector3Array(0, 0, 0, 5, 2, -7, -5, 2, -7, 5, -2, -7, -5, -2, -7)
 
 [node name="Enemy" type="CharacterBody3D" unique_id=209923709 node_paths=PackedStringArray("Waypoints")]
+collision_mask = 5
 script = ExtResource("1_enemy")
 Waypoints = []
 MovementType = 1
@@ -35,6 +36,7 @@ shape = SubResource("ConvexPolygonShape3D_vision")
 
 [node name="ObstacleRay" type="RayCast3D" parent="." unique_id=998877665]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+collision_mask = 5
 target_position = Vector3(0, 0, -2)
 debug_shape_custom_color = Color(1, 0, 1, 1)
 debug_shape_thickness = 5

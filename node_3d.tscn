@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://clsgsyq4e35in"]
 
 [ext_resource type="Environment" uid="uid://dedlit5h2y2dx" path="res://Enviorment/foggy_enviorment.tres" id="1_1q667"]
-[ext_resource type="Material" uid="uid://2ue4fowvhkgs" path="res://floor_material.tres" id="2_floor_mat"]
 [ext_resource type="PackedScene" uid="uid://bw5pjdvnaigpr" path="res://SCENE/player.tscn" id="3_5t8nk"]
 [ext_resource type="Script" uid="uid://36lhpbg631ox" path="res://InteractionSystem/Pickup.cs" id="6_pickup"]
 [ext_resource type="Resource" uid="uid://kjpgb7fjq8yj" path="res://InventorySystem/item_key.tres" id="8_key"]
@@ -15,21 +14,20 @@
 [ext_resource type="PackedScene" uid="uid://cnjat2lllxcge" path="res://scenes/Masks/maska_1_gotova.tscn" id="17_id0nj"]
 [ext_resource type="PackedScene" uid="uid://bvmujkt7g26vc" path="res://Enemy.tscn" id="17_tuemg"]
 [ext_resource type="PackedScene" uid="uid://di5loc04hah3b" path="res://scenes/Masks/xray_mask.tscn" id="19_1q667"]
-[ext_resource type="Script" uid="uid://bycgccef6qxd0" path="res://InteractionSystem/SecurityCamera.cs" id="19_camera_script"]
 [ext_resource type="Resource" path="res://InventorySystem/item_mask_insect.tres" id="19_insect_mask_item"]
-[ext_resource type="PackedScene" uid="uid://b8d5477s0d1d6" path="res://Models/KAMERA.fbx" id="21_s0gvp"]
+[ext_resource type="PackedScene" uid="uid://cax6c2a8mw3x8" path="res://scenes/kamera.tscn" id="20_id0nj"]
 [ext_resource type="PackedScene" uid="uid://m01a2075fgds" path="res://scenes/Masks/stealth_mask.tscn" id="22_1q667"]
+[ext_resource type="PackedScene" uid="uid://r4xtgl04pf8" path="res://scenes/cabinet_setup.tscn" id="23_2yde8"]
 [ext_resource type="Script" uid="uid://c3kxsx5ujtgbq" path="res://InteractionSystem/SetupNavigation.cs" id="23_nav_setup"]
 [ext_resource type="Resource" uid="uid://cinl6dcub0s6t" path="res://InventorySystem/item_silverkey.tres" id="24_silverkey"]
-[ext_resource type="Script" uid="uid://dvjnuu11sqjgv" path="res://InteractionSystem/Drawer.cs" id="25_drawer"]
-[ext_resource type="Script" uid="uid://cq57csrn0m4qu" path="res://InteractionSystem/Note.cs" id="26_note"]
+[ext_resource type="PackedScene" uid="uid://1k3d1wsad8on" path="res://scenes/pickup_note.tscn" id="27_id0nj"]
 [ext_resource type="PackedScene" uid="uid://2eitq0pep0d6" path="res://Models/key.fbx" id="27_key_model"]
 [ext_resource type="PackedScene" uid="uid://xxubkdsrtqqv" path="res://scenes/banderaubava.tscn" id="30_id0nj"]
 [ext_resource type="PackedScene" uid="uid://bqr8h3k2v5m6p" path="res://Radio.tscn" id="31_radio"]
 [ext_resource type="PackedScene" uid="uid://bc6vrfi26lc2s" path="res://SCENE/node_3d.tscn" id="32_ype4i"]
 [ext_resource type="Script" uid="uid://dspsq8j6ui7jr" path="res://InteractionSystem/SceneDoor.cs" id="33_scenedoor"]
 [ext_resource type="PackedScene" path="res://Models/FlashlightPickup.tscn" id="36_flashlight"]
-[ext_resource type="PackedScene" path="res://Models/BatteryPickup.tscn" id="37_battery"]
+[ext_resource type="PackedScene" uid="uid://cyy3r7ee3ovo" path="res://Models/BatteryPickup.tscn" id="37_battery"]
 [ext_resource type="PackedScene" uid="uid://cawb3lrlaxph1" path="res://scenes/UI.tscn" id="38_ui"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_key_large"]
@@ -71,43 +69,8 @@ albedo_color = Color(0.5, 0, 0.5, 1)
 material = SubResource("StandardMaterial3D_purple")
 size = Vector3(0.4, 0.4, 0.4)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_transparent_red"]
-transparency = 1
-shading_mode = 0
-albedo_color = Color(1, 0, 0, 0.3)
-
-[sub_resource type="CylinderMesh" id="CylinderMesh_vision_cone"]
-material = SubResource("StandardMaterial3D_transparent_red")
-top_radius = 0.0
-bottom_radius = 4.0
-height = 10.0
-radial_segments = 16
-rings = 1
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_camera_detection"]
-size = Vector3(10, 5, 12)
-
 [sub_resource type="NavigationMesh" id="NavigationMesh_runtime"]
 geometry_collision_mask = 1
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_drawer_floor"]
-size = Vector3(0.85, 0.05, 0.5)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_drawer_front"]
-size = Vector3(0.85, 0.4, 0.029528808)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_key"]
-size = Vector3(0.1, 0.05, 0.2)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_paper"]
-albedo_color = Color(0.9, 0.9, 0.9, 1)
-
-[sub_resource type="BoxMesh" id="BoxMesh_note"]
-material = SubResource("StandardMaterial3D_paper")
-size = Vector3(0.2, 0.01, 0.3)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_note"]
-size = Vector3(0.2, 0.01, 0.3)
 
 [node name="Node3D" type="Node3D" unique_id=1025875681]
 
@@ -127,13 +90,14 @@ shadow_opacity = 0.8
 shadow_blur = 3.0
 
 [node name="Player" parent="." unique_id=1129234290 instance=ExtResource("3_5t8nk")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -9.407364)
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 10.651374, 1, -5.579859)
 SanityRegenRate = 0.1
 
 [node name="UI" parent="." unique_id=2005998870 instance=ExtResource("38_ui")]
 
 [node name="Pickup_Key" type="RigidBody3D" parent="." unique_id=1181565980]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.5, -3)
+visible = false
 collision_layer = 2
 script = ExtResource("6_pickup")
 ItemResource = ExtResource("8_key")
@@ -146,6 +110,7 @@ shape = SubResource("BoxShape3D_key_large")
 
 [node name="Pickup_SilverKey" type="RigidBody3D" parent="." unique_id=1181565981]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.5, -5)
+visible = false
 collision_layer = 2
 script = ExtResource("6_pickup")
 ItemResource = ExtResource("24_silverkey")
@@ -158,6 +123,7 @@ shape = SubResource("BoxShape3D_key_large")
 
 [node name="DoorObject_Locked" type="RigidBody3D" parent="." unique_id=218706111]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.2, -4, 1.5, -4)
+visible = false
 collision_layer = 4
 mass = 10.0
 script = ExtResource("9_door")
@@ -170,6 +136,7 @@ shape = SubResource("BoxShape3D_door")
 
 [node name="DoorObject_Regular" type="RigidBody3D" parent="." unique_id=218706112]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.2, 0, 1.5, -4)
+visible = false
 collision_layer = 4
 mass = 10.0
 script = ExtResource("9_door")
@@ -188,6 +155,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.89435244, -1.6488895, 0)
 
 [node name="DoorObject_SilverLocked" type="RigidBody3D" parent="." unique_id=218706113]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.2, 4, 1.5, -4)
+visible = false
 collision_layer = 4
 mass = 10.0
 script = ExtResource("9_door")
@@ -200,7 +168,7 @@ mesh = SubResource("BoxMesh_door")
 shape = SubResource("BoxShape3D_door")
 
 [node name="DoorObject_Cell" type="RigidBody3D" parent="." unique_id=999999999]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.2, 8, 1.5, -4)
+transform = Transform3D(-0.012217023, 0, 0.19998507, 0, 1, 0, -0.9999254, 0, -0.0024434046, 16.111599, 1.5, -4)
 collision_layer = 4
 mass = 10.0
 script = ExtResource("33_scenedoor")
@@ -219,6 +187,7 @@ XRayOverlayMaterial = SubResource("StandardMaterial3D_xray_overlay")
 
 [node name="RadioactiveZone" type="Area3D" parent="." unique_id=1478112542]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 2.5, 0)
+visible = false
 script = ExtResource("11_rad_zone")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="RadioactiveZone" unique_id=1350302298]
@@ -229,7 +198,7 @@ size = Vector3(10, 5, 10)
 material = SubResource("StandardMaterial3D_radzone")
 
 [node name="Pickup_GasMask" type="RigidBody3D" parent="." unique_id=1903511097]
-transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0.1366244, 3)
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 9.449373, 0.1366244, 0.33177853)
 collision_layer = 2
 script = ExtResource("6_pickup")
 ItemResource = ExtResource("12_gas")
@@ -240,7 +209,7 @@ shape = SubResource("BoxShape3D_pickup")
 [node name="maska1gotova" parent="Pickup_GasMask" unique_id=170019225 instance=ExtResource("17_id0nj")]
 
 [node name="Pickup_XRayMask" type="RigidBody3D" parent="." unique_id=1649173418]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.5, 3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.449373, 0.5, 0.33177853)
 collision_layer = 2
 script = ExtResource("6_pickup")
 ItemResource = ExtResource("13_xray")
@@ -252,7 +221,7 @@ shape = SubResource("BoxShape3D_pickup")
 transform = Transform3D(14.999999, 0, 0, 0, -6.5567076e-07, 14.999998, 0, -14.999998, -6.5567076e-07, 0, -0.3796752, 0)
 
 [node name="Pickup_StealthMask" type="RigidBody3D" parent="." unique_id=1649173499]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.5, 3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.449373, 0.5, 0.33177853)
 collision_layer = 2
 script = ExtResource("6_pickup")
 ItemResource = ExtResource("14_stealth")
@@ -264,7 +233,8 @@ shape = SubResource("BoxShape3D_pickup")
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, -0.28841987, 0)
 
 [node name="Pickup_InsectMask" type="RigidBody3D" parent="." unique_id=1649175000]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0.5, 3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.449373, 0.5, 0.33177853)
+visible = false
 collision_layer = 2
 script = ExtResource("6_pickup")
 ItemResource = ExtResource("19_insect_mask_item")
@@ -277,16 +247,19 @@ shape = SubResource("BoxShape3D_pickup")
 
 [node name="WallHidingItem" type="CSGBox3D" parent="." unique_id=1079450384]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.852402, 1.5, 0)
+visible = false
 use_collision = true
 size = Vector3(1, 3, 5)
 
 [node name="Wall" type="CSGBox3D" parent="." unique_id=1364616113]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.495885, 1.6466911, 7.1931496)
+visible = false
 use_collision = true
 size = Vector3(0.51257324, 3.3914795, 2.4250488)
 
 [node name="HiddenItem" type="RigidBody3D" parent="." unique_id=131212969 groups=["XRayable"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 1.5, 0)
+visible = false
 collision_layer = 2
 script = ExtResource("6_pickup")
 ItemResource = ExtResource("8_key")
@@ -297,41 +270,9 @@ shape = SubResource("BoxShape3D_key_large")
 [node name="KeyModel" parent="HiddenItem" unique_id=107222891 instance=ExtResource("27_key_model")]
 transform = Transform3D(25, 0, 0, 0, 25, 0, 0, 0, 25, 0, 0, 0)
 
-[node name="KAMERA" parent="." unique_id=1498223709 node_paths=PackedStringArray("CameraPivot", "ModelGeometry") instance=ExtResource("21_s0gvp")]
-transform = Transform3D(-3.1404778e-07, 1.9954948, 7.447288, 1.744517e-07, 7.447288, -1.9954948, -7.71, 8.722585e-08, -3.4849828e-07, -2.0343962, 2.5, 7)
-script = ExtResource("19_camera_script")
-CameraPivot = NodePath("Pivot")
-ModelGeometry = NodePath("group1")
-
-[node name="ViewCone" type="SpotLight3D" parent="KAMERA" unique_id=2003004007 groups=["XRayable"]]
-transform = Transform3D(-1, -5.1928816e-15, 1.509958e-07, -8.5598196e-16, 1, 2.8721988e-08, -1.509958e-07, 2.8721988e-08, -1, 0, 0.054141685, -0.014507204)
-light_color = Color(1, 0, 0, 1)
-light_energy = 5.0
-shadow_enabled = true
-spot_range = 12.0
-spot_angle = 30.0
-
-[node name="VisionConeMesh" type="MeshInstance3D" parent="KAMERA" unique_id=293847560 groups=["XRayInvisible"]]
-transform = Transform3D(-0.12970169, 1.1338882e-08, -3.330669e-16, -1.110223e-16, -3.7252903e-09, -0.12970169, -1.1338882e-08, -0.12970169, 3.7252903e-09, 0, -1.4901161e-08, 0.6485084)
+[node name="KAMERA" parent="." unique_id=593528217 instance=ExtResource("20_id0nj")]
+transform = Transform3D(0, 0.2588, 0.9659, 0, 0.9659, -0.2588, -1, 0, 0, -2.0344, 2.5, 7)
 visible = false
-mesh = SubResource("CylinderMesh_vision_cone")
-skeleton = NodePath("")
-
-[node name="DetectionArea" type="Area3D" parent="KAMERA" unique_id=2003004008]
-transform = Transform3D(-0.12970169, -2.220446e-16, 1.1338882e-08, 0, 0.12970169, -6.195479e-17, -1.1338882e-08, -6.6325836e-17, -0.12970169, 0, 0.056700215, -0.015192777)
-collision_layer = 0
-monitorable = false
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="KAMERA/DetectionArea" unique_id=2003004009]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -5)
-shape = SubResource("BoxShape3D_camera_detection")
-
-[node name="LOSRay" type="RayCast3D" parent="KAMERA" unique_id=2003004010]
-transform = Transform3D(-0.12970169, -1.110223e-16, 1.9584412e-08, -1.110223e-16, 0.1297017, -1.5523926e-16, -1.958441e-08, -6.632585e-17, -0.1297017, 0, 0.056891546, -0.015244037)
-target_position = Vector3(0, 0, -12)
-
-[node name="Pivot" type="Node3D" parent="KAMERA" unique_id=420721037]
-transform = Transform3D(1, 1.7763568e-15, 0, -8.881784e-16, 1, -5.1137216e-16, -7.1054274e-15, -5.1137216e-16, 1, 0, 0.09512232, -0.02548793)
 
 [node name="Waypoint1" type="Marker3D" parent="." unique_id=812746639]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 7)
@@ -344,6 +285,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.7981987, 0, 1.0790443)
 
 [node name="Radio" parent="." unique_id=2092089017 instance=ExtResource("31_radio")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1, -3)
+visible = false
 
 [node name="NavigationSetup" type="Node" parent="." unique_id=1234567890]
 script = ExtResource("23_nav_setup")
@@ -351,83 +293,9 @@ script = ExtResource("23_nav_setup")
 [node name="RuntimeNavRegion" type="NavigationRegion3D" parent="." unique_id=1234567891]
 navigation_mesh = SubResource("NavigationMesh_runtime")
 
-[node name="CabinetSetup" type="Node3D" parent="." unique_id=969819830]
+[node name="CabinetSetup" parent="." unique_id=610435702 instance=ExtResource("23_2yde8")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.012434959, 2)
-
-[node name="CabinetBody" type="CSGBox3D" parent="CabinetSetup" unique_id=1567266291]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
-use_collision = true
-size = Vector3(1, 1, 0.6)
-material = ExtResource("2_floor_mat")
-
-[node name="CabinetHollow" type="CSGBox3D" parent="CabinetSetup/CabinetBody" unique_id=1913093843]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.05)
-operation = 2
-size = Vector3(0.9, 0.9, 0.55)
-
-[node name="Drawer_Locked" type="RigidBody3D" parent="CabinetSetup" unique_id=956537449 groups=["Interactable"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
-collision_layer = 4
-freeze = true
-script = ExtResource("25_drawer")
-_isLocked = true
-SlideDistance = 0.4
-
-[node name="DrawerMesh" type="CSGBox3D" parent="CabinetSetup/Drawer_Locked" unique_id=906277751]
-size = Vector3(0.85, 0.4, 0.5)
-material = ExtResource("2_floor_mat")
-
-[node name="DrawerHollow" type="CSGBox3D" parent="CabinetSetup/Drawer_Locked/DrawerMesh" unique_id=2038921831]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
-operation = 2
-size = Vector3(0.75, 0.35, 0.4)
-material = ExtResource("2_floor_mat")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="CabinetSetup/Drawer_Locked" unique_id=1921620293]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.175, 0)
-shape = SubResource("BoxShape3D_drawer_floor")
-
-[node name="CollisionShape3D_Front" type="CollisionShape3D" parent="CabinetSetup/Drawer_Locked" unique_id=2101025612]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.228302)
-shape = SubResource("BoxShape3D_drawer_front")
-
-[node name="Drawer_Unlocked" type="RigidBody3D" parent="CabinetSetup" unique_id=1245101275 groups=["Interactable"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
-collision_layer = 4
-freeze = true
-script = ExtResource("25_drawer")
-SlideDistance = 0.4
-
-[node name="Pickup_SmallKey" type="RigidBody3D" parent="CabinetSetup/Drawer_Unlocked" unique_id=1080425226]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.05, 0)
-collision_layer = 2
-freeze = true
-script = ExtResource("6_pickup")
-ItemResource = ExtResource("8_key")
-
-[node name="KeyModel" parent="CabinetSetup/Drawer_Unlocked/Pickup_SmallKey" unique_id=122555564 instance=ExtResource("27_key_model")]
-transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 0, 0)
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="CabinetSetup/Drawer_Unlocked/Pickup_SmallKey" unique_id=1832139648]
-shape = SubResource("BoxShape3D_key")
-
-[node name="DrawerMesh" type="CSGBox3D" parent="CabinetSetup/Drawer_Unlocked" unique_id=590886608]
-size = Vector3(0.85, 0.4, 0.5)
-material = ExtResource("2_floor_mat")
-
-[node name="DrawerHollow" type="CSGBox3D" parent="CabinetSetup/Drawer_Unlocked/DrawerMesh" unique_id=429441474]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
-operation = 2
-size = Vector3(0.75, 0.35, 0.4)
-material = ExtResource("2_floor_mat")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="CabinetSetup/Drawer_Unlocked" unique_id=1701561275]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.175, 0)
-shape = SubResource("BoxShape3D_drawer_floor")
-
-[node name="CollisionShape3D_Front" type="CollisionShape3D" parent="CabinetSetup/Drawer_Unlocked" unique_id=1198085560]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.23853755)
-shape = SubResource("BoxShape3D_drawer_front")
+visible = false
 
 [node name="Pickup_Flashlight" parent="." unique_id=1012240445 instance=ExtResource("36_flashlight")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -6)
@@ -435,17 +303,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -6)
 [node name="Pickup_Battery" parent="." unique_id=383562448 instance=ExtResource("37_battery")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.5, -6)
 
-[node name="Pickup_Note" type="RigidBody3D" parent="." unique_id=556677889 groups=["Interactable"]]
+[node name="Pickup_Note" parent="." unique_id=610533629 instance=ExtResource("27_id0nj")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 1.02, 2)
-collision_layer = 4
-script = ExtResource("26_note")
-NoteText = "Day 4: They are locking everything now. I hid the small key in the bottom drawer. Hopefully they forget about it."
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Pickup_Note" unique_id=2004243602]
-mesh = SubResource("BoxMesh_note")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_Note" unique_id=32051481]
-shape = SubResource("BoxShape3D_note")
+visible = false
 
 [node name="Enemy" parent="." unique_id=209923709 node_paths=PackedStringArray("Waypoints") instance=ExtResource("17_tuemg")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.028717, 0.07678223, 17.049515)
@@ -513,3 +373,11 @@ mesh = SubResource("BoxMesh_door")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="DoorObject_Cell2" unique_id=2058953033]
 shape = SubResource("BoxShape3D_door")
+
+[node name="Enemy3" parent="." unique_id=906672302 node_paths=PackedStringArray("Waypoints") instance=ExtResource("17_tuemg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.9419, 0.07678223, -21.536606)
+Waypoints = [NodePath("../Waypoint4"), NodePath("../Waypoint5"), NodePath("../Waypoint6")]
+
+[node name="Enemy4" parent="." unique_id=1948321441 node_paths=PackedStringArray("Waypoints") instance=ExtResource("17_tuemg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.468204, 0.07678223, -21.536606)
+Waypoints = [NodePath("../Waypoint4"), NodePath("../Waypoint5"), NodePath("../Waypoint6")]

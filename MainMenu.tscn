@@ -116,7 +116,7 @@ theme_override_constants/separation = -10
 
 [node name="Title" type="Label" parent="CenterContainer/VBoxContainer/TitleGroup" unique_id=743954673]
 layout_mode = 2
-text = "CITY ESCAPE"
+text = "MASKACRE"
 label_settings = SubResource("LabelSettings_title")
 horizontal_alignment = 1
 

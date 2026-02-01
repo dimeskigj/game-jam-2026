@@ -35,29 +35,45 @@ public partial class EnemyAI : CharacterBody3D
 	private float _investigateTimer = 0.0f;
 	private const float MaxInvestigateTime = 15.0f;
 
+	public override void _EnterTree()
+	{
+		AddToGroup("Enemies");
+	}
+
 	public override void _Ready()
 	{
 		_navAgent = GetNode<NavigationAgent3D>("NavigationAgent3D");
 		_obstacleRay = GetNodeOrNull<RayCast3D>("ObstacleRay");
 		_visionArea = GetNodeOrNull<Area3D>("VisionArea");
 
-		// Find animation player
-		_animPlayer = GetNodeOrNull<AnimationPlayer>("Model/kit_player/AnimationPlayer");
-		if (_animPlayer == null)
+		// Find animation player recursively
+		_animPlayer = FindFirstNodeOfType<AnimationPlayer>(this);
+		
+		Node model = GetNodeOrNull("Model");
+		if (model != null)
 		{
-			// Fallback search
-			Node model = GetNodeOrNull("Model");
-			if (model != null)
+			// DEBUG: Print Structure
+			PrintNodeTree(model, "");
+		}
+		
+		if (_animPlayer != null)
+		{
+			var anims = _animPlayer.GetAnimationList();
+			GD.Print($"EnemyAI: Main AnimationPlayer found at {_animPlayer.GetPath()}. Anims: {string.Join(", ", anims)}");
+			
+			// Try to ensure looping on idle if possible (though libraries might be read-only)
+			// We just play them.
+			
+			// FIX ROOT MOTION (Force In-Place)
+			foreach(var animName in anims)
 			{
-				foreach (Node child in model.GetChildren())
-				{
-					if (child is AnimationPlayer ap) { _animPlayer = ap; break; }
-					foreach (Node grandChild in child.GetChildren())
-					{
-						if (grandChild is AnimationPlayer ap2) { _animPlayer = ap2; break; }
-					}
-				}
+				var anim = _animPlayer.GetAnimation(animName);
+				MakeAnimationInPlace(anim, animName);
 			}
+		}
+		else
+		{
+			GD.PrintErr("EnemyAI: Critical - No AnimationPlayer found in Model!");
 		}
 		
 		if (_visionArea != null)
@@ -69,8 +85,7 @@ public partial class EnemyAI : CharacterBody3D
 		// Improve navigation parameters
 		_navAgent.PathDesiredDistance = 1.0f;
 		_navAgent.TargetDesiredDistance = 1.0f;
-		_navAgent.PathMaxDistance = 15.0f; // High value ensures they don't give up if pushed far off path
-		// Avoidance Setup
+		_navAgent.PathMaxDistance = 15.0f; 
 		_navAgent.AvoidanceEnabled = false;
 		_navAgent.Radius = 0.5f;
 		_navAgent.NeighborDistance = 10.0f;
@@ -80,24 +95,74 @@ public partial class EnemyAI : CharacterBody3D
 		// Defer setup to ensuring physics is ready
 		CallDeferred(MethodName.ActorSetup);
 	}
+	
+	// Removed InjectAnimations logic as scene now has libraries linked.
 
 	private async void ActorSetup()
 	{
-		// Wait for the first physics frame so the NavigationServer can sync.
+		// ... existing setup ...
 		await ToSignal(GetTree(), SceneTree.SignalName.PhysicsFrame);
 		await ToSignal(GetTree(), SceneTree.SignalName.PhysicsFrame);
 
 		_mapReady = true;
 		GD.Print("EnemyAI: ActorSetup complete. Navigation ready.");
 		
-		// Force initial path (re)calculation now that map is present
 		if (Waypoints != null && Waypoints.Count > 0)
 		{
 			_currentWaypointIndex = 0;
 			_navAgent.TargetPosition = Waypoints[0].GlobalPosition;
-			GD.Print($"EnemyAI: Initial target set to {Waypoints[0].GlobalPosition}");
 		}
 	}
+	// ...
+
+	private void UpdateAnimation(Vector3 velocity)
+	{
+		if (_animPlayer == null) return;
+		
+		Vector2 horizontalVel = new Vector2(velocity.X, velocity.Z);
+		float speed = horizontalVel.Length();
+		
+		string targetAnim = "";
+		
+		// Find available animations from list
+		var animList = _animPlayer.GetAnimationList();
+		
+		string runAnim = "";
+		string walkAnim = "";
+		string idleAnim = "";
+		
+		// Map animations based on naming conventions in the specific scene libraries
+		foreach(var a in animList)
+		{
+			string lower = a.ToLower();
+			if (lower.Contains("run")) runAnim = a;
+			else if (lower.Contains("walk")) walkAnim = a;
+			else if (lower.Contains("idle") || lower.Contains("mixamo")) idleAnim = a;
+		}
+		
+		if (speed > 4.0f && !string.IsNullOrEmpty(runAnim))
+		{
+			targetAnim = runAnim;
+		}
+		else if (speed > 0.1f && !string.IsNullOrEmpty(walkAnim))
+		{
+			targetAnim = walkAnim;
+		}
+		else if (!string.IsNullOrEmpty(idleAnim))
+		{
+			targetAnim = idleAnim;
+		}
+		
+		if (!string.IsNullOrEmpty(targetAnim))
+		{
+			if (_animPlayer.CurrentAnimation != targetAnim)
+			{
+				_animPlayer.Play(targetAnim, 0.2f);
+			}
+		}
+	}
+
+
 
 	public override void _PhysicsProcess(double delta)
 	{
@@ -501,28 +566,7 @@ public partial class EnemyAI : CharacterBody3D
 		}
 	}
 
-	private void UpdateAnimation(Vector3 velocity)
-	{
-		if (_animPlayer == null) return;
-		
-		Vector2 horizontalVel = new Vector2(velocity.X, velocity.Z);
-		string animToPlay = "idle";
-		
-		if (horizontalVel.Length() > 0.1f)
-		{
-			if (_currentState == State.Chase && _animPlayer.HasAnimation("run"))
-				animToPlay = "run";
-			else if (_animPlayer.HasAnimation("walk"))
-				animToPlay = "walk";
-			else if (_animPlayer.HasAnimation("run"))
-				animToPlay = "run";
-		}
-		
-		if (_animPlayer.CurrentAnimation != animToPlay && _animPlayer.HasAnimation(animToPlay))
-		{
-			_animPlayer.Play(animToPlay, 0.2f);
-		}
-	}
+
 
 	private void AdvanceWaypoint()
 	{
@@ -563,14 +607,14 @@ public partial class EnemyAI : CharacterBody3D
 
 	public void AlertToLocation(Vector3 location)
 	{
-		if (_currentState == State.Chase) return;
+		// Even if investigating, update the target to the new noise/alert
+		if (_currentState == State.Chase) return; // Priority: Chase > Alert
 		
 		_investigateTarget = location;
-		if (_currentState != State.Investigate)
-		{
-			GD.Print($"Enemy alerted to location: {location}");
-			_currentState = State.Investigate;
-		}
+		_currentState = State.Investigate;
+		_investigateTimer = 0.0f;
+		
+		GD.Print($"Enemy alerted to location: {location}");
 	}
 
 	private void OnBodyEnteredVision(Node3D body)
@@ -584,5 +628,80 @@ public partial class EnemyAI : CharacterBody3D
 	private void OnBodyExitedVision(Node3D body)
 	{
 		// Chase timeout handles this
+	}
+
+	private void MakeAnimationInPlace(Animation anim, string animName)
+	{
+		if (anim == null) return;
+		
+		GD.Print($"EnemyAI: Processing '{animName}' - Tracks: {anim.GetTrackCount()}");
+		
+		bool foundRoot = false;
+		
+		for(int i = 0; i < anim.GetTrackCount(); i++)
+		{
+			string path = anim.TrackGetPath(i).ToString();
+			string lower = path.ToLower();
+			var type = anim.TrackGetType(i);
+			
+			// DEBUG: Print all tracks to see what we are dealing with at runtime
+			// GD.Print($"  Track {i}: {path} ({type})");
+			
+			if (lower.Contains("hips") || lower.Contains("root") || lower.Contains("pelvis"))
+			{
+				if (type == Animation.TrackType.Position3D)
+				{
+					// Found separate position track - Safe to disable
+					anim.TrackSetEnabled(i, false);
+					GD.Print($"EnemyAI: DISABLED Root Motion (Pos3D) for '{animName}' on track '{path}'");
+					foundRoot = true;
+				}
+				else
+				{
+					// Found Hips on a non-Position3D track (likely Rotation, Scale, or Value).
+					// Disabling Rotation would break the animation.
+					// We only disable explicit translation tracks.
+					GD.PushWarning($"EnemyAI: Found Hips on track '{path}' of type '{type}'. NOT disabling (safe).");
+				}
+			}
+		}
+		
+		if (!foundRoot)
+		{
+			// Fallback: Disable Track 0 if it looks suspicious? No, too risky.
+			GD.Print($"EnemyAI: WARNING - No Hips/Root position track identified for '{animName}'. Teleporting may occur.");
+		}
+			
+		// Also ensure loop if it's Walk/Run/Idle
+		string nameLower = animName.ToLower();
+		if (nameLower.Contains("walk") || nameLower.Contains("run") || nameLower.Contains("idle"))
+		{
+			if (anim.LoopMode != Animation.LoopModeEnum.Linear)
+			{
+				anim.LoopMode = Animation.LoopModeEnum.Linear;
+				GD.Print($"EnemyAI: Forced Looping for '{animName}'");
+			}
+		}
+	}
+
+	private void PrintNodeTree(Node node, string indent)
+	{
+		GD.Print($"{indent}- {node.Name} ({node.GetType().Name})");
+		foreach (Node child in node.GetChildren())
+		{
+			PrintNodeTree(child, indent + "  ");
+		}
+	}
+
+	private T FindFirstNodeOfType<T>(Node root) where T : Node
+	{
+		if (root is T t) return t;
+		
+		foreach (Node child in root.GetChildren())
+		{
+			T found = FindFirstNodeOfType<T>(child);
+			if (found != null) return found;
+		}
+		return null;
 	}
 }

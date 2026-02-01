@@ -799,6 +799,31 @@ public partial class PlayerController : CharacterBody3D
 		_inventory.SelectSlot(newSlot);
 	}
 	
+	public void ShowCaughtMessage()
+	{
+		if (IsDead) return;
+		
+		IsDead = true;
+		if (_gameOverLabel != null)
+		{
+			_gameOverLabel.Text = "YOU HAVE BEEN CAUGHT";
+			_gameOverLabel.Visible = true;
+		}
+		
+		// Optional: Show some red overlay or camera effect
+		if (_detectionOverlay != null) 
+		{
+			_detectionOverlay.Visible = true;
+			if (_detectionOverlay.Material is ShaderMaterial mat) 
+				mat.SetShaderParameter("intensity", 1.0f);
+			else
+				_detectionOverlay.Color = new Color(1, 0, 0, 0.8f);
+		}
+
+		Input.MouseMode = Input.MouseModeEnum.Visible;
+		GD.Print("GAME OVER: Caught by Camera.");
+	}
+
 	private void UpdateSanity(double delta)
 	{
 		if (IsDead) 
@@ -807,6 +832,12 @@ public partial class PlayerController : CharacterBody3D
 			if (Input.MouseMode != Input.MouseModeEnum.Visible)
 			{
 				Input.MouseMode = Input.MouseModeEnum.Visible;
+			}
+			
+			// Optional: Allow restart on click?
+			if (Input.IsMouseButtonPressed(MouseButton.Left))
+			{
+				RestartGame();
 			}
 			return;
 		}
@@ -828,7 +859,11 @@ public partial class PlayerController : CharacterBody3D
 		if (CurrentSanity <= 0)
 		{
 			IsDead = true;
-			if (_gameOverLabel != null) _gameOverLabel.Visible = true;
+			if (_gameOverLabel != null) 
+			{
+				_gameOverLabel.Text = "GAME OVER\nSanity Depleted";
+				_gameOverLabel.Visible = true;
+			}
 			Input.MouseMode = Input.MouseModeEnum.Visible;
 			GD.Print("GAME OVER: Sanity Depleted.");
 		}

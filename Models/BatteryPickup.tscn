@@ -1,6 +1,6 @@
-[gd_scene format=3 uid="uid://b16blr5mknbta"]
+[gd_scene format=3 uid="uid://cyy3r7ee3ovo"]
 
-[ext_resource type="Script" path="res://InteractionSystem/BatteryPickup.cs" id="1_script"]
+[ext_resource type="Script" uid="uid://0lmghhbsh38j" path="res://InteractionSystem/BatteryPickup.cs" id="1_script"]
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_battery"]
 top_radius = 0.02
@@ -15,13 +15,14 @@ roughness = 0.2
 [sub_resource type="BoxShape3D" id="BoxShape3D_coll"]
 size = Vector3(0.05, 0.1, 0.05)
 
-[node name="BatteryPickup" type="RigidBody3D" groups=["Interactable"]]
+[node name="BatteryPickup" type="RigidBody3D" unique_id=294423957 groups=["Interactable"]]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
 collision_layer = 2
 script = ExtResource("1_script")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1531242369]
 mesh = SubResource("CylinderMesh_battery")
 surface_material_override/0 = SubResource("StandardMaterial3D_green")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=403063260]
 shape = SubResource("BoxShape3D_coll")

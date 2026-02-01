@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://3mulsgvuqcsy"]
+
+[ext_resource type="PackedScene" uid="uid://bs2xrk6o6oir8" path="res://Animations/Model2/Standing Idle (4).fbx" id="1_fbx"]
+
+[node name="EnemyVisuals" type="Node3D"]
+
+[node name="Model" parent="." instance=ExtResource("1_fbx")]

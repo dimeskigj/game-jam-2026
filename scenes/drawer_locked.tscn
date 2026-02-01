@@ -1,0 +1,35 @@
+[gd_scene format=3 uid="uid://ck4mtl3seeo50"]
+
+[ext_resource type="Script" uid="uid://dvjnuu11sqjgv" path="res://InteractionSystem/Drawer.cs" id="1_kbtrq"]
+[ext_resource type="Material" uid="uid://2ue4fowvhkgs" path="res://floor_material.tres" id="2_b4d1m"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_drawer_floor"]
+size = Vector3(0.85, 0.05, 0.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_drawer_front"]
+size = Vector3(0.85, 0.4, 0.029528808)
+
+[node name="Drawer_Locked" type="RigidBody3D" unique_id=1723164413 groups=["Interactable"]]
+collision_layer = 4
+freeze = true
+script = ExtResource("1_kbtrq")
+_isLocked = true
+SlideDistance = 0.4
+
+[node name="DrawerMesh" type="CSGBox3D" parent="." unique_id=1304312579]
+size = Vector3(0.85, 0.4, 0.5)
+material = ExtResource("2_b4d1m")
+
+[node name="DrawerHollow" type="CSGBox3D" parent="DrawerMesh" unique_id=1479004482]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+operation = 2
+size = Vector3(0.75, 0.35, 0.4)
+material = ExtResource("2_b4d1m")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1090641985]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.175, 0)
+shape = SubResource("BoxShape3D_drawer_floor")
+
+[node name="CollisionShape3D_Front" type="CollisionShape3D" parent="." unique_id=490318048]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.228302)
+shape = SubResource("BoxShape3D_drawer_front")

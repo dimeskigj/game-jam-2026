@@ -1,10 +1,11 @@
 [gd_resource type="StandardMaterial3D" format=3 uid="uid://1qhyyq65ax23"]
 
-[ext_resource type="Texture2D" uid="uid://nptr036ech54" path="res://textures/floor/PavingStones075_1K-JPG_Color.jpg" id="1_jdywe"]
-[ext_resource type="Texture2D" uid="uid://cb5aus6skac82" path="res://textures/floor/PavingStones075_1K-JPG_AmbientOcclusion.jpg" id="2_4iawo"]
-[ext_resource type="Texture2D" uid="uid://cn7ucu6gcjjqj" path="res://textures/floor/PavingStones075_1K-JPG_NormalDX.jpg" id="3_sie6l"]
+[ext_resource type="Texture2D" uid="uid://bgxahb84d5apo" path="res://textures/floor/PavingStones075_1K-JPG_Color.jpg" id="1_jdywe"]
+[ext_resource type="Texture2D" uid="uid://xinp4ywixgnl" path="res://textures/floor/PavingStones075_1K-JPG_AmbientOcclusion.jpg" id="2_4iawo"]
+[ext_resource type="Texture2D" uid="uid://fts04ojr5lx1" path="res://textures/floor/PavingStones075_1K-JPG_NormalDX.jpg" id="3_sie6l"]
 
 [resource]
+cull_mode = 2
 albedo_texture = ExtResource("1_jdywe")
 normal_enabled = true
 normal_scale = 1.5

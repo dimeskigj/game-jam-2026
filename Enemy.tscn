@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://bvmujkt7g26vc"]
 
 [ext_resource type="Script" uid="uid://b6ve2oh4nyign" path="res://EnemyAI.cs" id="1_enemy"]
-[ext_resource type="PackedScene" uid="uid://b3bsawn2e6f8o" path="res://kit_player.glb" id="2_model"]
+[ext_resource type="PackedScene" uid="uid://cx8sxh5d1673o" path="res://scenes/enemy_scene.tscn" id="2_scene"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_enemy"]
 radius = 0.4
@@ -21,12 +21,13 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
 shape = SubResource("CapsuleShape3D_enemy")
 
 [node name="Model" type="Node3D" parent="." unique_id=1436602698]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.49358582, 0)
 
-[node name="kit_player" parent="Model" unique_id=656933467 instance=ExtResource("2_model")]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
+[node name="EnemyScene" parent="Model" unique_id=656933467 instance=ExtResource("2_scene")]
+transform = Transform3D(-2, 0, -3.019916e-07, 0, 2, 0, 3.019916e-07, 0, -2, 0, -0.2151885, 0)
 
 [node name="VisionArea" type="Area3D" parent="." unique_id=1946592985]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8541241, 0.25853693)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8541241, -0.3410107)
 collision_layer = 0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="VisionArea" unique_id=937449206]
@@ -36,7 +37,7 @@ shape = SubResource("ConvexPolygonShape3D_vision")
 
 [node name="ObstacleRay" type="RayCast3D" parent="." unique_id=998877665]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
-collision_mask = 5
 target_position = Vector3(0, 0, -2)
+collision_mask = 5
 debug_shape_custom_color = Color(1, 0, 1, 1)
 debug_shape_thickness = 5

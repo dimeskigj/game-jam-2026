@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://1k3d1wsad8on"]
+
+[ext_resource type="Script" uid="uid://cq57csrn0m4qu" path="res://InteractionSystem/Note.cs" id="1_eu4qg"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_paper"]
+albedo_color = Color(0.9, 0.9, 0.9, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_note"]
+material = SubResource("StandardMaterial3D_paper")
+size = Vector3(0.2, 0.01, 0.3)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_note"]
+size = Vector3(0.2, 0.01, 0.3)
+
+[node name="Pickup_Note" type="RigidBody3D" unique_id=610533629 groups=["Interactable"]]
+collision_layer = 4
+script = ExtResource("1_eu4qg")
+NoteText = "Day 4: They are locking everything now. I hid the small key in the bottom drawer. Hopefully they forget about it."
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=741331370]
+mesh = SubResource("BoxMesh_note")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1215720819]
+shape = SubResource("BoxShape3D_note")

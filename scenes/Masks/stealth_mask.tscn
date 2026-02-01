@@ -1,7 +1,7 @@
 [gd_scene format=4 uid="uid://m01a2075fgds"]
 
 [ext_resource type="PackedScene" uid="uid://birqv8ugylv1s" path="res://Models/maska3.fbx" id="1_f1dfm"]
-[ext_resource type="Material" path="res://textures/new_standard_material_3d.tres" id="2_ckfkm"]
+[ext_resource type="Material" uid="uid://1qhyyq65ax23" path="res://textures/new_standard_material_3d.tres" id="2_ckfkm"]
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_wl0tk"]
 resource_name = "pSphere2"

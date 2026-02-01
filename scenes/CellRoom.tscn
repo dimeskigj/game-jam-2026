@@ -2,11 +2,20 @@
 
 [ext_resource type="PackedScene" uid="uid://bw5pjdvnaigpr" path="res://SCENE/player.tscn" id="1_player"]
 [ext_resource type="Script" uid="uid://dixulpjbqlcrn" path="res://scenes/CellRoomSetup.cs" id="1_setup"]
+[ext_resource type="Environment" path="res://Enviorment/creepy_hospital.tres" id="2_36isu"]
 [ext_resource type="PackedScene" uid="uid://ccot2sqelnfee" path="res://NEW_MODELS/Room_Props/ROOMS_PROPS/CELL ROOM DONE.fbx" id="2_room_model"]
 [ext_resource type="Script" uid="uid://dspsq8j6ui7jr" path="res://InteractionSystem/SceneDoor.cs" id="3_scene_door"]
-[ext_resource type="Environment" path="res://Enviorment/creepy_hospital.tres" id="5_env"]
 [ext_resource type="PackedScene" path="res://scenes/FlickeringLight.tscn" id="6_flicker"]
+[ext_resource type="PackedScene" uid="uid://1k3d1wsad8on" path="res://scenes/pickup_note.tscn" id="7_ame7c"]
 [ext_resource type="PackedScene" uid="uid://cawb3lrlaxph1" path="res://scenes/UI.tscn" id="7_ui"]
+[ext_resource type="PackedScene" uid="uid://bqr8h3k2v5m6p" path="res://Radio.tscn" id="8_5v4v3"]
+[ext_resource type="Material" uid="uid://2ue4fowvhkgs" path="res://floor_material.tres" id="9_vilip"]
+[ext_resource type="Script" uid="uid://dvjnuu11sqjgv" path="res://InteractionSystem/Drawer.cs" id="10_36isu"]
+[ext_resource type="PackedScene" uid="uid://cyy3r7ee3ovo" path="res://Models/BatteryPickup.tscn" id="11_w0rah"]
+[ext_resource type="Script" uid="uid://36lhpbg631ox" path="res://InteractionSystem/Pickup.cs" id="12_33vu0"]
+[ext_resource type="Resource" uid="uid://kjpgb7fjq8yj" path="res://InventorySystem/item_key.tres" id="13_1bg4f"]
+[ext_resource type="PackedScene" uid="uid://2eitq0pep0d6" path="res://Models/key.fbx" id="14_poild"]
+[ext_resource type="PackedScene" path="res://Models/FlashlightPickup.tscn" id="16_w0rah"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_door"]
 size = Vector3(1, 2, 0.1)
@@ -17,11 +26,26 @@ size = Vector3(1, 2, 0.1)
 [sub_resource type="PlaneMesh" id="PlaneMesh_5qn5l"]
 size = Vector2(15.835, 23.91)
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_drawer_floor"]
+size = Vector3(0.85, 0.05, 0.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_drawer_front"]
+size = Vector3(0.85, 0.4, 0.029528808)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_key"]
+size = Vector3(0.1, 0.05, 0.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_uaumr"]
+size = Vector3(0.85, 0.05, 0.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ysye5"]
+size = Vector3(0.85, 0.4, 0.029528808)
+
 [node name="CellRoom" type="Node3D" unique_id=1356157967]
 script = ExtResource("1_setup")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1137394876]
-environment = ExtResource("5_env")
+environment = ExtResource("2_36isu")
 
 [node name="Player" parent="." unique_id=1356078150 instance=ExtResource("1_player")]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -3.8556173, -3.1581116, -10.344799)
@@ -50,3 +74,95 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.3452318, 0.09278977, -6.99
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=2095753235]
 transform = Transform3D(-1, 8.742278e-08, 0, -8.742278e-08, -1, 0, 0, 0, 1, -8.991041, -0.53216827, -2.793456)
 mesh = SubResource("PlaneMesh_5qn5l")
+
+[node name="Pickup_Note" parent="." unique_id=610533629 instance=ExtResource("7_ame7c")]
+transform = Transform3D(0.9366722, 0, 0.3502074, 0, 1, 0, -0.3502074, 0, 0.9366722, -11.055498, -2.8202527, -10.555708)
+
+[node name="Radio" parent="." unique_id=2081431176 instance=ExtResource("8_5v4v3")]
+transform = Transform3D(-0.3746066, 0, 0.92718387, 0, 1, 0, -0.92718387, 0, -0.3746066, -12.757311, -2.8207877, -6.4793353)
+
+[node name="CabinetSetup" type="Node3D" parent="." unique_id=610435702]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.751489, -3.9932613, -10.610749)
+
+[node name="CabinetBody" type="CSGBox3D" parent="CabinetSetup" unique_id=1473234705]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+use_collision = true
+size = Vector3(1, 1, 0.6)
+material = ExtResource("9_vilip")
+
+[node name="CabinetHollow" type="CSGBox3D" parent="CabinetSetup/CabinetBody" unique_id=251401327]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.05)
+operation = 2
+size = Vector3(0.9, 0.9, 0.55)
+
+[node name="Drawer_Locked" type="RigidBody3D" parent="CabinetSetup" unique_id=1723164413 groups=["Interactable"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+collision_layer = 4
+freeze = true
+script = ExtResource("10_36isu")
+_isLocked = true
+SlideDistance = 0.4
+
+[node name="DrawerMesh" type="CSGBox3D" parent="CabinetSetup/Drawer_Locked" unique_id=1304312579]
+size = Vector3(0.85, 0.4, 0.5)
+material = ExtResource("9_vilip")
+
+[node name="DrawerHollow" type="CSGBox3D" parent="CabinetSetup/Drawer_Locked/DrawerMesh" unique_id=1479004482]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+operation = 2
+size = Vector3(0.75, 0.35, 0.4)
+material = ExtResource("9_vilip")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CabinetSetup/Drawer_Locked" unique_id=1090641985]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.175, 0)
+shape = SubResource("BoxShape3D_drawer_floor")
+
+[node name="CollisionShape3D_Front" type="CollisionShape3D" parent="CabinetSetup/Drawer_Locked" unique_id=490318048]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.228302)
+shape = SubResource("BoxShape3D_drawer_front")
+
+[node name="BatteryPickup" parent="CabinetSetup/Drawer_Locked" unique_id=294423957 instance=ExtResource("11_w0rah")]
+
+[node name="BatteryPickup2" parent="CabinetSetup/Drawer_Locked" unique_id=2065094390 instance=ExtResource("11_w0rah")]
+transform = Transform3D(1.8733444, 0.7004148, 0, 3.0616103e-08, -8.188648e-08, -2, -0.7004148, 1.8733444, -8.742278e-08, 0.21634483, 0, 0)
+
+[node name="Drawer_Unlocked" type="RigidBody3D" parent="CabinetSetup" unique_id=127263191 groups=["Interactable"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+collision_layer = 4
+freeze = true
+script = ExtResource("10_36isu")
+SlideDistance = 0.4
+
+[node name="Pickup_SmallKey" type="RigidBody3D" parent="CabinetSetup/Drawer_Unlocked" unique_id=2134746386]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.05, 0)
+collision_layer = 2
+freeze = true
+script = ExtResource("12_33vu0")
+ItemResource = ExtResource("13_1bg4f")
+
+[node name="KeyModel" parent="CabinetSetup/Drawer_Unlocked/Pickup_SmallKey" unique_id=1046397598 instance=ExtResource("14_poild")]
+transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CabinetSetup/Drawer_Unlocked/Pickup_SmallKey" unique_id=1467779184]
+shape = SubResource("BoxShape3D_key")
+
+[node name="DrawerMesh" type="CSGBox3D" parent="CabinetSetup/Drawer_Unlocked" unique_id=848663467]
+size = Vector3(0.85, 0.4, 0.5)
+material = ExtResource("9_vilip")
+
+[node name="DrawerHollow" type="CSGBox3D" parent="CabinetSetup/Drawer_Unlocked/DrawerMesh" unique_id=1110182378]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+operation = 2
+size = Vector3(0.75, 0.35, 0.4)
+material = ExtResource("9_vilip")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CabinetSetup/Drawer_Unlocked" unique_id=1120908197]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.175, 0)
+shape = SubResource("BoxShape3D_uaumr")
+
+[node name="CollisionShape3D_Front" type="CollisionShape3D" parent="CabinetSetup/Drawer_Unlocked" unique_id=680977659]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.23853755)
+shape = SubResource("BoxShape3D_ysye5")
+
+[node name="FlashlightPickup" parent="." unique_id=971608910 instance=ExtResource("16_w0rah")]
+transform = Transform3D(0.7880108, 0, 0.6156615, 0, 1, 0, -0.6156615, 0, 0.7880108, -12.687853, -2.7905107, -8.281309)

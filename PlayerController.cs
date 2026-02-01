@@ -113,6 +113,16 @@ public partial class PlayerController : CharacterBody3D
 	private RigidBody3D _heldBody;
 	private Vector3 _defaultCamPos;
 	private float _bobTime = 0.0f;
+	
+	// Flashlight State
+	public bool HasFlashlight { get; private set; } = false;
+	private float _flashlightBattery = 0.0f; // Starts empty
+	[Export] public float MaxFlashlightBattery = 100.0f;
+	[Export] public float FlashlightDrainRate = 2.0f;
+	private bool _isFlashlightOn = false;
+	private SpotLight3D _flashlight;
+	private ProgressBar _flashlightBar;
+	private Control _flashlightUI;
 
 	public override void _Ready()
 	{
@@ -144,6 +154,12 @@ public partial class PlayerController : CharacterBody3D
 		_detectionLabel = GetNodeOrNull<Label>("../UI/DetectionLabel"); 
 		
 		_xRayManager = GetNodeOrNull<XRayManager>("../XRayManager");
+		
+		_flashlight = _camera.GetNodeOrNull<SpotLight3D>("Flashlight");
+		_flashlightUI = GetNodeOrNull<Control>("../UI/FlashlightOverlay");
+		_flashlightBar = GetNodeOrNull<ProgressBar>("../UI/FlashlightOverlay/BatteryBar");
+		
+		if (_flashlightUI != null) _flashlightUI.Visible = false; // Hide until collected
 
 		// Setup Outline Material
 		_outlineMaterial = new ShaderMaterial();
@@ -281,7 +297,13 @@ public partial class PlayerController : CharacterBody3D
 		if (_isReadingNote) return; // Stop movement while reading
 
 		UpdateInteractionPrompt();
+		UpdateFlashlight(delta);
 		
+		if (Input.IsActionJustPressed("toggle_flashlight"))
+		{
+			ToggleFlashlight();
+		}
+
 		if (_input.LeftClickHeld && Input.MouseMode == Input.MouseModeEnum.Captured)
 		{
 			if (_heldBody == null)
@@ -545,6 +567,24 @@ public partial class PlayerController : CharacterBody3D
 				}
 				HighlightObject(sceneDoor);
 			}
+			else if (bestInteractable is FlashlightPickup)
+			{
+				if (_interactionLabel != null)
+				{
+					_interactionLabel.Text = "Right Click to Pick Up Flashlight";
+					_interactionLabel.Visible = true;
+				}
+				HighlightObject((Node)bestInteractable);
+			}
+			else if (bestInteractable is BatteryPickup)
+			{
+				if (_interactionLabel != null)
+				{
+					_interactionLabel.Text = "Right Click to Pick Up Battery";
+					_interactionLabel.Visible = true;
+				}
+				HighlightObject((Node)bestInteractable);
+			}
 		}
 	}
 	
@@ -665,6 +705,14 @@ public partial class PlayerController : CharacterBody3D
 			{
 				sceneDoor.Interact();
 			}
+			else if (bestInteractable is FlashlightPickup flashlightPickup)
+			{
+				flashlightPickup.Interact(this);
+			}
+			else if (bestInteractable is BatteryPickup batteryPickup)
+			{
+				batteryPickup.Interact(this);
+			}
 		}
 	}
 
@@ -748,5 +796,52 @@ public partial class PlayerController : CharacterBody3D
 		targetPos.X += Mathf.Cos(_bobTime * BobFreq * 0.5f) * BobAmp * 0.5f * multiplier;
 		
 		_camera.Position = _camera.Position.Lerp(targetPos, (float)delta * CrouchTransitionSpeed);
+	}
+
+	public void CollectFlashlight()
+	{
+		HasFlashlight = true;
+		if (_flashlightUI != null) _flashlightUI.Visible = true;
+		ShowNotification("Flashlight Acquired! Press F to toggle.");
+		// Give a little starting charge?
+		_flashlightBattery = 50.0f;
+	}
+
+	public void AddBattery(float amount)
+	{
+		_flashlightBattery += amount;
+		if (_flashlightBattery > MaxFlashlightBattery) _flashlightBattery = MaxFlashlightBattery;
+		ShowNotification("Battery Recharged");
+	}
+
+	private void ToggleFlashlight()
+	{
+		if (!HasFlashlight) return;
+		
+		_isFlashlightOn = !_isFlashlightOn;
+		if (_flashlight != null)
+		{
+			if (_flashlightBattery <= 0) _isFlashlightOn = false;
+			_flashlight.Visible = _isFlashlightOn;
+		}
+	}
+
+	private void UpdateFlashlight(double delta)
+	{
+		if (HasFlashlight && _isFlashlightOn)
+		{
+			_flashlightBattery -= FlashlightDrainRate * (float)delta;
+			if (_flashlightBattery <= 0)
+			{
+				_flashlightBattery = 0;
+				_isFlashlightOn = false;
+				if (_flashlight != null) _flashlight.Visible = false;
+			}
+		}
+
+		if (_flashlightBar != null)
+		{
+			_flashlightBar.Value = _flashlightBattery;
+		}
 	}
 }

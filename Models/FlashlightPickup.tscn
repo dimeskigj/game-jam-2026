@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://q2sscu2q6oww"]
+
+[ext_resource type="Script" path="res://InteractionSystem/FlashlightPickup.cs" id="1_script"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_handle"]
+top_radius = 0.03
+bottom_radius = 0.03
+height = 0.15
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_head"]
+top_radius = 0.05
+bottom_radius = 0.03
+height = 0.05
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_black"]
+albedo_color = Color(0.1, 0.1, 0.1, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_coll"]
+size = Vector3(0.1, 0.2, 0.1)
+
+[node name="FlashlightPickup" type="RigidBody3D" groups=["Interactable"]]
+collision_layer = 2
+script = ExtResource("1_script")
+
+[node name="Handle" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0)
+mesh = SubResource("CylinderMesh_handle")
+surface_material_override/0 = SubResource("StandardMaterial3D_black")
+
+[node name="Head" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0.1)
+mesh = SubResource("CylinderMesh_head")
+surface_material_override/0 = SubResource("StandardMaterial3D_black")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0468352, 0)
+shape = SubResource("BoxShape3D_coll")

@@ -34,6 +34,8 @@
 [ext_resource type="PackedScene" uid="uid://bqr8h3k2v5m6p" path="res://Radio.tscn" id="31_radio"]
 [ext_resource type="PackedScene" uid="uid://bc6vrfi26lc2s" path="res://SCENE/node_3d.tscn" id="32_ype4i"]
 [ext_resource type="Script" uid="uid://dspsq8j6ui7jr" path="res://InteractionSystem/SceneDoor.cs" id="33_scenedoor"]
+[ext_resource type="PackedScene" path="res://Models/FlashlightPickup.tscn" id="36_flashlight"]
+[ext_resource type="PackedScene" path="res://Models/BatteryPickup.tscn" id="37_battery"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_gas"]
 shader = ExtResource("14_gas_shader")
@@ -191,6 +193,35 @@ theme_override_colors/font_color = Color(1, 1, 0, 1)
 text = "Locked!"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="FlashlightOverlay" type="Control" parent="UI" unique_id=482103984]
+layout_mode = 3
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -220.0
+offset_top = -60.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="Label" type="Label" parent="UI/FlashlightOverlay" unique_id=310239485]
+layout_mode = 0
+offset_top = -25.0
+offset_right = 120.0
+text = "Battery"
+
+[node name="BatteryBar" type="ProgressBar" parent="UI/FlashlightOverlay" unique_id=840294857]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+value = 100.0
 
 [node name="Control" type="Control" parent="UI" unique_id=1160298769]
 layout_mode = 3
@@ -854,6 +885,12 @@ shape = SubResource("BoxShape3D_drawer_floor")
 [node name="CollisionShape3D_Front" type="CollisionShape3D" parent="CabinetSetup/Drawer_Unlocked" unique_id=1198085560]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.23853755)
 shape = SubResource("BoxShape3D_drawer_front")
+
+[node name="Pickup_Flashlight" parent="." unique_id=1012240445 instance=ExtResource("36_flashlight")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -6)
+
+[node name="Pickup_Battery" parent="." unique_id=383562448 instance=ExtResource("37_battery")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.5, -6)
 
 [node name="Pickup_Note" type="RigidBody3D" parent="." unique_id=556677889 groups=["Interactable"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 1.02, 2)

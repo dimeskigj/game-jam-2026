@@ -1,15 +1,12 @@
 [gd_scene format=3 uid="uid://cdc8fjxvacgok"]
 
-[ext_resource type="Script" path="res://scenes/CellRoomSetup.cs" id="1_setup"]
 [ext_resource type="PackedScene" uid="uid://bw5pjdvnaigpr" path="res://SCENE/player.tscn" id="1_player"]
+[ext_resource type="Script" uid="uid://dixulpjbqlcrn" path="res://scenes/CellRoomSetup.cs" id="1_setup"]
+[ext_resource type="PackedScene" uid="uid://ccot2sqelnfee" path="res://NEW_MODELS/Room_Props/ROOMS_PROPS/CELL ROOM DONE.fbx" id="2_room_model"]
 [ext_resource type="Script" uid="uid://dspsq8j6ui7jr" path="res://InteractionSystem/SceneDoor.cs" id="3_scene_door"]
-[ext_resource type="PackedScene" uid="uid://b7d3o733domgq" path="res://NEW_MODELS/Room_Props/ROOMS_PROPS/TOP ROOM DONE.fbx" id="4_0m2cf"]
 [ext_resource type="Script" uid="uid://cx8x1mac1t274" path="res://InventorySystem/InventoryUI.cs" id="4_inventory_ui"]
-
-[sub_resource type="Environment" id="Environment_cell"]
-background_mode = 1
-ambient_light_source = 2
-ambient_light_color = Color(0.1, 0.1, 0.1, 1)
+[ext_resource type="Environment" path="res://Enviorment/creepy_hospital.tres" id="5_env"]
+[ext_resource type="PackedScene" path="res://scenes/FlickeringLight.tscn" id="6_flicker"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_door"]
 size = Vector3(1, 2, 0.1)
@@ -17,18 +14,17 @@ size = Vector3(1, 2, 0.1)
 [sub_resource type="BoxMesh" id="BoxMesh_door_vis"]
 size = Vector3(1, 2, 0.1)
 
+[sub_resource type="PlaneMesh" id="PlaneMesh_5qn5l"]
+size = Vector2(15.835, 23.91)
+
 [node name="CellRoom" type="Node3D" unique_id=1356157967]
 script = ExtResource("1_setup")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1137394876]
-environment = SubResource("Environment_cell")
-
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=359094057]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 10, 0)
-light_energy = 0.5
+environment = ExtResource("5_env")
 
 [node name="Player" parent="." unique_id=1356078150 instance=ExtResource("1_player")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -3.8556173, -3.1581116, -10.344799)
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=1157725227]
 script = ExtResource("4_inventory_ui")
@@ -49,7 +45,7 @@ text = "Interaction"
 horizontal_alignment = 1
 
 [node name="ReturnDoor" type="RigidBody3D" parent="." unique_id=90983241]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -7.048153, -3.0009131, -1.591482)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.229617, -3.0009131, -12.190473)
 collision_layer = 4
 freeze = true
 script = ExtResource("3_scene_door")
@@ -61,5 +57,15 @@ shape = SubResource("BoxShape3D_door")
 [node name="MeshInstance3D" type="MeshInstance3D" parent="ReturnDoor" unique_id=1744670704]
 mesh = SubResource("BoxMesh_door_vis")
 
-[node name="TOP ROOM DONE" parent="." unique_id=1417280232 instance=ExtResource("4_0m2cf")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42.960026, 5.275339, -4.2216635)
+[node name="CELL ROOM DONE" parent="." unique_id=674888423 instance=ExtResource("2_room_model")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 53.908848, 5.275339, -4.2216635)
+
+[node name="FlickeringLight_Player" parent="." unique_id=2126274228 instance=ExtResource("6_flicker")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
+
+[node name="FlickeringLight_Room" parent="." unique_id=460528198 instance=ExtResource("6_flicker")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.3455694, -0.003970504, -6.9763584)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=2095753235]
+transform = Transform3D(-1, 8.742278e-08, 0, -8.742278e-08, -1, 0, 0, 0, 1, -8.991041, 0, 0)
+mesh = SubResource("PlaneMesh_5qn5l")

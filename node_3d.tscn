@@ -893,9 +893,6 @@ transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, -13.880697, 0, 5.614683)
 [node name="banderaubava5" parent="." unique_id=1256493276 instance=ExtResource("30_id0nj")]
 transform = Transform3D(-4.371139e-07, 0, 10, 0, 10, 0, -10, 0, -4.371139e-07, -8.83551, 0, -10.913092)
 
-[node name="Door_4" parent="." unique_id=1938907739 instance=ExtResource("13_ype4i")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.532412, 0.047723796, 7.4653587)
-
 [node name="banderaubava6" parent="." unique_id=43698682 instance=ExtResource("30_id0nj")]
 transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, -27.836756, 0, 5.614683)
 
@@ -922,3 +919,17 @@ transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 14.216732, 0, -34.642197)
 
 [node name="banderaubava16" parent="." unique_id=515447692 instance=ExtResource("30_id0nj")]
 transform = Transform3D(-10, 0, -8.742278e-07, 0, 10, 0, 8.742278e-07, 0, -10, 14.216732, 0, -21.942661)
+
+[node name="DoorObject_Cell2" type="RigidBody3D" parent="." unique_id=603246922]
+transform = Transform3D(-4.371139e-08, 0, 0.2, 0, 1, 0, -1, 0, -8.742278e-09, -9.030375, 1.5, -6.3200545)
+collision_layer = 4
+mass = 10.0
+script = ExtResource("33_scenedoor")
+TargetScenePath = "res://scenes/Room.tscn"
+DoorName = "Detective Room"
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="DoorObject_Cell2" unique_id=940712714]
+mesh = SubResource("BoxMesh_door")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="DoorObject_Cell2" unique_id=2058953033]
+shape = SubResource("BoxShape3D_door")

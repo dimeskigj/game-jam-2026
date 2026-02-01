@@ -11,6 +11,14 @@ public partial class GlobalSceneManager : Node
 	private Godot.Collections.Array _progress;
 	private string _targetScenePath;
 	private bool _isLoading = false;
+	
+	// Persistent State
+	public InventoryItem[] SavedInventory = new InventoryItem[8];
+	public bool HasFlashlight = false;
+	public float FlashlightBattery = 0.0f;
+	
+	// Track collected world items by their unique node path
+	public System.Collections.Generic.HashSet<string> CollectedItemPaths = new System.Collections.Generic.HashSet<string>();
 
 	public override void _Ready()
 	{

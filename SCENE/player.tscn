@@ -29,10 +29,14 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8866763, 0)
 [node name="Flashlight" type="SpotLight3D" parent="Camera3D" unique_id=987654321]
 visible = false
 light_energy = 5.0
-light_projector = null
+light_specular = 0.5
 shadow_enabled = true
-spot_range = 20.0
-spot_angle = 35.0
+shadow_bias = 0.02
+shadow_normal_bias = 2.0
+shadow_blur = 2.0
+spot_range = 25.0
+spot_angle = 45.0
+spot_attenuation = 1.0
 
 [node name="ShapeCast3D" type="ShapeCast3D" parent="Camera3D" unique_id=298029791]
 shape = SubResource("SphereShape3D_shapecast")

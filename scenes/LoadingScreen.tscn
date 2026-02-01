@@ -1,6 +1,16 @@
-[gd_scene format=3 uid="uid://b8q7x6s5j4k3"]
+[gd_scene format=3 uid="uid://b2vajj3kcsioa"]
 
-[node name="LoadingScreen" type="Control"]
+[ext_resource type="Shader" uid="uid://ljp06gy6p2ku" path="res://Shaders/rusty_overlay.gdshader" id="1_jqyhx"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_x85qc"]
+shader = ExtResource("1_jqyhx")
+shader_parameter/pixel_size = 2.50000007125
+shader_parameter/grain_amount = 0.150000007125
+shader_parameter/vignette_intensity = 0.6
+shader_parameter/vignette_opacity = 0.4
+shader_parameter/tint_color = Color(0.45, 0.35, 0.2, 0.1)
+
+[node name="LoadingScreen" type="Control" unique_id=1873350788]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -9,7 +19,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="ColorRect" type="ColorRect" parent="."]
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1935105434]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -18,7 +28,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 1)
 
-[node name="Label" type="Label" parent="."]
+[node name="Label" type="Label" parent="." unique_id=1810150628]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -34,7 +44,7 @@ grow_vertical = 2
 text = "LOADING..."
 horizontal_alignment = 1
 
-[node name="ProgressBar" type="ProgressBar" parent="."]
+[node name="ProgressBar" type="ProgressBar" parent="." unique_id=1516831875]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -47,3 +57,15 @@ offset_right = 150.0
 offset_bottom = 37.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="UI" type="CanvasLayer" parent="." unique_id=1441287150]
+
+[node name="RustyOverlay" type="ColorRect" parent="UI" unique_id=447177974]
+material = SubResource("ShaderMaterial_x85qc")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+metadata/_edit_use_anchors_ = true

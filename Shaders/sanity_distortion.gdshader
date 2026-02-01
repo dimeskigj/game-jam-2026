@@ -9,7 +9,7 @@ void fragment() {
 	// Distortion params
 	float wave_speed = 2.0;
 	float wave_freq = 10.0;
-	float wave_amp = 0.02 * intensity; // Max deviation
+	float wave_amp = 0.05 * intensity; // Max deviation
 	
 	// 1. Wavy Distortion
 	float off_x = sin(uv.y * wave_freq + TIME * wave_speed) * wave_amp;
@@ -19,7 +19,7 @@ void fragment() {
 	
 	// 2. Chromatic Aberration (Color Split)
 	// Higher intensity = more split
-	float split_amount = 0.02 * intensity;
+	float split_amount = 0.05 * intensity;
 	
 	float r = texture(SCREEN_TEXTURE, distorted_uv + vec2(split_amount, 0.0)).r;
 	float g = texture(SCREEN_TEXTURE, distorted_uv).g;

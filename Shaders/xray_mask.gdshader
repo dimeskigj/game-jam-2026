@@ -8,7 +8,7 @@ void fragment() {
     vec3 color = texture(SCREEN_TEXTURE, uv).rgb;
     
     // Green Tint
-    color = mix(color, vec3(0.0, 1.0, 0.2), 0.3);
+    color = mix(color, vec3(0.0, 0.2, 0.2), 0.3);
     
     // Scanlines
     float scanline = sin(uv.y * scanline_count * 3.14159);
@@ -16,12 +16,12 @@ void fragment() {
     
     // Vignette
     float d = distance(uv, vec2(0.5, 0.5));
-    color *= smoothstep(0.8, 0.4, d * (1.0 + color.g * 0.2));
+    color *= smoothstep(1.0, 0.4, d * (1.0 + color.g * 0.2));
     
     // Boost Green channel
     color.g = 0.8;
     color.r *= 0.8;
-    color.b *= color.b * 1.1;
+    color.b *= color.b;
     
-    COLOR = vec4(color, 0.5);
+    COLOR = vec4(color, 0.25);
 }

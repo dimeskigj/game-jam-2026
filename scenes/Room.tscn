@@ -2,11 +2,11 @@
 
 [ext_resource type="Script" uid="uid://dixulpjbqlcrn" path="res://scenes/CellRoomSetup.cs" id="1_6iwk6"]
 [ext_resource type="PackedScene" uid="uid://bw5pjdvnaigpr" path="res://SCENE/player.tscn" id="2_ut7mc"]
-[ext_resource type="Script" uid="uid://cx8x1mac1t274" path="res://InventorySystem/InventoryUI.cs" id="3_8h30a"]
 [ext_resource type="Script" uid="uid://dspsq8j6ui7jr" path="res://InteractionSystem/SceneDoor.cs" id="4_ey61u"]
 [ext_resource type="PackedScene" uid="uid://b7d3o733domgq" path="res://NEW_MODELS/Room_Props/ROOMS_PROPS/TOP ROOM DONE.fbx" id="5_lygdb"]
 [ext_resource type="PackedScene" path="res://scenes/FlickeringLight.tscn" id="6_ut7mc"]
 [ext_resource type="Environment" path="res://Enviorment/creepy_hospital.tres" id="7_env"]
+[ext_resource type="PackedScene" uid="uid://cawb3lrlaxph1" path="res://scenes/UI.tscn" id="7_ui"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_door"]
 size = Vector3(1, 2, 0.1)
@@ -26,23 +26,7 @@ environment = ExtResource("7_env")
 [node name="Player" parent="." unique_id=1356078150 instance=ExtResource("2_ut7mc")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -5.6749268, -2.9364762, -1.5858053)
 
-[node name="UI" type="CanvasLayer" parent="." unique_id=1157725227]
-script = ExtResource("3_8h30a")
-
-[node name="InteractionLabel" type="Label" parent="UI" unique_id=13094022]
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -20.0
-offset_top = 30.0
-offset_right = 20.0
-offset_bottom = 53.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "Interaction"
-horizontal_alignment = 1
+[node name="UI" parent="." unique_id=1157725227 instance=ExtResource("7_ui")]
 
 [node name="ReturnDoor" type="RigidBody3D" parent="." unique_id=90983241]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -7.048153, -3.0009131, -1.591482)
@@ -59,9 +43,6 @@ mesh = SubResource("BoxMesh_door_vis")
 
 [node name="TOP ROOM DONE" parent="." unique_id=1417280232 instance=ExtResource("5_lygdb")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42.960026, 5.275339, -4.2216635)
-
-[node name="FlickeringLight_Player" parent="." unique_id=455201644 instance=ExtResource("6_ut7mc")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.43589616, 0)
 
 [node name="FlickeringLight_Room" parent="." unique_id=1999378533 instance=ExtResource("6_ut7mc")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0008072853, -0.4940977, 2.43783e-05)

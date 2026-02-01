@@ -77,8 +77,8 @@ public partial class PlayerController : CharacterBody3D
 	public MaskEffect CurrentMaskEffect { get; private set; } = MaskEffect.None;
 
 	[Export] public float MaxSanity = 100.0f;
-	[Export] public float SanityDrainRate = 5.0f; 
-	[Export] public float SanityRegenRate = 10.0f; 
+	[Export] public float SanityDrainRate = 1.5f; 
+	[Export] public float SanityRegenRate = 0.5f; 
 	
 	public float CurrentSanity { get; private set; } = 100.0f;
 	public bool IsDead { get; private set; } = false;
@@ -161,6 +161,10 @@ public partial class PlayerController : CharacterBody3D
 		
 		if (_flashlightUI != null) _flashlightUI.Visible = false; // Hide until collected
 
+		GD.Print($"UI Init: SanityBar found: {_sanityBar != null}, SanityOverlay found: {_sanityOverlay != null}");
+		GD.Print($"UI Init: DetectionOverlay found: {_detectionOverlay != null}");
+		if (_sanityBar == null) GD.PrintErr("CRITICAL: SanityBar NOT FOUND at ../UI/SanityBar");
+
 		// Setup Outline Material
 		_outlineMaterial = new ShaderMaterial();
 		_outlineMaterial.Shader = GD.Load<Shader>("res://Shaders/outline.gdshader");
@@ -190,6 +194,61 @@ public partial class PlayerController : CharacterBody3D
 		
 		// Fix "Too Close" issue
 		_interactionCast.AddException(this);
+		
+		// Load Persistent State
+		LoadGameState();
+		
+		// Save Inventory on change
+		_inventory.InventoryUpdated += SaveGameState;
+	}
+	
+	private void LoadGameState()
+	{
+		var global = GlobalSceneManager.Instance;
+		if (global == null) return;
+		
+		// Load Inventory
+		for (int i = 0; i < 8; i++)
+		{
+			if (global.SavedInventory[i] != null)
+			{
+				_inventory.items[i] = global.SavedInventory[i].Clone();
+			}
+			else
+			{
+				_inventory.items[i] = null;
+			}
+		}
+		_inventory.EmitSignal(Inventory.SignalName.InventoryUpdated);
+		
+		// Load Flashlight
+		HasFlashlight = global.HasFlashlight;
+		_flashlightBattery = global.FlashlightBattery;
+		
+		if (HasFlashlight && _flashlightUI != null)
+		{
+			_flashlightUI.Visible = true;
+			if (_flashlightBar != null) _flashlightBar.Value = _flashlightBattery;
+		}
+	}
+	
+	private void SaveGameState()
+	{
+		var global = GlobalSceneManager.Instance;
+		if (global == null) return;
+		
+		// Save Inventory
+		for (int i = 0; i < 8; i++)
+		{
+			if (_inventory.items[i] != null)
+				global.SavedInventory[i] = _inventory.items[i].Clone();
+			else
+				global.SavedInventory[i] = null;
+		}
+		
+		// Save Flashlight
+		global.HasFlashlight = HasFlashlight;
+		global.FlashlightBattery = _flashlightBattery;
 	}
 	
 	private void OnDropItem()
@@ -742,7 +801,15 @@ public partial class PlayerController : CharacterBody3D
 	
 	private void UpdateSanity(double delta)
 	{
-		if (IsDead) return;
+		if (IsDead) 
+		{
+			// Ensure mouse is visible when dead
+			if (Input.MouseMode != Input.MouseModeEnum.Visible)
+			{
+				Input.MouseMode = Input.MouseModeEnum.Visible;
+			}
+			return;
+		}
 
 		if (CurrentMaskEffect != MaskEffect.None) CurrentSanity -= SanityDrainRate * (float)delta;
 		else CurrentSanity += SanityRegenRate * (float)delta;
@@ -764,6 +831,27 @@ public partial class PlayerController : CharacterBody3D
 			if (_gameOverLabel != null) _gameOverLabel.Visible = true;
 			Input.MouseMode = Input.MouseModeEnum.Visible;
 			GD.Print("GAME OVER: Sanity Depleted.");
+		}
+	}
+
+	public void RestartGame()
+	{
+		// Reset local state
+		IsDead = false;
+		CurrentSanity = MaxSanity;
+		if (_gameOverLabel != null) _gameOverLabel.Visible = false;
+		Input.MouseMode = Input.MouseModeEnum.Captured;
+		
+		// Reload Scene via Global Manager if possible
+		var tree = GetTree();
+		var currentScene = tree.CurrentScene;
+		if (GlobalSceneManager.Instance != null && currentScene != null)
+		{
+			GlobalSceneManager.Instance.LoadScene(currentScene.SceneFilePath);
+		}
+		else
+		{
+			tree.ReloadCurrentScene();
 		}
 	}
 
@@ -805,6 +893,7 @@ public partial class PlayerController : CharacterBody3D
 		ShowNotification("Flashlight Acquired! Press F to toggle.");
 		// Give a little starting charge?
 		_flashlightBattery = 50.0f;
+		SaveGameState();
 	}
 
 	public void AddBattery(float amount)
@@ -812,6 +901,7 @@ public partial class PlayerController : CharacterBody3D
 		_flashlightBattery += amount;
 		if (_flashlightBattery > MaxFlashlightBattery) _flashlightBattery = MaxFlashlightBattery;
 		ShowNotification("Battery Recharged");
+		SaveGameState();
 	}
 
 	private void ToggleFlashlight()
@@ -836,6 +926,13 @@ public partial class PlayerController : CharacterBody3D
 				_flashlightBattery = 0;
 				_isFlashlightOn = false;
 				if (_flashlight != null) _flashlight.Visible = false;
+			}
+			// Only save periodically or on critical events if needed, but for now we update local vars.
+			// Saving on every frame is bad, so we rely on the scene change/inventory events to save, 
+			// OR we explicitly update the global state every frame (since it's just a reference).
+			if (GlobalSceneManager.Instance != null)
+			{
+				GlobalSceneManager.Instance.FlashlightBattery = _flashlightBattery;
 			}
 		}
 

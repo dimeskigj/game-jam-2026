@@ -35,7 +35,7 @@ public partial class InventoryItem : Resource
     public InventoryItem Clone()
     {
         InventoryItem newItem = (InventoryItem)this.Duplicate();
-        newItem.CurrentStack = 1;
+        newItem.CurrentStack = this.CurrentStack;
         return newItem;
     }
 }

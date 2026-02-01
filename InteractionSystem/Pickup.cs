@@ -9,6 +9,12 @@ public partial class Pickup : RigidBody3D
 	public override void _Ready()
 	{
 		Mass = 0.5f; // Lightweight but stable
+		
+		// Check if already collected
+		if (GlobalSceneManager.Instance != null && GlobalSceneManager.Instance.CollectedItemPaths.Contains(GetPath().ToString()))
+		{
+			QueueFree();
+		}
 	}
 
 	public void Interact(Inventory inventory)
@@ -17,6 +23,10 @@ public partial class Pickup : RigidBody3D
 		{
 			if (inventory.AddItem(ItemResource))
 			{
+				if (GlobalSceneManager.Instance != null)
+				{
+					GlobalSceneManager.Instance.CollectedItemPaths.Add(GetPath().ToString());
+				}
 				QueueFree(); // Destroy pickup if added successfully
 			}
 			else

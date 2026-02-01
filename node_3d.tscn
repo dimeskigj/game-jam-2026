@@ -14,12 +14,12 @@
 [ext_resource type="Resource" path="res://InventorySystem/item_mask_invisibility.tres" id="14_stealth"]
 [ext_resource type="Shader" uid="uid://bi2pcl63pfjp4" path="res://Shaders/xray_mask.gdshader" id="15_xray_shader"]
 [ext_resource type="Shader" uid="uid://bwplect3jwpmg" path="res://Shaders/stealth_mask.gdshader" id="16_stealth_shader"]
-[ext_resource type="Shader" path="res://Shaders/insect_mask.gdshader" id="18_insect_shader"]
-[ext_resource type="Resource" path="res://InventorySystem/item_mask_insect.tres" id="19_insect_mask_item"]
 [ext_resource type="Shader" uid="uid://crgke0qi3gsvd" path="res://Shaders/sanity_distortion.gdshader" id="17_sanity_shader"]
+[ext_resource type="Shader" uid="uid://chdbdu06v30gy" path="res://Shaders/insect_mask.gdshader" id="18_insect_shader"]
 [ext_resource type="Script" uid="uid://bycgccef6qxd0" path="res://InteractionSystem/SecurityCamera.cs" id="19_camera_script"]
+[ext_resource type="Resource" path="res://InventorySystem/item_mask_insect.tres" id="19_insect_mask_item"]
 [ext_resource type="PackedScene" uid="uid://b8d5477s0d1d6" path="res://Models/KAMERA.fbx" id="21_s0gvp"]
-[ext_resource type="PackedScene" uid="uid://bqr8h3k2v5m6p" path="res://Radio.tscn" id="22_radio"]
+[ext_resource type="PackedScene" path="res://Radio.tscn" id="22_radio"]
 [ext_resource type="Script" uid="uid://c3kxsx5ujtgbq" path="res://InteractionSystem/SetupNavigation.cs" id="23_nav_setup"]
 [ext_resource type="Resource" uid="uid://cinl6dcub0s6t" path="res://InventorySystem/item_silverkey.tres" id="24_silverkey"]
 [ext_resource type="Script" uid="uid://dvjnuu11sqjgv" path="res://InteractionSystem/Drawer.cs" id="25_drawer"]
@@ -27,6 +27,7 @@
 [ext_resource type="Script" uid="uid://cq57csrn0m4qu" path="res://InteractionSystem/Note.cs" id="26_note"]
 [ext_resource type="PackedScene" uid="uid://2eitq0pep0d6" path="res://Models/key.fbx" id="27_key_model"]
 [ext_resource type="PackedScene" uid="uid://b1gnuduwgru12" path="res://Models/maska1gotova.fbx" id="28_mask1"]
+[ext_resource type="PackedScene" uid="uid://xxubkdsrtqqv" path="res://scenes/banderaubava.tscn" id="30_id0nj"]
 [ext_resource type="PackedScene" uid="uid://birqv8ugylv1s" path="res://Models/maska3.fbx" id="30_mask3"]
 [ext_resource type="PackedScene" uid="uid://bjhmb3sr1punt" path="res://Models/xray-mask.fbx" id="32_xray_mask"]
 
@@ -49,24 +50,22 @@ tonemap_mode = 2
 tonemap_exposure = 0.5
 ssr_enabled = true
 ssr_max_steps = 32
-ssao_enabled = true
-ssao_intensity = 3.18
-ssao_power = 7.9170485
-ssao_horizon = 0.28
-ssil_enabled = true
-ssil_radius = 3.0
-ssil_intensity = 0.1
-ssil_sharpness = 0.53
-ssil_normal_rejection = 0.8
+ssao_intensity = 4.0
+ssao_power = 2.0
+ssao_detail = 1.0
 sdfgi_enabled = true
 sdfgi_use_occlusion = true
 glow_enabled = true
-glow_intensity = 0.65
-glow_bloom = 0.5
+glow_intensity = 0.8
+glow_bloom = 0.2
+glow_blend_mode = 0
 volumetric_fog_enabled = true
-volumetric_fog_density = 0.01
-volumetric_fog_albedo = Color(0, 0, 0, 1)
-volumetric_fog_emission = Color(0.012180077, 0.005632854, 0.004087274, 1)
+volumetric_fog_density = 0.08
+volumetric_fog_albedo = Color(0.129412, 0.14902, 0.192157, 1)
+volumetric_fog_emission = Color(0.0156863, 0.0156863, 0.0235294, 1)
+volumetric_fog_length = 64.0
+volumetric_fog_ambient_inject = 0.5
+
 volumetric_fog_emission_energy = 197.47
 volumetric_fog_gi_inject = 4.7
 volumetric_fog_anisotropy = 0.34
@@ -92,8 +91,9 @@ shader_parameter/scanline_count = 50.0
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_insect"]
 shader = ExtResource("18_insect_shader")
-shader_parameter/color = Color(0.5, 0.0, 0.5, 0.2)
-shader_parameter/scanline_count = 50.0
+shader_parameter/distortion_strength = 0.08
+shader_parameter/cell_count = 50.0
+shader_parameter/color_tint = Color(1, 0.9, 0, 0.1)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_sanity"]
 shader = ExtResource("17_sanity_shader")
@@ -132,11 +132,12 @@ albedo_color = Color(0.2, 1, 0.2, 0.3)
 size = Vector3(0.6542969, 0.6760254, 0.61328125)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_purple"]
-albedo_color = Color(0.5, 0.0, 0.5, 1.0)
+albedo_color = Color(0.5, 0, 0.5, 1)
 
 [sub_resource type="BoxMesh" id="BoxMesh_purple_small"]
 material = SubResource("StandardMaterial3D_purple")
 size = Vector3(0.4, 0.4, 0.4)
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_transparent_red"]
 transparency = 1
 shading_mode = 0
@@ -778,7 +779,6 @@ skeleton = NodePath("")
 [node name="DetectionArea" type="Area3D" parent="KAMERA" unique_id=2003004008]
 transform = Transform3D(-0.12970169, -2.220446e-16, 1.1338882e-08, 0, 0.12970169, -6.195479e-17, -1.1338882e-08, -6.6325836e-17, -0.12970169, 0, 0.056700215, -0.015192777)
 collision_layer = 0
-collision_mask = 1
 monitorable = false
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="KAMERA/DetectionArea" unique_id=2003004009]
@@ -809,7 +809,6 @@ script = ExtResource("23_nav_setup")
 
 [node name="RuntimeNavRegion" type="NavigationRegion3D" parent="." unique_id=1234567891]
 navigation_mesh = SubResource("NavigationMesh_runtime")
-
 
 [node name="CabinetSetup" type="Node3D" parent="." unique_id=969819830]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.012434959, 2)
@@ -903,3 +902,5 @@ shape = SubResource("BoxShape3D_note")
 
 [node name="Node3D" parent="." unique_id=379405592 instance=ExtResource("26_j3e5s")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.17, 17.055, -15.494)
+
+[node name="banderaubava2" parent="." unique_id=925164897 instance=ExtResource("30_id0nj")]

@@ -3,4 +3,5 @@
 [ext_resource type="Texture2D" uid="uid://cnefk8i2s66rm" path="res://NEW_MODELS/Finished_Buildings/Aparments/5c805b0fd2a83160979172.jpg" id="1_qpnfb"]
 
 [resource]
+cull_mode = 2
 albedo_texture = ExtResource("1_qpnfb")

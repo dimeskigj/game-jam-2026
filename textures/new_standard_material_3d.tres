@@ -7,7 +7,15 @@
 [resource]
 albedo_texture = ExtResource("1_jdywe")
 normal_enabled = true
+normal_scale = 1.5
 normal_texture = ExtResource("3_sie6l")
 ao_enabled = true
+ao_light_affect = 0.8
 ao_texture = ExtResource("2_4iawo")
 heightmap_enabled = true
+heightmap_scale = 10.0
+heightmap_deep_parallax = true
+heightmap_min_layers = 8
+heightmap_max_layers = 16
+uv1_scale = Vector3(20, 20, 20)
+uv1_triplanar = true

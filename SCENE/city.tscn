@@ -2,33 +2,34 @@
 
 [ext_resource type="Script" uid="uid://yvedskp3bxhc" path="res://SCENE/SceneCollisionGenerator.cs" id="1_7ach4"]
 [ext_resource type="PackedScene" uid="uid://cksm4gr08bems" path="res://NEW_MODELS/Finished_Buildings/Aparments/Aparment_1.fbx" id="2_c4mwc"]
-[ext_resource type="PackedScene" uid="uid://cohqk4i566kn1" path="res://NEW_MODELS/Finished_Buildings/Aparments/Aparment_2.fbx" id="3_moreo"]
-[ext_resource type="PackedScene" uid="uid://dkdqmq2vjjpx7" path="res://NEW_MODELS/Finished_Buildings/Brutalist_Apartments/Brutalist_Apartment_1.fbx" id="4_457dm"]
-[ext_resource type="PackedScene" uid="uid://c1hbbatnwvviv" path="res://NEW_MODELS/Finished_Buildings/Brutalist_Apartments/Brutalist_Apartment_2.fbx" id="5_pbjnk"]
-[ext_resource type="PackedScene" uid="uid://btf0ddlss81j6" path="res://NEW_MODELS/Finished_Buildings/Brutalist_Apartments/Brutalist_Apartment_3.fbx" id="6_u0qmd"]
-[ext_resource type="PackedScene" uid="uid://dkd84x3rsrn0a" path="res://NEW_MODELS/Finished_Buildings/Construction_Building/Construction_Building.fbx" id="7_888qu"]
-[ext_resource type="PackedScene" uid="uid://dmaj5vteatvdt" path="res://NEW_MODELS/Finished_Buildings/W-Kruschev/Kruchevka.fbx" id="8_cl1yn"]
-[ext_resource type="PackedScene" uid="uid://cf6b8gt5rue1y" path="res://NEW_MODELS/Finished_Buildings/Workers_Housing/Workers_Housing_1.fbx" id="9_j1d56"]
-[ext_resource type="PackedScene" uid="uid://3gtceoon553g" path="res://NEW_MODELS/Finished_Buildings/Workers_Housing/Workers_Housing_2.fbx" id="10_ng8tv"]
-[ext_resource type="PackedScene" uid="uid://cgsaqs0orqvui" path="res://NEW_MODELS/Finished_Buildings/Workers_Housing/Workers_Housing_3.fbx" id="11_xujkr"]
-[ext_resource type="PackedScene" uid="uid://ci4p75ey4wi3c" path="res://NEW_MODELS/Finished_Buildings/WALL/Wall.fbx" id="12_ad3bl"]
-[ext_resource type="PackedScene" uid="uid://bpk5iwa4yg8e2" path="res://NEW_MODELS/Finished_Buildings/fmopasgmf.fbx" id="13_6bssk"]
+[ext_resource type="Material" path="res://floor_material.tres" id="3_floor_mat"]
+[ext_resource type="PackedScene" uid="uid://cohqk4i566kn1" path="res://NEW_MODELS/Finished_Buildings/Aparments/Aparment_2.fbx" id="4_moreo"]
+[ext_resource type="PackedScene" uid="uid://dkdqmq2vjjpx7" path="res://NEW_MODELS/Finished_Buildings/Brutalist_Apartments/Brutalist_Apartment_1.fbx" id="5_457dm"]
+[ext_resource type="PackedScene" uid="uid://c1hbbatnwvviv" path="res://NEW_MODELS/Finished_Buildings/Brutalist_Apartments/Brutalist_Apartment_2.fbx" id="6_pbjnk"]
+[ext_resource type="PackedScene" uid="uid://btf0ddlss81j6" path="res://NEW_MODELS/Finished_Buildings/Brutalist_Apartments/Brutalist_Apartment_3.fbx" id="7_u0qmd"]
+[ext_resource type="PackedScene" uid="uid://dkd84x3rsrn0a" path="res://NEW_MODELS/Finished_Buildings/Construction_Building/Construction_Building.fbx" id="8_888qu"]
+[ext_resource type="PackedScene" uid="uid://dmaj5vteatvdt" path="res://NEW_MODELS/Finished_Buildings/W-Kruschev/Kruchevka.fbx" id="9_cl1yn"]
+[ext_resource type="PackedScene" uid="uid://cf6b8gt5rue1y" path="res://NEW_MODELS/Finished_Buildings/Workers_Housing/Workers_Housing_1.fbx" id="10_j1d56"]
+[ext_resource type="PackedScene" uid="uid://3gtceoon553g" path="res://NEW_MODELS/Finished_Buildings/Workers_Housing/Workers_Housing_2.fbx" id="11_ng8tv"]
+[ext_resource type="PackedScene" uid="uid://cgsaqs0orqvui" path="res://NEW_MODELS/Finished_Buildings/Workers_Housing/Workers_Housing_3.fbx" id="12_xujkr"]
+[ext_resource type="PackedScene" uid="uid://ci4p75ey4wi3c" path="res://NEW_MODELS/Finished_Buildings/WALL/Wall.fbx" id="13_ad3bl"]
+[ext_resource type="PackedScene" uid="uid://bpk5iwa4yg8e2" path="res://NEW_MODELS/Finished_Buildings/fmopasgmf.fbx" id="14_6bssk"]
+[ext_resource type="PackedScene" uid="uid://xxubkdsrtqqv" path="res://scenes/banderaubava.tscn" id="15_light_prop"]
+[ext_resource type="Material" path="res://textures/road/asphalt_material.tres" id="16_road_mat"]
+[ext_resource type="Material" path="res://textures/road/sidewalk_material.tres" id="17_sidewalk_mat"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_floor"]
 size = Vector3(1000, 1, 1000)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ground"]
-albedo_color = Color(0.2, 0.2, 0.2, 1)
-
 [sub_resource type="BoxMesh" id="BoxMesh_ground"]
-material = SubResource("StandardMaterial3D_ground")
+material = ExtResource("3_floor_mat")
 size = Vector3(1000, 1, 1000)
 
 [node name="Node3D" type="Node3D" unique_id=379405592]
 script = ExtResource("1_7ach4")
 
 [node name="Ground" type="StaticBody3D" parent="." unique_id=2027758011]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -17.478218, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Ground" unique_id=1680878032]
 shape = SubResource("BoxShape3D_floor")
@@ -38,25 +39,119 @@ mesh = SubResource("BoxMesh_ground")
 
 [node name="Aparment_1" parent="." unique_id=949401137 instance=ExtResource("2_c4mwc")]
 
-[node name="Aparment_2" parent="." unique_id=894202894 instance=ExtResource("3_moreo")]
+[node name="Aparment_2" parent="." unique_id=894202894 instance=ExtResource("4_moreo")]
 
-[node name="Brutalist_Apartment_1" parent="." unique_id=1830734141 instance=ExtResource("4_457dm")]
+[node name="Brutalist_Apartment_1" parent="." unique_id=1830734141 instance=ExtResource("5_457dm")]
 
-[node name="Brutalist_Apartment_2" parent="." unique_id=582192063 instance=ExtResource("5_pbjnk")]
+[node name="Brutalist_Apartment_2" parent="." unique_id=582192063 instance=ExtResource("6_pbjnk")]
 
-[node name="Brutalist_Apartment_3" parent="." unique_id=2145957896 instance=ExtResource("6_u0qmd")]
+[node name="Brutalist_Apartment_3" parent="." unique_id=2145957896 instance=ExtResource("7_u0qmd")]
 
-[node name="Construction_Building" parent="." unique_id=1017354091 instance=ExtResource("7_888qu")]
+[node name="Construction_Building" parent="." unique_id=1017354091 instance=ExtResource("8_888qu")]
 
-[node name="Kruchevka" parent="." unique_id=570762059 instance=ExtResource("8_cl1yn")]
+[node name="Kruchevka" parent="." unique_id=570762059 instance=ExtResource("9_cl1yn")]
 
-[node name="Workers_Housing_1" parent="." unique_id=1856614271 instance=ExtResource("9_j1d56")]
+[node name="Workers_Housing_1" parent="." unique_id=1856614271 instance=ExtResource("10_j1d56")]
 
-[node name="Workers_Housing_2" parent="." unique_id=1665188472 instance=ExtResource("10_ng8tv")]
+[node name="Workers_Housing_2" parent="." unique_id=1665188472 instance=ExtResource("11_ng8tv")]
 
-[node name="Workers_Housing_3" parent="." unique_id=433006204 instance=ExtResource("11_xujkr")]
+[node name="Workers_Housing_3" parent="." unique_id=433006204 instance=ExtResource("12_xujkr")]
 
-[node name="Wall" parent="." unique_id=2077116835 instance=ExtResource("12_ad3bl")]
+[node name="Wall" parent="." unique_id=2077116835 instance=ExtResource("13_ad3bl")]
 transform = Transform3D(0.9271899, 0, 0, 0, 1, 0, 0, 0, 1.037994, 0, 12.432373, 1.3963575)
 
-[node name="fmopasgmf" parent="." unique_id=638228135 instance=ExtResource("13_6bssk")]
+[node name="fmopasgmf" parent="." unique_id=638228135 instance=ExtResource("14_6bssk")]
+
+[node name="RoadSystem" type="Node3D" parent="." unique_id=311234567]
+
+[node name="MainRoad_Z" type="CSGBox3D" parent="RoadSystem" unique_id=311234568]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -26.023731, 0.01, 0)
+size = Vector3(15, 0.1, 1000)
+use_collision = true
+material = ExtResource("16_road_mat")
+
+[node name="Sidewalk_Z_L" type="CSGBox3D" parent="RoadSystem" unique_id=311234569]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35.02373, 0.1, 0)
+size = Vector3(3, 0.2, 1000)
+use_collision = true
+material = ExtResource("17_sidewalk_mat")
+
+[node name="Sidewalk_Z_R" type="CSGBox3D" parent="RoadSystem" unique_id=311234570]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.023731, 0.1, 0)
+size = Vector3(3, 0.2, 1000)
+use_collision = true
+material = ExtResource("17_sidewalk_mat")
+
+[node name="MainRoad_X" type="CSGBox3D" parent="RoadSystem" unique_id=311234571]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.47901323, 0, 0.009999998, 20.357704)
+size = Vector3(1000, 0.1, 15)
+use_collision = true
+material = ExtResource("16_road_mat")
+
+[node name="Sidewalk_X_L" type="CSGBox3D" parent="RoadSystem" unique_id=311234572]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.47901323, 0, 0.1, 16.046585)
+size = Vector3(1000, 0.2, 3)
+use_collision = true
+material = ExtResource("17_sidewalk_mat")
+
+[node name="Sidewalk_X_R" type="CSGBox3D" parent="RoadSystem" unique_id=311234573]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.47901323, 0, 0.1, 24.668823)
+size = Vector3(1000, 0.2, 3)
+use_collision = true
+material = ExtResource("17_sidewalk_mat")
+
+[node name="Lights" type="Node3D" parent="RoadSystem" unique_id=311234580]
+
+[node name="Lamp1" parent="RoadSystem/Lights" unique_id=311234581 instance=ExtResource("15_light_prop")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.5, 0.2, 20)
+
+[node name="Lamp2" parent="RoadSystem/Lights" unique_id=311234582 instance=ExtResource("15_light_prop")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.5, 0.2, -20)
+
+[node name="Lamp3" parent="RoadSystem/Lights" unique_id=311234583 instance=ExtResource("15_light_prop")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.5, 0.2, 40)
+
+[node name="Lamp4" parent="RoadSystem/Lights" unique_id=311234584 instance=ExtResource("15_light_prop")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.5, 0.2, -40)
+
+[node name="Lamp5" parent="RoadSystem/Lights" unique_id=311234585 instance=ExtResource("15_light_prop")]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 20, 0.2, 10.5)
+
+[node name="Lamp6" parent="RoadSystem/Lights" unique_id=311234586 instance=ExtResource("15_light_prop")]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -20, 0.2, 10.5)
+
+[node name="MainRoad_Z2" type="CSGBox3D" parent="RoadSystem" unique_id=81615461]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.519005, 0.11, 0)
+size = Vector3(15, 0.1, 1000)
+use_collision = true
+material = ExtResource("16_road_mat")
+
+[node name="Sidewalk_Z_L2" type="CSGBox3D" parent="RoadSystem" unique_id=719809947]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.519005, 0.2, 0)
+size = Vector3(3, 0.2, 1000)
+use_collision = true
+material = ExtResource("17_sidewalk_mat")
+
+[node name="Sidewalk_Z_R2" type="CSGBox3D" parent="RoadSystem" unique_id=1922203468]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.519005, 0.2, 0)
+size = Vector3(3, 0.2, 1000)
+use_collision = true
+material = ExtResource("17_sidewalk_mat")
+
+[node name="MainRoad_X2" type="CSGBox3D" parent="RoadSystem" unique_id=219154657]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.47901323, 0, 0.009999998, -8.556559)
+size = Vector3(1000, 0.1, 15)
+use_collision = true
+material = ExtResource("16_road_mat")
+
+[node name="Sidewalk_X_L2" type="CSGBox3D" parent="RoadSystem" unique_id=92145984]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.47901323, 0, 0.1, -12.867678)
+size = Vector3(1000, 0.2, 3)
+use_collision = true
+material = ExtResource("17_sidewalk_mat")
+
+[node name="Sidewalk_X_R2" type="CSGBox3D" parent="RoadSystem" unique_id=295813081]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.47901323, 0, 0.1, -4.2454395)
+size = Vector3(1000, 0.2, 3)
+use_collision = true
+material = ExtResource("17_sidewalk_mat")

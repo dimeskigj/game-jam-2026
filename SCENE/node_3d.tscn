@@ -11,9 +11,9 @@
 [ext_resource type="PackedScene" uid="uid://3gtceoon553g" path="res://NEW_MODELS/Finished_Buildings/Workers_Housing/Workers_Housing_2.fbx" id="9_mtmjk"]
 [ext_resource type="PackedScene" uid="uid://cgsaqs0orqvui" path="res://NEW_MODELS/Finished_Buildings/Workers_Housing/Workers_Housing_3.fbx" id="10_dq5np"]
 [ext_resource type="PackedScene" uid="uid://ci4p75ey4wi3c" path="res://NEW_MODELS/Finished_Buildings/WALL/Wall.fbx" id="11_lsvm8"]
-[ext_resource type="PackedScene" uid="uid://bpk5iwa4yg8e2" path="res://NEW_MODELS/Finished_Buildings/fmopasgmf.fbx" id="12_i5kv5"]
+[ext_resource type="PackedScene" uid="uid://cj7qac60dwwjx" path="res://scenes/floor.tscn" id="13_1p576"]
 
-[node name="Node3D" type="Node3D" unique_id=379405592]
+[node name="Node3D2" type="Node3D" unique_id=379405592]
 
 [node name="Aparment_1" parent="." unique_id=949401137 instance=ExtResource("1_ve6e6")]
 
@@ -38,4 +38,4 @@
 [node name="Wall" parent="." unique_id=2077116835 instance=ExtResource("11_lsvm8")]
 transform = Transform3D(0.9271899, 0, 0, 0, 1, 0, 0, 0, 1.037994, 0, 12.432373, 1.3963575)
 
-[node name="fmopasgmf" parent="." unique_id=638228135 instance=ExtResource("12_i5kv5")]
+[node name="fmopasgmf" parent="." unique_id=1880311483 instance=ExtResource("13_1p576")]

@@ -41,7 +41,7 @@ public partial class SetupNavigation : Node
 		// 1. Configure the Navigation Mesh Resource
 		var navMesh = new NavigationMesh();
 		navMesh.CellSize = 0.25f;
-		navMesh.AgentRadius = 0.5f;
+		navMesh.AgentRadius = 1.0f;
 		navMesh.AgentHeight = 1.0f; // Friendly height
 		navMesh.AgentMaxClimb = 0.5f;
 		navMesh.AgentMaxSlope = 50.0f;
@@ -71,15 +71,9 @@ public partial class SetupNavigation : Node
 		// 4. Bake
 		NavigationServer3D.BakeFromSourceGeometryData(navMesh, sourceGeometry);
 		
-		// Fallback: If 0 polygons, try parsing Meshes as backup
 		if (navMesh.GetPolygonCount() == 0)
 		{
-			GD.Print("Navigation: Static bake yielded 0 polygons. Retrying with MeshInstances...");
-			navMesh.GeometryParsedGeometryType = NavigationMesh.ParsedGeometryType.MeshInstances;
-			// Note: This risks baking Doors as obstacles if they have meshes on Layer 1.
-			// Ideally, Door Meshes should be on a visual layer or we mask them.
-			NavigationServer3D.ParseSourceGeometryData(navMesh, sourceGeometry, rootNode);
-			NavigationServer3D.BakeFromSourceGeometryData(navMesh, sourceGeometry);
+			GD.PrintErr("Navigation: Bake yielded 0 polygons using StaticColliders. Please ensure floors/walls have StaticBody3D with collision shapes.");
 		}
 		
 		// 5. Assign to region

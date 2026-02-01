@@ -1,0 +1,73 @@
+[gd_scene format=4 uid="uid://cj7qac60dwwjx"]
+
+[ext_resource type="PackedScene" uid="uid://bpk5iwa4yg8e2" path="res://NEW_MODELS/Finished_Buildings/fmopasgmf.fbx" id="1_poy5y"]
+[ext_resource type="Texture2D" uid="uid://bgxahb84d5apo" path="res://textures/floor/PavingStones075_1K-JPG_Color.jpg" id="2_1bx2v"]
+[ext_resource type="Texture2D" uid="uid://xinp4ywixgnl" path="res://textures/floor/PavingStones075_1K-JPG_AmbientOcclusion.jpg" id="3_wc2lb"]
+[ext_resource type="Texture2D" uid="uid://co33kho4boxrg" path="res://textures/floor/PavingStones075_1K-JPG_Displacement.jpg" id="4_hl37q"]
+[ext_resource type="Texture2D" uid="uid://fts04ojr5lx1" path="res://textures/floor/PavingStones075_1K-JPG_NormalDX.jpg" id="5_qn20g"]
+[ext_resource type="Texture2D" uid="uid://c5sphd8dly0hi" path="res://textures/floor/PavingStones075_1K-JPG_Roughness.jpg" id="6_a2b8f"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hgjnp"]
+albedo_texture = ExtResource("2_1bx2v")
+roughness_texture = ExtResource("6_a2b8f")
+normal_enabled = true
+normal_texture = ExtResource("5_qn20g")
+ao_enabled = true
+ao_texture = ExtResource("3_wc2lb")
+ao_on_uv2 = true
+heightmap_enabled = true
+heightmap_texture = ExtResource("4_hl37q")
+uv1_scale = Vector3(240, 240, 240)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vfbrn"]
+resource_name = "lambert3"
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.48984498, 0.48984498, 0.48984498, 1)
+emission_enabled = true
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_poy5y"]
+_surfaces = [{
+"aabb": AABB(-53.79121, -18.08574, -40.60735, 107.58242, 1.0257664, 81.2147),
+"format": 34359742465,
+"index_count": 36,
+"index_data": PackedByteArray("AAABAAIAAgADAAAAAQAAAAQABAAAAAMABQACAAEAAwACAAUABAAGAAEAAQAGAAUAAwAHAAQABgAEAAcABQAHAAMABwAFAAYA"),
+"name": "lambert3",
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 8,
+"vertex_data": PackedByteArray("MypXQpivkMHtbSJCMypXwpivkMHtbSJCMypXwtN6iMHtbSJCMypXQtN6iMHtbSJCMypXQpivkMHtbSLCMypXwtN6iMHtbSLCMypXwpivkMHtbSLCMypXQtN6iMHtbSLC")
+}]
+blend_shape_mode = 0
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_1bx2v"]
+resource_name = "polySurface496"
+_surfaces = [{
+"aabb": AABB(-53.79121, -18.08574, -40.60735, 107.58242, 1.0257664, 81.2147),
+"attribute_data": PackedByteArray("AAAgPwAAQD8AAMA+AABAPwAAwD4AAIA/AAAgPwAAgD8AACA/AAAAPwAAwD4AAAA/AADAPgAAQD8AACA/AABAPwAAID8AAIA+AADAPgAAgD4AAMA+AAAAPwAAID8AAAA/AAAgPwAAAAAAAMA+AAAAAAAAwD4AAIA+AAAgPwAAgD4AAGA/AABAPwAAID8AAEA/AAAgPwAAgD8AAGA/AACAPwAAwD4AAEA/AAAAPgAAQD8AAAA+AACAPwAAwD4AAIA/"),
+"format": 34359742487,
+"index_count": 36,
+"index_data": PackedByteArray("AAABAAIAAgADAAAABAAFAAYABgAHAAQACAAJAAoACgALAAgADAANAA4ADgAPAAwAEAARABIAEgATABAAFAAVABYAFgAXABQA"),
+"material": SubResource("StandardMaterial3D_vfbrn"),
+"name": "lambert3",
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 24,
+"vertex_data": PackedByteArray("MypXQpivkMHtbSJCMypXwpivkMHtbSJCMypXwtN6iMHtbSJCMypXQtN6iMHtbSJCMypXQpivkMHtbSLCMypXwpivkMHtbSLCMypXwpivkMHtbSJCMypXQpivkMHtbSJCMypXQtN6iMHtbSLCMypXwtN6iMHtbSLCMypXwpivkMHtbSLCMypXQpivkMHtbSLCMypXQtN6iMHtbSJCMypXwtN6iMHtbSJCMypXwtN6iMHtbSLCMypXQtN6iMHtbSLCMypXQpivkMHtbSLCMypXQpivkMHtbSJCMypXQtN6iMHtbSJCMypXQtN6iMHtbSLCMypXwpivkMHtbSJCMypXwpivkMHtbSLCMypXwtN6iMHtbSLCMypXwtN6iMHtbSJC/3//f////z//f/9/////P/9//3////8//3//f////z//fwAA////P/9/AAD///8//38AAP///z//fwAA////P/////////8//////////z//////////P/////////8//3///////z//f///////P/9///////8//3///////z////9///8AAP///3///wAA////f///AAD///9///8AAAAA/3//f/8/AAD/f/9//z8AAP9//3//PwAA/3//f/8/")
+}]
+blend_shape_mode = 0
+shadow_mesh = SubResource("ArrayMesh_poy5y")
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_floor"]
+size = Vector3(110, 1.0, 82)
+
+[node name="fmopasgmf" instance=ExtResource("1_poy5y")]
+
+[node name="polySurface496" parent="polySurface472" index="0"]
+material_override = SubResource("StandardMaterial3D_hgjnp")
+mesh = SubResource("ArrayMesh_1bx2v")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="polySurface472/polySurface496" index="0"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="polySurface472/polySurface496/StaticBody3D" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -17.5, 0)
+shape = SubResource("BoxShape3D_floor")

@@ -1,0 +1,10 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://culcrst0fvu27"]
+
+[ext_resource type="Texture2D" uid="uid://cbs14bxn0w8oa" path="res://NEW_MODELS/Finished_Buildings/W-Kruschev/Kruchevka_1.png" id="1_tex"]
+
+[resource]
+albedo_texture = ExtResource("1_tex")
+roughness = 0.9
+normal_enabled = false
+ao_enabled = true
+ao_light_affect = 0.4

@@ -1,0 +1,13 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://cyele0eug8606"]
+
+[ext_resource type="Texture2D" uid="uid://djo0b7ooavus" path="res://NEW_MODELS/Finished_Buildings/Brutalist_Apartments/photo-1495578942200-c5f5d2137def.jpg" id="1_tex"]
+
+[resource]
+albedo_texture = ExtResource("1_tex")
+roughness = 0.85
+normal_enabled = false
+normal_scale = 1.5
+ao_enabled = true
+ao_light_affect = 0.3
+uv1_scale = Vector3(0.3, 0.3, 0.3)
+uv1_triplanar = true

@@ -1,5 +1,6 @@
 [gd_scene format=3 uid="uid://clsgsyq4e35in"]
 
+[ext_resource type="Environment" uid="uid://dedlit5h2y2dx" path="res://Enviorment/foggy_enviorment.tres" id="1_1q667"]
 [ext_resource type="Material" path="res://floor_material.tres" id="2_floor_mat"]
 [ext_resource type="PackedScene" uid="uid://bw5pjdvnaigpr" path="res://SCENE/player.tscn" id="3_5t8nk"]
 [ext_resource type="Script" uid="uid://cx8x1mac1t274" path="res://InventorySystem/InventoryUI.cs" id="5_inventory_ui"]
@@ -14,68 +15,23 @@
 [ext_resource type="Resource" path="res://InventorySystem/item_mask_invisibility.tres" id="14_stealth"]
 [ext_resource type="Shader" uid="uid://bi2pcl63pfjp4" path="res://Shaders/xray_mask.gdshader" id="15_xray_shader"]
 [ext_resource type="Shader" uid="uid://bwplect3jwpmg" path="res://Shaders/stealth_mask.gdshader" id="16_stealth_shader"]
+[ext_resource type="PackedScene" uid="uid://cnjat2lllxcge" path="res://scenes/Masks/maska_1_gotova.tscn" id="17_id0nj"]
 [ext_resource type="Shader" uid="uid://crgke0qi3gsvd" path="res://Shaders/sanity_distortion.gdshader" id="17_sanity_shader"]
+[ext_resource type="PackedScene" uid="uid://bvmujkt7g26vc" path="res://Enemy.tscn" id="17_tuemg"]
 [ext_resource type="Shader" uid="uid://chdbdu06v30gy" path="res://Shaders/insect_mask.gdshader" id="18_insect_shader"]
+[ext_resource type="PackedScene" uid="uid://di5loc04hah3b" path="res://scenes/Masks/xray_mask.tscn" id="19_1q667"]
 [ext_resource type="Script" uid="uid://bycgccef6qxd0" path="res://InteractionSystem/SecurityCamera.cs" id="19_camera_script"]
 [ext_resource type="Resource" path="res://InventorySystem/item_mask_insect.tres" id="19_insect_mask_item"]
 [ext_resource type="PackedScene" uid="uid://b8d5477s0d1d6" path="res://Models/KAMERA.fbx" id="21_s0gvp"]
-[ext_resource type="PackedScene" path="res://Radio.tscn" id="22_radio"]
+[ext_resource type="PackedScene" uid="uid://m01a2075fgds" path="res://scenes/Masks/stealth_mask.tscn" id="22_1q667"]
 [ext_resource type="Script" uid="uid://c3kxsx5ujtgbq" path="res://InteractionSystem/SetupNavigation.cs" id="23_nav_setup"]
 [ext_resource type="Resource" uid="uid://cinl6dcub0s6t" path="res://InventorySystem/item_silverkey.tres" id="24_silverkey"]
 [ext_resource type="Script" uid="uid://dvjnuu11sqjgv" path="res://InteractionSystem/Drawer.cs" id="25_drawer"]
-[ext_resource type="PackedScene" uid="uid://djedkheulovl3" path="res://SCENE/city.tscn" id="26_j3e5s"]
 [ext_resource type="Script" uid="uid://cq57csrn0m4qu" path="res://InteractionSystem/Note.cs" id="26_note"]
 [ext_resource type="PackedScene" uid="uid://2eitq0pep0d6" path="res://Models/key.fbx" id="27_key_model"]
-[ext_resource type="PackedScene" uid="uid://b1gnuduwgru12" path="res://Models/maska1gotova.fbx" id="28_mask1"]
 [ext_resource type="PackedScene" uid="uid://xxubkdsrtqqv" path="res://scenes/banderaubava.tscn" id="30_id0nj"]
-[ext_resource type="PackedScene" uid="uid://birqv8ugylv1s" path="res://Models/maska3.fbx" id="30_mask3"]
-[ext_resource type="PackedScene" uid="uid://bjhmb3sr1punt" path="res://Models/xray-mask.fbx" id="32_xray_mask"]
-
-[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_vxd74"]
-load_path = "res://.godot/imported/NightSkyHDRI003_4K_HDR.exr-0e20ad0d6ba89c0330da9e9f11ad122e.bptc.ctex"
-
-[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_default"]
-panorama = SubResource("CompressedTexture2D_vxd74")
-
-[sub_resource type="Sky" id="Sky_nu31w"]
-sky_material = SubResource("PanoramaSkyMaterial_default")
-
-[sub_resource type="Environment" id="Environment_default"]
-background_mode = 2
-sky = SubResource("Sky_nu31w")
-ambient_light_source = 2
-ambient_light_color = Color(0.5, 0.5, 0.5, 1)
-ambient_light_sky_contribution = 0.5
-tonemap_mode = 2
-tonemap_exposure = 0.5
-ssr_enabled = true
-ssr_max_steps = 32
-ssao_intensity = 4.0
-ssao_power = 2.0
-ssao_detail = 1.0
-sdfgi_enabled = true
-sdfgi_use_occlusion = true
-glow_enabled = true
-glow_intensity = 0.8
-glow_bloom = 0.2
-glow_blend_mode = 0
-volumetric_fog_enabled = true
-volumetric_fog_density = 0.08
-volumetric_fog_albedo = Color(0.129412, 0.14902, 0.192157, 1)
-volumetric_fog_emission = Color(0.0156863, 0.0156863, 0.0235294, 1)
-volumetric_fog_length = 64.0
-volumetric_fog_ambient_inject = 0.5
-
-volumetric_fog_emission_energy = 197.47
-volumetric_fog_gi_inject = 4.7
-volumetric_fog_anisotropy = 0.34
-volumetric_fog_length = 1024.0
-volumetric_fog_detail_spread = 1.5000006
-volumetric_fog_ambient_inject = 8.26
-adjustment_enabled = true
-adjustment_brightness = 0.85
-adjustment_contrast = 1.15
-adjustment_saturation = 0.85
+[ext_resource type="PackedScene" uid="uid://bqr8h3k2v5m6p" path="res://Radio.tscn" id="31_radio"]
+[ext_resource type="PackedScene" uid="uid://bc6vrfi26lc2s" path="res://SCENE/node_3d.tscn" id="32_ype4i"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_gas"]
 shader = ExtResource("14_gas_shader")
@@ -179,24 +135,19 @@ size = Vector3(0.2, 0.01, 0.3)
 [node name="Node3D" type="Node3D" unique_id=1025875681]
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1572345889]
-environment = SubResource("Environment_default")
+environment = ExtResource("1_1q667")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=2106531217]
 transform = Transform3D(-0.866023, -0.433016, 0.250001, 0, 0.499998, 0.866027, -0.500003, 0.749999, -0.43301, 0, 0, 0)
-light_color = Color(1, 0.95, 0.9, 1)
-light_indirect_energy = 0.1
-light_bake_mode = 1
+light_color = Color(0.79725105, 0.8722252, 0.99999934, 1)
+light_energy = 0.15
+light_volumetric_fog_energy = 8.0
+light_angular_distance = 0.5
 shadow_enabled = true
-shadow_bias = 0.595
-shadow_normal_bias = 5.242
-shadow_opacity = 0.17
-shadow_blur = 0.725
-
-[node name="Floor" type="CSGBox3D" parent="." unique_id=1229859552]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0.7739258)
-use_collision = true
-size = Vector3(35.288086, 1, 46.45508)
-material = ExtResource("2_floor_mat")
+shadow_bias = 0.05
+shadow_normal_bias = 1.0
+shadow_opacity = 0.8
+shadow_blur = 3.0
 
 [node name="Player" parent="." unique_id=1129234290 instance=ExtResource("3_5t8nk")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -9.407364)
@@ -605,10 +556,6 @@ theme_override_font_sizes/font_size = 64
 text = "!"
 horizontal_alignment = 1
 
-[node name="Target" type="CSGBox3D" parent="." unique_id=302556415]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -5)
-use_collision = true
-
 [node name="Pickup_Key" type="RigidBody3D" parent="." unique_id=1181565980]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.5, -3)
 collision_layer = 2
@@ -687,16 +634,15 @@ size = Vector3(10, 5, 10)
 material = SubResource("StandardMaterial3D_radzone")
 
 [node name="Pickup_GasMask" type="RigidBody3D" parent="." unique_id=1903511097]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 3)
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0.1366244, 3)
 collision_layer = 2
 script = ExtResource("6_pickup")
 ItemResource = ExtResource("12_gas")
 
-[node name="MaskModel" parent="Pickup_GasMask" unique_id=186623245 instance=ExtResource("28_mask1")]
-transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0.27706814, 0, -0.8363302)
-
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_GasMask" unique_id=1189970334]
 shape = SubResource("BoxShape3D_pickup")
+
+[node name="maska1gotova" parent="Pickup_GasMask" unique_id=170019225 instance=ExtResource("17_id0nj")]
 
 [node name="Pickup_XRayMask" type="RigidBody3D" parent="." unique_id=1649173418]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.5, 3)
@@ -704,11 +650,11 @@ collision_layer = 2
 script = ExtResource("6_pickup")
 ItemResource = ExtResource("13_xray")
 
-[node name="MaskModel" parent="Pickup_XRayMask" unique_id=903877897 instance=ExtResource("32_xray_mask")]
-transform = Transform3D(25, 0, 0, 0, 25, 0, 0, 0, 1.5, 0, 0, 0)
-
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_XRayMask" unique_id=719004815]
 shape = SubResource("BoxShape3D_pickup")
+
+[node name="xray-mask" parent="Pickup_XRayMask" unique_id=618225201 instance=ExtResource("19_1q667")]
+transform = Transform3D(14.999999, 0, 0, 0, -6.5567076e-07, 14.999998, 0, -14.999998, -6.5567076e-07, 0, -0.3796752, 0)
 
 [node name="Pickup_StealthMask" type="RigidBody3D" parent="." unique_id=1649173499]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.5, 3)
@@ -716,11 +662,11 @@ collision_layer = 2
 script = ExtResource("6_pickup")
 ItemResource = ExtResource("14_stealth")
 
-[node name="MaskModel" parent="Pickup_StealthMask" unique_id=909891014 instance=ExtResource("30_mask3")]
-transform = Transform3D(1.25, 0, 0, 0, 1.25, 0, 0, 0, 1.5, 0.6251712, 0.004694283, -0.97570634)
-
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_StealthMask" unique_id=719004999]
 shape = SubResource("BoxShape3D_pickup")
+
+[node name="maska3" parent="Pickup_StealthMask" unique_id=474543263 instance=ExtResource("22_1q667")]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, -0.28841987, 0)
 
 [node name="Pickup_InsectMask" type="RigidBody3D" parent="." unique_id=1649175000]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0.5, 3)
@@ -801,7 +747,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 7)
 [node name="Waypoint3" type="Marker3D" parent="." unique_id=821892749]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.7981987, 0, 1.0790443)
 
-[node name="Radio" parent="." unique_id=2092089017 instance=ExtResource("22_radio")]
+[node name="Radio" parent="." unique_id=2092089017 instance=ExtResource("31_radio")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1, -3)
 
 [node name="NavigationSetup" type="Node" parent="." unique_id=1234567890]
@@ -900,7 +846,33 @@ mesh = SubResource("BoxMesh_note")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Pickup_Note" unique_id=32051481]
 shape = SubResource("BoxShape3D_note")
 
-[node name="Node3D" parent="." unique_id=379405592 instance=ExtResource("26_j3e5s")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.17, 17.055, -15.494)
-
 [node name="banderaubava2" parent="." unique_id=925164897 instance=ExtResource("30_id0nj")]
+
+[node name="Enemy" parent="." unique_id=209923709 node_paths=PackedStringArray("Waypoints") instance=ExtResource("17_tuemg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.028717, 0.07678223, 17.049515)
+Waypoints = [NodePath("../Waypoint1"), NodePath("../Waypoint2"), NodePath("../Waypoint3")]
+
+[node name="Waypoint4" type="Marker3D" parent="." unique_id=1244056834]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.71533, 0, 11.430875)
+
+[node name="Waypoint5" type="Marker3D" parent="." unique_id=1683807173]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.0423064, 0, 11.430875)
+
+[node name="Waypoint6" type="Marker3D" parent="." unique_id=431661489]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.072702, 0, 2.401702)
+
+[node name="Enemy2" parent="." unique_id=1393831310 node_paths=PackedStringArray("Waypoints") instance=ExtResource("17_tuemg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.9419, 0.07678223, 9.742079)
+Waypoints = [NodePath("../Waypoint4"), NodePath("../Waypoint5"), NodePath("../Waypoint6")]
+
+[node name="Floor" parent="." unique_id=379405592 instance=ExtResource("32_ype4i")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.813255, 17.047724, -10.554663)
+
+[node name="banderaubava3" parent="." unique_id=1813153953 instance=ExtResource("30_id0nj")]
+transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, -11.9095955, 0, 5.614683)
+
+[node name="banderaubava4" parent="." unique_id=1486594182 instance=ExtResource("30_id0nj")]
+transform = Transform3D(-4.371139e-07, 0, -10, 0, 10, 0, 10, 0, -4.371139e-07, -0.71088505, 0, 19.41876)
+
+[node name="banderaubava5" parent="." unique_id=1256493276 instance=ExtResource("30_id0nj")]
+transform = Transform3D(-4.371139e-07, 0, -10, 0, 10, 0, 10, 0, -4.371139e-07, -0.71088505, 0, -14.507239)

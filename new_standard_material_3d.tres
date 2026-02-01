@@ -1,3 +1,8 @@
-[gd_resource type="StandardMaterial3D" format=3 uid="uid://p3t7o1l4edk2"]
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://em7cv8cw5f8t"]
 
 [resource]
+rim = 0.04
+rim_tint = 0.64
+proximity_fade_distance = 96.51
+distance_fade_min_distance = 10.72
+distance_fade_max_distance = 139.39

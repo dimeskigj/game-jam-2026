@@ -2,7 +2,7 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cn7ucu6gcjjqj"
+uid="uid://fts04ojr5lx1"
 path.s3tc="res://.godot/imported/PavingStones075_1K-JPG_NormalDX.jpg-eb7a8b8cbca2bd8e08f1c4904279874d.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
@@ -26,8 +26,8 @@ compress/normal_map=1
 compress/channel_pack=0
 mipmaps/generate=true
 mipmaps/limit=-1
-roughness/mode=1
-roughness/src_normal="res://textures/floor/PavingStones075_1K-JPG_NormalDX.jpg"
+roughness/mode=0
+roughness/src_normal=""
 process/channel_remap/red=0
 process/channel_remap/green=1
 process/channel_remap/blue=2

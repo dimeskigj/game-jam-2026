@@ -32,6 +32,8 @@ public partial class EnemyAI : CharacterBody3D
 	private RayCast3D _obstacleRay;
 	private AnimationPlayer _animPlayer;
 	private bool _mapReady = false;
+	private float _investigateTimer = 0.0f;
+	private const float MaxInvestigateTime = 15.0f;
 
 	public override void _Ready()
 	{
@@ -67,7 +69,13 @@ public partial class EnemyAI : CharacterBody3D
 		// Improve navigation parameters
 		_navAgent.PathDesiredDistance = 1.0f;
 		_navAgent.TargetDesiredDistance = 1.0f;
-		_navAgent.PathMaxDistance = 3.0f; // Allow snapping to mesh from further away 
+		_navAgent.PathMaxDistance = 15.0f; // High value ensures they don't give up if pushed far off path
+		// Avoidance Setup
+		_navAgent.AvoidanceEnabled = false;
+		_navAgent.Radius = 0.5f;
+		_navAgent.NeighborDistance = 10.0f;
+		_navAgent.MaxNeighbors = 10;
+		_navAgent.VelocityComputed += OnVelocityComputed;
 
 		// Defer setup to ensuring physics is ready
 		CallDeferred(MethodName.ActorSetup);
@@ -121,7 +129,38 @@ public partial class EnemyAI : CharacterBody3D
 				break;
 		}
 		
-		Velocity = velocity;
+		// Instead of MoveAndSlide, we pass desired velocity to avoidance
+		if (_navAgent.AvoidanceEnabled)
+		{
+			_navAgent.Velocity = velocity;
+		}
+		else
+		{
+			Velocity = velocity;
+			MoveAndSlide();
+			
+			// Handle door collisions
+			HandleDoorCollisions();
+			
+			// Push items gently
+			ApplyKickForce();
+			
+			// Non-avoidance logic (face direction, animations)
+			Vector3 flatVelocity = new Vector3(velocity.X, 0, velocity.Z);
+			if (flatVelocity.LengthSquared() > 0.01f)
+			{
+				Vector3 lookTarget = GlobalPosition + flatVelocity.Normalized();
+				LookAt(lookTarget, Vector3.Up);
+			}
+			UpdateAnimation(velocity);
+		}
+	}
+
+	private void OnVelocityComputed(Vector3 safeVelocity)
+	{
+		if (!_navAgent.AvoidanceEnabled) return; // Ignore callback if avoidance is off
+
+		Velocity = safeVelocity;
 		MoveAndSlide();
 		
 		// Handle door collisions
@@ -130,15 +169,15 @@ public partial class EnemyAI : CharacterBody3D
 		// Push items gently
 		ApplyKickForce();
 		
-		// Face movement direction
-		Vector3 flatVelocity = new Vector3(velocity.X, 0, velocity.Z);
-		if (flatVelocity.LengthSquared() > 0.1f)
+		// Face movement direction - use safe velocity for better rotation
+		Vector3 flatVelocity = new Vector3(safeVelocity.X, 0, safeVelocity.Z);
+		if (flatVelocity.LengthSquared() > 0.01f)
 		{
 			Vector3 lookTarget = GlobalPosition + flatVelocity.Normalized();
 			LookAt(lookTarget, Vector3.Up);
 		}
 		
-		UpdateAnimation(velocity);
+		UpdateAnimation(safeVelocity);
 	}
 
 	private void CheckVision()
@@ -272,6 +311,7 @@ public partial class EnemyAI : CharacterBody3D
 				_targetPlayer.SetAlert(false, this);
 				_targetPlayer = null;
 				_currentState = State.Investigate;
+				_investigateTimer = 0.0f;
 				return;
 			}
 		}
@@ -282,7 +322,7 @@ public partial class EnemyAI : CharacterBody3D
 			GD.Print("Enemy: Player turned invisible. Returning to Patrol.");
 			_targetPlayer.SetAlert(false, this);
 			_targetPlayer = null;
-			_currentState = State.Patrol;
+			ReturnToPatrol();
 			return;
 		}
 		
@@ -296,6 +336,7 @@ public partial class EnemyAI : CharacterBody3D
 				_targetPlayer.SetAlert(false, this);
 				_targetPlayer = null;
 				_currentState = State.Investigate;
+				_investigateTimer = 0.0f;
 				return;
 			}
 		}
@@ -316,11 +357,16 @@ public partial class EnemyAI : CharacterBody3D
 	private void ProcessInvestigate(ref Vector3 velocity, float delta)
 	{
 		_navAgent.TargetPosition = _investigateTarget;
+		_investigateTimer += delta;
 		
-		if (_navAgent.IsNavigationFinished())
+		if (_navAgent.IsNavigationFinished() || _investigateTimer >= MaxInvestigateTime)
 		{
-			GD.Print("Enemy finished investigation. Returning to Patrol.");
-			_currentState = State.Patrol;
+			if (_investigateTimer >= MaxInvestigateTime)
+				GD.Print("Enemy investigation timed out. Returning to Patrol.");
+			else
+				GD.Print("Enemy finished investigation. Returning to Patrol.");
+				
+			ReturnToPatrol();
 			velocity.X = 0;
 			velocity.Z = 0;
 		}
@@ -333,6 +379,34 @@ public partial class EnemyAI : CharacterBody3D
 			velocity.X = direction.X * ChaseSpeed;
 			velocity.Z = direction.Z * ChaseSpeed;
 		}
+	}
+
+	private void ReturnToPatrol()
+	{
+		_currentState = State.Patrol;
+		_currentWaypointIndex = FindClosestWaypointIndex();
+		if (Waypoints != null && Waypoints.Count > 0)
+			_navAgent.TargetPosition = Waypoints[_currentWaypointIndex].GlobalPosition;
+	}
+
+	private int FindClosestWaypointIndex()
+	{
+		if (Waypoints == null || Waypoints.Count == 0) return 0;
+		
+		int closestIdx = 0;
+		float minDist = float.MaxValue;
+		
+		for (int i = 0; i < Waypoints.Count; i++)
+		{
+			if (Waypoints[i] == null) continue;
+			float dist = GlobalPosition.DistanceSquaredTo(Waypoints[i].GlobalPosition);
+			if (dist < minDist)
+			{
+				minDist = dist;
+				closestIdx = i;
+			}
+		}
+		return closestIdx;
 	}
 
 	private bool IsPlayerVisible()
